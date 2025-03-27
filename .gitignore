@@ -48,6 +48,3 @@ lib!/mvn/wrapper/maven-wrapper.jar
 lib!**/src/main/**/target/
 lib!**/src/test/**/target/
 /lib/target/
-
-
-
