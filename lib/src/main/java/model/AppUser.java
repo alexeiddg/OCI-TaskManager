@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "app_user")
@@ -29,7 +30,18 @@ public class AppUser {
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
-    @Column(name = "created_at", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private AppUser manager;
+
+    @OneToMany(mappedBy = "manager")
+    private List<AppUser> teamMembers;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
