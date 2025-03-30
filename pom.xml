@@ -12,6 +12,7 @@
     <modules>
         <module>lib</module> <!-- shared-lib module -->
         <module>web</module>
+        <module>telegram</module>
     </modules>
 
     <properties>
