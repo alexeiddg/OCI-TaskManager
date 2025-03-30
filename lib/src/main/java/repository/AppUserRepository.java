@@ -1,4 +1,4 @@
-package com.alexeiddg.web.repository;
+package repository;
 
 import model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
