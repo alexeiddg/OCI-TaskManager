@@ -18,7 +18,12 @@ public class StartAbility {
                 .info("Start command")
                 .locality(Locality.ALL)
                 .privacy(Privacy.PUBLIC)
-                .action(ctx -> bot.silent().send("Hello, welcome to Task Manager Bot! Let's get you started", ctx.chatId()))
+                .action(ctx -> {
+                    Long chatId = ctx.chatId();
+                    Long telegramId = ctx.user().getId(); // User ID is a Long
+                    String response = String.format("Hello! Your Telegram ID is %d", telegramId);
+                    bot.silent().send(response, chatId);
+                })
                 .build();
     }
 }

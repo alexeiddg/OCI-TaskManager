@@ -24,6 +24,7 @@ public class TaskManagerBot extends AbilityBot {
             @Value("${telegram.bot.token}") String botToken, StartAbility start)
     {
         super(botToken, botUsername);
+        // Abilities Init
         this.start = start;
     }
 
