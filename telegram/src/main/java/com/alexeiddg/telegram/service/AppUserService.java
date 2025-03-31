@@ -31,6 +31,11 @@ public class AppUserService {
         return appUserRepository.findByUsername(username);
     }
 
+    // gerUserByTelegramId
+    public Optional<AppUser> getUserByTelegramId(String telegramId) {
+        return appUserRepository.findByTelegramId(telegramId);
+    }
+
     // updateUser
     public AppUser updateUser(AppUser appUser) {
         return appUserRepository.save(appUser);

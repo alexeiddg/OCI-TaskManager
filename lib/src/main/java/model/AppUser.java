@@ -27,6 +27,9 @@ public class AppUser {
     @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
+    @Column(name = "telegram_id", unique = true)
+    private String telegramId;
+
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
