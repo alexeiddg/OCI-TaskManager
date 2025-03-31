@@ -51,10 +51,11 @@
 			<scope>compile</scope>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots-springboot-longpolling-starter</artifactId>
-			<version>8.2.0</version>
+			<artifactId>telegrambots</artifactId>
+			<version>6.9.7.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.telegram/telegrambots-client -->
@@ -62,6 +63,18 @@
 			<groupId>org.telegram</groupId>
 			<artifactId>telegrambots-client</artifactId>
 			<version>8.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots-spring-boot-starter</artifactId>
+			<version>6.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots-abilities</artifactId>
+			<version>6.7.0</version>
 		</dependency>
 
 		<dependency>
