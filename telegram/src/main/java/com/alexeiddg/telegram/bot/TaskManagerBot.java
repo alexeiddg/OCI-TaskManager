@@ -1,13 +1,12 @@
 package com.alexeiddg.telegram.bot;
 
+import com.alexeiddg.telegram.bot.actions.StartAbility;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
-import org.telegram.abilitybots.api.objects.Locality;
-import org.telegram.abilitybots.api.objects.Privacy;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
@@ -22,9 +21,10 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TaskManagerBot extends AbilityBot {
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
-            @Value("${telegram.bot.token}") String botToken)
+            @Value("${telegram.bot.token}") String botToken, StartAbility start)
     {
         super(botToken, botUsername);
+        this.start = start;
     }
 
     @PostConstruct
@@ -42,14 +42,14 @@ public class TaskManagerBot extends AbilityBot {
         return 1L;
     }
 
+    /**
+     * Here The bot actions are called, found per Ability in the Ability folder
+     */
+
+    private final StartAbility start;
+
     public Ability start() {
-        return Ability
-                .builder()
-                .name("start")
-                .info("Start command")
-                .locality(Locality.ALL)
-                .privacy(Privacy.PUBLIC)
-                .action(ctx -> silent.send("Hello, welcome to the bot!", ctx.chatId()))
-                .build();
+        return start.start(this);
     }
+
 }
