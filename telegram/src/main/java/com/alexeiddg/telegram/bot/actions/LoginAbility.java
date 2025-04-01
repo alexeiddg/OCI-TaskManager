@@ -40,29 +40,30 @@ public class LoginAbility {
             Optional<AppUser> userOpt = appUserService.getUserByUsername(text);
 
             // Check if user exists
-            if (userOpt.isPresent()) {
-                AppUser user = userOpt.get();
-
-                // If user has no telegram ID, link it
-                if (user.getTelegramId() == null || user.getTelegramId().isEmpty()) {
-                    user.setTelegramId(userId.toString());
-                    appUserService.updateUser(user);
-
-                    bot.silent().send("✅ Login successful. Your account is now linked to Telegram.", chatId);
-                } else if (user.getTelegramId().equals(userId.toString())) {
-                    // Already the same user re-logging
-                    bot.silent().send("🔓 You’re already logged in.", chatId);
-
-                }
-            } else {
-                // Telegram ID mismatch
-                bot.silent().send("❌ That username is already linked to a different Telegram account.", chatId);
+            if (userOpt.isEmpty()) {
+                bot.silent().send("❌ Username not found. Please ensure you typed it correctly.", chatId);
+                userSessionManager.clearState(userId);
+                return;
             }
-        }  else {
-            bot.silent().send("❌ Username not found. Please ensure you typed it correctly.", chatId);
+
+            // Check if user exists
+            AppUser user = userOpt.get();
+
+            // If user has no telegram ID, link it
+            if (user.getTelegramId() == null || user.getTelegramId().isEmpty()) {
+                user.setTelegramId(userId.toString());
+                appUserService.updateUser(user);
+
+                userSessionManager.setState(userId, UserState.MAIN_MENU);
+                bot.silent().send("✅ Login successful. Your account is now linked to Telegram.", chatId);
+            } else if (user.getTelegramId().equals(userId.toString())) {
+                bot.silent().send("🔓 You’re already logged in.", chatId);
+                userSessionManager.setState(userId, UserState.MAIN_MENU);
+            } else {
+                bot.silent().send("❌ That username is already linked to a different Telegram user.", chatId);
+                userSessionManager.clearState(userId);
+            }
         }
-        // Clear state
-        userSessionManager.clearState(userId);
     }
 
     public Ability login(BaseAbilityBot bot) {

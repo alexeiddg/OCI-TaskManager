@@ -54,7 +54,6 @@ public class SignUpAbility {
                 tempUserDataStore.set(userId, user);
                 userSessionManager.setState(userId, UserState.SIGNUP_USERNAME);
 
-                // Send message to user to enter username
                 bot.silent().send("✅ Name saved. Now enter a *username*, example: JohnDoe24:", chatId);
             }
 
@@ -64,7 +63,6 @@ public class SignUpAbility {
                 if (user != null) {
                     user.setUsername(text);
 
-                    // Update state
                     userSessionManager.setState(userId, UserState.SIGNUP_ROLE);
 
                     // Build new keyboard and message
@@ -91,11 +89,24 @@ public class SignUpAbility {
                         user.setRole(UserRole.MANAGER);
                         appUserService.createUser(user);
 
-                        // State cleanup
+                        // Temp AppUser Obj cleanup
                         tempUserDataStore.clear(userId);
-                        userSessionManager.clearState(userId);
 
+                        // set new state to main menu on successful registration
+                        userSessionManager.setState(userId, UserState.MAIN_MENU);
                         bot.silent().send("🎉 You're now registered as *Manager*!", chatId);
+
+                        // Build new Main Menu Keyboard
+                        SendMessage msg = new SendMessage();
+                        msg.setChatId(chatId.toString());
+                        msg.setText("Welcome to the main menu!");
+                        msg.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
+
+                        try {
+                            bot.execute(msg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } else if (text.equalsIgnoreCase("developer")) {
                         user.setRole(UserRole.DEVELOPER);
 
@@ -132,11 +143,24 @@ public class SignUpAbility {
                         user.setManager(managerOpt.get());
                         appUserService.createUser(user);
 
-                        // Clean up state
+                        // Clean up temp AppUser obj
                         tempUserDataStore.clear(userId);
-                        userSessionManager.clearState(userId);
 
+                        // set new state to main menu on successful registration
+                        userSessionManager.setState(userId, UserState.MAIN_MENU);
                         bot.silent().send("🎉 You’re now registered under manager @" + text, chatId);
+
+                        // Build new Main Menu Keyboard
+                        SendMessage msg = new SendMessage();
+                        msg.setChatId(chatId.toString());
+                        msg.setText("Welcome to the main menu!");
+                        msg.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
+
+                        try {
+                            bot.execute(msg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         bot.silent().send("❌ That username is not recognized as a Manager. Please try again.", chatId);
                     }
