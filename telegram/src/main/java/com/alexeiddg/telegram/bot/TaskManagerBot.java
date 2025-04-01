@@ -3,6 +3,7 @@ package com.alexeiddg.telegram.bot;
 import com.alexeiddg.telegram.bot.actions.LoginAbility;
 import com.alexeiddg.telegram.bot.actions.SignUpAbility;
 import com.alexeiddg.telegram.bot.actions.StartAbility;
+import com.alexeiddg.telegram.bot.actions.StopAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -29,13 +30,14 @@ public class TaskManagerBot extends AbilityBot {
     private final StartAbility start;
     private final SignUpAbility signUp;
     private final LoginAbility login;
+    private final StopAbility stop;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
             @Value("${telegram.bot.token}") String botToken,
             UserSessionManager userSessionManager,
             StartAbility start,
-            SignUpAbility signUp, LoginAbility login
+            SignUpAbility signUp, LoginAbility login, StopAbility stop
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
@@ -44,6 +46,7 @@ public class TaskManagerBot extends AbilityBot {
         this.start = start;
         this.signUp = signUp;
         this.login = login;
+        this.stop = stop;
     }
 
     /**
@@ -107,6 +110,11 @@ public class TaskManagerBot extends AbilityBot {
             // handle login
             if (state == UserState.LOGIN_USERNAME) {
                 login.handleLogin(this, update);
+            }
+
+            // Handle logout
+            if (messageText.equals("🔒 Logout")) {
+                stop.handleStop(this, userId, chatId);
             }
         }
     }
