@@ -1,6 +1,8 @@
 package com.alexeiddg.telegram.bot;
 
+import com.alexeiddg.telegram.bot.actions.SignUpAbility;
 import com.alexeiddg.telegram.bot.actions.StartAbility;
+import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,25 +10,42 @@ import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 /**
- * This class handles creating the bot and registering it with the Telegram API.
- * The @PostConstruct annotation is used to register the bot when the application starts.
- * Spring will not create the bean by itself, hence the need for the @PostConstruct annotation.
+ * Main class responsible for initializing and registering the Telegram bot.
+ * The bot is registered automatically on application startup using the {@code @PostConstruct} annotation.
+ * It extends {@link AbilityBot} to handle abilities and user interactions.
  */
 
 @Slf4j
 @Component
 public class TaskManagerBot extends AbilityBot {
+
+    private final UserSessionManager userSessionManager;
+    private final StartAbility start;
+    private final SignUpAbility signUp;
+
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
-            @Value("${telegram.bot.token}") String botToken, StartAbility start)
-    {
+            @Value("${telegram.bot.token}") String botToken,
+            UserSessionManager userSessionManager,
+            StartAbility start,
+            SignUpAbility signUp
+    ) {
         super(botToken, botUsername);
+        this.userSessionManager = userSessionManager;
+
         // Abilities Init
         this.start = start;
+        this.signUp = signUp;
     }
+
+    /**
+     * Initializes and registers the bot instance with the Telegram API.
+     * Called once by Spring after dependency injection is completed.
+     */
 
     @PostConstruct
     public void registerBot() {
@@ -44,13 +63,40 @@ public class TaskManagerBot extends AbilityBot {
     }
 
     /**
-     * Here The bot actions are called, found per Ability in the Ability folder
+     * Handles incoming updates from Telegram.
+     * This override ensures that {@link AbilityBot} still processes updates,
+     * and also adds custom handling for callback queries (e.g., button clicks).
+     * Maintains the state of the user session and command flow
+     * e.g. /start to /signup steps
      */
 
-    private final StartAbility start;
+    @Override
+    public void onUpdateReceived(Update update) {
+        super.onUpdateReceived(update);
+
+        if(update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            Long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("📝 Sign up")) {
+                signUp.beginSignup(this, chatId);
+            }
+        }
+    }
+
+    /**
+     * Returns the ability associated with the {@code /{ability}} command.
+     * e.g. {@code /start} or {@code /signup}
+     * This method is automatically detected by AbilityBot and registered as a command.
+     * No state is maintained between invocations.
+     */
 
     public Ability start() {
         return start.start(this);
+    }
+
+    public Ability signUp() {
+        return signUp.signUp(this);
     }
 
 }

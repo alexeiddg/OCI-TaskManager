@@ -1,5 +1,7 @@
 package com.alexeiddg.telegram.bot.actions;
 
+import com.alexeiddg.telegram.bot.session.UserState;
+import com.alexeiddg.telegram.bot.util.ReplyKeyboard;
 import com.alexeiddg.telegram.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import model.AppUser;
@@ -8,6 +10,8 @@ import org.telegram.abilitybots.api.bot.BaseAbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.abilitybots.api.objects.Locality;
 import org.telegram.abilitybots.api.objects.Privacy;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.Optional;
 
@@ -16,7 +20,6 @@ import java.util.Optional;
 public class StartAbility {
 
     private final AppUserService appUserService;
-
     public Ability start(BaseAbilityBot bot) {
         return Ability
                 .builder()
@@ -36,8 +39,24 @@ public class StartAbility {
 
                         String response = String.format("👋 Hello, %s (@%s)! Let's get working!", name, username);
                         bot.silent().send(response, chatId);
-                    } else {
+                    }
+
+                    else {
                        bot.silent().send("Welcome to the task manager bot! let's get you registered", chatId);
+
+                       ReplyKeyboardMarkup markup = ReplyKeyboard.generateKeyboardForState(UserState.SIGNUP);
+
+
+                       SendMessage message = new SendMessage();
+                       message.setChatId(chatId.toString());
+                       message.setText("Click '📝 Sign up' to begin registration!");
+                       message.setReplyMarkup(markup);
+
+                       try {
+                           bot.execute(message);
+                       } catch (Exception e) {
+                           e.printStackTrace();
+                       }
                     }
                 })
                 .build();
