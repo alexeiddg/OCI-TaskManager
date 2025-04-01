@@ -18,6 +18,24 @@ public class ReplyKeyboard {
             case SIGNUP -> {
                 KeyboardRow row = new KeyboardRow();
                 row.add("📝 Sign up");
+                row.add("📝 Login w/username");
+                keyboard.add(row);
+            }
+
+            case SIGNUP_ROLE -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("Manager");
+                row.add("Developer");
+                keyboard.add(row);
+            }
+
+            case MAIN_MENU -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("View Current Projects");
+                row.add("View Current Sprint");
+                row.add("📝 Create Task");
+                row.add("📋 View Tasks");
+                row.add("🔒 Logout");
                 keyboard.add(row);
             }
         }

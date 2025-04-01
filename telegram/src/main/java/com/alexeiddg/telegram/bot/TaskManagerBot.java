@@ -3,6 +3,7 @@ package com.alexeiddg.telegram.bot;
 import com.alexeiddg.telegram.bot.actions.SignUpAbility;
 import com.alexeiddg.telegram.bot.actions.StartAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
+import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,9 +78,21 @@ public class TaskManagerBot extends AbilityBot {
         if(update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
+            Long userId = update.getMessage().getFrom().getId();
+            UserState state = userSessionManager.getState(userId);
 
+            // Start Ability flow for signup
             if (messageText.equals("📝 Sign up")) {
                 signUp.beginSignup(this, chatId);
+            }
+
+            // Handle signup flow based on the current state
+            if (state == UserState.SIGNUP_NAME ||
+                    state == UserState.SIGNUP_USERNAME ||
+                    state == UserState.SIGNUP_ROLE ||
+                    state == UserState.SIGNUP_MANAGER) {
+
+                signUp.handleSignUp(this, update);
             }
         }
     }

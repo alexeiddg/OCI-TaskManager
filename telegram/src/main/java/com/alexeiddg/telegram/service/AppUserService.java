@@ -1,6 +1,6 @@
 package com.alexeiddg.telegram.service;
 
-import org.checkerframework.checker.units.qual.A;
+import enums.UserRole;
 import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
 import model.AppUser;
@@ -18,14 +18,6 @@ public class AppUserService {
 
     // createUser
     public AppUser createUser(AppUser appUser) {
-        return appUserRepository.save(appUser);
-    }
-
-    // create user from telegram
-    public AppUser createUserFromTelegram(String telegramId, String username) {
-        AppUser appUser = new AppUser();
-        appUser.setTelegramId(telegramId);
-        appUser.setUsername(username);
         return appUserRepository.save(appUser);
     }
 
@@ -52,6 +44,11 @@ public class AppUserService {
     // deleteUser
     public void deleteUser(Long id) {
         appUserRepository.deleteById(id);
+    }
+
+    // getAllManagers
+    public List<AppUser> getAllManagers() {
+        return appUserRepository.findAllByRole(UserRole.MANAGER);
     }
 
     // getAllUsers - protected route

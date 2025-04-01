@@ -49,7 +49,7 @@ public class StartAbility {
 
                        SendMessage message = new SendMessage();
                        message.setChatId(chatId.toString());
-                       message.setText("Click '📝 Sign up' to begin registration!");
+                       message.setText("Click '📝 Sign up' to begin registration! or Click '📝 Login w/username to login");
                        message.setReplyMarkup(markup);
 
                        try {
