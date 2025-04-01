@@ -21,6 +21,14 @@ public class AppUserService {
         return appUserRepository.save(appUser);
     }
 
+    // create user from telegram
+    public AppUser createUserFromTelegram(String telegramId, String username) {
+        AppUser appUser = new AppUser();
+        appUser.setTelegramId(telegramId);
+        appUser.setUsername(username);
+        return appUserRepository.save(appUser);
+    }
+
     // getUserById
     public Optional<AppUser> getUserById(Long id) {
         return appUserRepository.findById(id);
