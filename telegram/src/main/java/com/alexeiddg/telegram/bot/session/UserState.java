@@ -8,5 +8,6 @@ public enum UserState {
     SIGNUP_ROLE,
     SIGNUP_MANAGER,
     SIGNUP_FINISH,
+    LOGIN_USERNAME,
     MAIN_MENU,
 }

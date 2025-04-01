@@ -135,6 +135,7 @@ public class SignUpAbility {
                         // Clean up state
                         tempUserDataStore.clear(userId);
                         userSessionManager.clearState(userId);
+
                         bot.silent().send("🎉 You’re now registered under manager @" + text, chatId);
                     } else {
                         bot.silent().send("❌ That username is not recognized as a Manager. Please try again.", chatId);

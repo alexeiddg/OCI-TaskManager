@@ -18,7 +18,7 @@ public class ReplyKeyboard {
             case SIGNUP -> {
                 KeyboardRow row = new KeyboardRow();
                 row.add("📝 Sign up");
-                row.add("📝 Login w/username");
+                row.add("👤 Login w/username");
                 keyboard.add(row);
             }
 

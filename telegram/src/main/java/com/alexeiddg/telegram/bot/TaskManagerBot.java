@@ -1,5 +1,6 @@
 package com.alexeiddg.telegram.bot;
 
+import com.alexeiddg.telegram.bot.actions.LoginAbility;
 import com.alexeiddg.telegram.bot.actions.SignUpAbility;
 import com.alexeiddg.telegram.bot.actions.StartAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
@@ -27,13 +28,14 @@ public class TaskManagerBot extends AbilityBot {
     private final UserSessionManager userSessionManager;
     private final StartAbility start;
     private final SignUpAbility signUp;
+    private final LoginAbility login;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
             @Value("${telegram.bot.token}") String botToken,
             UserSessionManager userSessionManager,
             StartAbility start,
-            SignUpAbility signUp
+            SignUpAbility signUp, LoginAbility login
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
@@ -41,6 +43,7 @@ public class TaskManagerBot extends AbilityBot {
         // Abilities Init
         this.start = start;
         this.signUp = signUp;
+        this.login = login;
     }
 
     /**
@@ -90,9 +93,20 @@ public class TaskManagerBot extends AbilityBot {
             if (state == UserState.SIGNUP_NAME ||
                     state == UserState.SIGNUP_USERNAME ||
                     state == UserState.SIGNUP_ROLE ||
-                    state == UserState.SIGNUP_MANAGER) {
+                    state == UserState.SIGNUP_MANAGER
+            ) {
 
                 signUp.handleSignUp(this, update);
+            }
+
+            // Begin Login on click
+            if (messageText.equals("👤 Login w/username")) {
+                login.beginLogin(this, chatId);
+            }
+
+            // handle login
+            if (state == UserState.LOGIN_USERNAME) {
+                login.handleLogin(this, update);
             }
         }
     }
@@ -112,4 +126,7 @@ public class TaskManagerBot extends AbilityBot {
         return signUp.signUp(this);
     }
 
+    public Ability login() {
+        return login.login(this);
+    }
 }
