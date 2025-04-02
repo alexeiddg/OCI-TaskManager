@@ -1,5 +1,6 @@
 package com.alexeiddg.telegram.bot.actions;
 
+import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import com.alexeiddg.telegram.bot.util.ReplyKeyboard;
 import com.alexeiddg.telegram.service.AppUserService;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class StartAbility {
 
     private final AppUserService appUserService;
+    private final UserSessionManager userSessionManager;
+
     public Ability start(BaseAbilityBot bot) {
         return Ability
                 .builder()
@@ -37,8 +40,22 @@ public class StartAbility {
                         String name = user.get().getName();
                         String username = user.get().getUsername();
 
+                        userSessionManager.setState(telegramId, UserState.MAIN_MENU);
+
                         String response = String.format("👋 Hello, %s (@%s)! Let's get working!", name, username);
                         bot.silent().send(response, chatId);
+
+                        // build the main menu keyboard
+                        SendMessage message = new SendMessage();
+                        message.setChatId(chatId.toString());
+                        message.setText("📋 Main Menu");
+                        message.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
+
+                        try {
+                            bot.execute(message);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     else {
@@ -60,5 +77,20 @@ public class StartAbility {
                     }
                 })
                 .build();
+    }
+
+    public void startMainMenu(BaseAbilityBot bot, Long chatId, Long telegramId) {
+        userSessionManager.setState(telegramId, UserState.MAIN_MENU);
+
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId.toString());
+        message.setText("📋 Main Menu");
+        message.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
+
+        try {
+            bot.execute(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

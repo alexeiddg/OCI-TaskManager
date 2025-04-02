@@ -23,6 +23,25 @@ public class DynamicReplyKeyboard {
                     keyboard.add(row);
                 }
             }
+
+            case PROJECT -> {
+                KeyboardRow MenuRow = new KeyboardRow();
+                MenuRow.add("Main Menu");
+                keyboard.add(MenuRow);
+
+                for (String project : options) {
+                    KeyboardRow projectsRow = new KeyboardRow();
+                    projectsRow.add(project);
+                    keyboard.add(projectsRow);
+                }
+
+                KeyboardRow actionsRow = new KeyboardRow();
+                actionsRow.add("➕ Create Project");
+                actionsRow.add("📝 Update Project");
+                actionsRow.add("❌ Delete Project");
+                actionsRow.add("🔒 Logout");
+                keyboard.add(actionsRow);
+            }
         }
 
         markup.setKeyboard(keyboard);

@@ -1,6 +1,7 @@
 package com.alexeiddg.telegram.bot;
 
 import com.alexeiddg.telegram.bot.actions.*;
+import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -28,6 +29,7 @@ public class TaskManagerBot extends AbilityBot {
     private final SignUpAbility signUp;
     private final LoginAbility login;
     private final StopAbility stop;
+    private final ProjectAbility projectAbility;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
@@ -36,7 +38,8 @@ public class TaskManagerBot extends AbilityBot {
             StartAbility start,
             SignUpAbility signUp,
             LoginAbility login,
-            StopAbility stop
+            StopAbility stop,
+            ProjectAbility projectAbility
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
@@ -46,6 +49,7 @@ public class TaskManagerBot extends AbilityBot {
         this.signUp = signUp;
         this.login = login;
         this.stop = stop;
+        this.projectAbility = projectAbility;
     }
 
     /**
@@ -111,6 +115,16 @@ public class TaskManagerBot extends AbilityBot {
                 login.handleLogin(this, update);
             }
 
+            // Start projects workflow
+            if (messageText.equals("View Current Projects")) {
+                projectAbility.ViewProjects(this, chatId, userId);
+            }
+
+            // Handle back to main menu
+            if (messageText.equals("Main Menu")) {
+                start.startMainMenu(this, chatId, userId);
+            }
+
             // Handle logout
             if (messageText.equals("🔒 Logout")) {
                 stop.handleStop(this, userId, chatId);
@@ -136,4 +150,10 @@ public class TaskManagerBot extends AbilityBot {
     public Ability login() {
         return login.login(this);
     }
+
+    public Ability stop() {
+        return stop.stopAbility(this);
+    }
+
+    // TODO: Impl stateless abilities
 }
