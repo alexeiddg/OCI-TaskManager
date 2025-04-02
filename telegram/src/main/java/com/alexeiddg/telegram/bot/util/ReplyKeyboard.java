@@ -33,6 +33,7 @@ public class ReplyKeyboard {
                 KeyboardRow row = new KeyboardRow();
                 row.add("View Current Projects");
                 row.add("View Current Sprint");
+                row.add("View Current Team");
                 row.add("📝 Create Task");
                 row.add("📋 View Tasks");
                 row.add("🔒 Logout");

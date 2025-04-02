@@ -27,6 +27,7 @@ public class SignUpAbility {
     private final UserSessionManager userSessionManager;
     private final TempUserDataStore tempUserDataStore;
     private final AppUserService appUserService;
+    private final MainMenuAbility mainMenuAbility;
 
     // Start the signup process
     public void beginSignup(BaseAbilityBot bot, Long chatId) {
@@ -107,6 +108,8 @@ public class SignUpAbility {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        mainMenuAbility.beginMainMenu(bot, chatId, Long.valueOf(telegramId));
                     } else if (text.equalsIgnoreCase("developer")) {
                         user.setRole(UserRole.DEVELOPER);
 
@@ -161,6 +164,8 @@ public class SignUpAbility {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        mainMenuAbility.beginMainMenu(bot, chatId, Long.valueOf(telegramId));
                     } else {
                         bot.silent().send("❌ That username is not recognized as a Manager. Please try again.", chatId);
                     }

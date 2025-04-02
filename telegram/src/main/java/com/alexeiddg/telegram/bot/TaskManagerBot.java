@@ -1,9 +1,6 @@
 package com.alexeiddg.telegram.bot;
 
-import com.alexeiddg.telegram.bot.actions.LoginAbility;
-import com.alexeiddg.telegram.bot.actions.SignUpAbility;
-import com.alexeiddg.telegram.bot.actions.StartAbility;
-import com.alexeiddg.telegram.bot.actions.StopAbility;
+import com.alexeiddg.telegram.bot.actions.*;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -37,7 +34,9 @@ public class TaskManagerBot extends AbilityBot {
             @Value("${telegram.bot.token}") String botToken,
             UserSessionManager userSessionManager,
             StartAbility start,
-            SignUpAbility signUp, LoginAbility login, StopAbility stop
+            SignUpAbility signUp,
+            LoginAbility login,
+            StopAbility stop
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;

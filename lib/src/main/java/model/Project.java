@@ -32,7 +32,7 @@ public class Project {
     @JoinColumn(name = "manager_id")
     private AppUser manager;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "project")
     private List<Team> teams;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
