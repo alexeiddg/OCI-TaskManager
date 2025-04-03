@@ -33,12 +33,12 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .authorizeHttpRequests()
-                .antMatchers("/api/v1/**").permitAll() // Allow public access to all endpoints under /api/v1
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().disable(); // Disable form login
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/v1/**").permitAll() // Changed from antMatchers to requestMatchers
+                        .anyRequest().authenticated()
+                )
+                .formLogin(formLogin -> formLogin.disable()); // Updated syntax for disabling form login
 
         return http.build();
     }
