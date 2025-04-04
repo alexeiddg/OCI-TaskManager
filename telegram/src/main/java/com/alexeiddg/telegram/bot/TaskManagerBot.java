@@ -4,6 +4,7 @@ import com.alexeiddg.telegram.bot.actions.*;
 import com.alexeiddg.telegram.bot.actions.project.CreateProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
+import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -34,6 +35,7 @@ public class TaskManagerBot extends AbilityBot {
     private final ProjectAbility projectAbility;
     private final CreateProjectAbility createProjectAbility;
     private final DeleteProjectAbility deleteProjectAbility;
+    private final SprintAbility sprintAbility;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
@@ -45,8 +47,9 @@ public class TaskManagerBot extends AbilityBot {
             StopAbility stop,
             ProjectAbility projectAbility,
             CreateProjectAbility createProjectAbility,
-            DeleteProjectAbility deleteProjectAbility
-    ) {
+            DeleteProjectAbility deleteProjectAbility,
+            SprintAbility sprintAbility
+            ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
 
@@ -58,6 +61,7 @@ public class TaskManagerBot extends AbilityBot {
         this.projectAbility = projectAbility;
         this.createProjectAbility = createProjectAbility;
         this.deleteProjectAbility = deleteProjectAbility;
+        this.sprintAbility = sprintAbility;
     }
 
     /**
@@ -158,6 +162,10 @@ public class TaskManagerBot extends AbilityBot {
 
             if (state == UserState.PROJECT_DELETE_CONFIRM) {
                 deleteProjectAbility.confirmDelete(this, update);
+            }
+
+            if (messageText.equals("View Current Sprint")) {
+                sprintAbility.viewSprints(this, chatId, userId);
             }
 
             // Handle logout

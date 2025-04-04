@@ -42,6 +42,25 @@ public class DynamicReplyKeyboard {
                 actionsRow.add("🔒 Logout");
                 keyboard.add(actionsRow);
             }
+
+            case SPRINT -> {
+                KeyboardRow MenuRow = new KeyboardRow();
+                MenuRow.add("Main Menu");
+                keyboard.add(MenuRow);
+
+                for (String sprint : options) {
+                    KeyboardRow sprintsRow = new KeyboardRow();
+                    sprintsRow.add(sprint);
+                    keyboard.add(sprintsRow);
+                }
+
+                KeyboardRow actionsRow = new KeyboardRow();
+                actionsRow.add("➕ Create Sprint");
+                actionsRow.add("📝 Update Sprint");
+                actionsRow.add("❌ Delete Sprint");
+                actionsRow.add("🔒 Logout");
+                keyboard.add(actionsRow);
+            }
         }
 
         markup.setKeyboard(keyboard);

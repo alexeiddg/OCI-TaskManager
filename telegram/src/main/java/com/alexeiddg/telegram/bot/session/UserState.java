@@ -34,4 +34,6 @@ public enum UserState {
     // Project delete state
     PROJECT_DELETE,
     PROJECT_DELETE_CONFIRM,
+    // Sprint state
+    SPRINT,
 }
