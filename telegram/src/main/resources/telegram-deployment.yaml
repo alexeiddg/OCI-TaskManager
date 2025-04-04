@@ -38,6 +38,8 @@ spec:
                 secretKeyRef:
                   name: telegram-secret
                   key: bot-token
+            - name: TELEGRAM_BOT_NAME
+              value: "oci_pms_testenv_bot"
             # Additional environment variables (if any) can be added here
           ports:
             - containerPort: 8080

@@ -13,22 +13,22 @@ docker rmi ${DOCKER_REGISTRY}/telegram:0.0.1
 cd ..
 
 # Build Web Service
-echo "Building Web Service..."
-cd web
-mvn clean package spring-boot:repackage
-docker build -t ${DOCKER_REGISTRY}/web:0.0.1 .
-docker push ${DOCKER_REGISTRY}/web:0.0.1
-docker rmi ${DOCKER_REGISTRY}/web:0.0.1
-cd ..
+# echo "Building Web Service..."
+# cd web
+# mvn clean package spring-boot:repackage
+# docker build -t ${DOCKER_REGISTRY}/web:0.0.1 .
+# docker push ${DOCKER_REGISTRY}/web:0.0.1
+# docker rmi ${DOCKER_REGISTRY}/web:0.0.1
+# cd ..
 
 # Build Frontend (Next.js)
-echo "Building Frontend..."
-cd frontend
-npm install
-npm run build
-docker build -t ${DOCKER_REGISTRY}/frontend:0.0.1 .
-docker push ${DOCKER_REGISTRY}/frontend:0.0.1
-docker rmi ${DOCKER_REGISTRY}/frontend:0.0.1
-cd ..
+# echo "Building Frontend..."
+# cd frontend
+# npm install
+# npm run build
+# docker build -t ${DOCKER_REGISTRY}/frontend:0.0.1 .
+# docker push ${DOCKER_REGISTRY}/frontend:0.0.1
+# docker rmi ${DOCKER_REGISTRY}/frontend:0.0.1
+# cd ..
 
 echo "All services have been built and pushed successfully."
