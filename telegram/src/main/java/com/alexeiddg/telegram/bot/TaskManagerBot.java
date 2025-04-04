@@ -1,6 +1,8 @@
 package com.alexeiddg.telegram.bot;
 
 import com.alexeiddg.telegram.bot.actions.*;
+import com.alexeiddg.telegram.bot.actions.project.CreateProjectAbility;
+import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
@@ -30,6 +32,8 @@ public class TaskManagerBot extends AbilityBot {
     private final LoginAbility login;
     private final StopAbility stop;
     private final ProjectAbility projectAbility;
+    private final CreateProjectAbility createProjectAbility;
+    private final DeleteProjectAbility deleteProjectAbility;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
@@ -39,7 +43,9 @@ public class TaskManagerBot extends AbilityBot {
             SignUpAbility signUp,
             LoginAbility login,
             StopAbility stop,
-            ProjectAbility projectAbility
+            ProjectAbility projectAbility,
+            CreateProjectAbility createProjectAbility,
+            DeleteProjectAbility deleteProjectAbility
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
@@ -50,6 +56,8 @@ public class TaskManagerBot extends AbilityBot {
         this.login = login;
         this.stop = stop;
         this.projectAbility = projectAbility;
+        this.createProjectAbility = createProjectAbility;
+        this.deleteProjectAbility = deleteProjectAbility;
     }
 
     /**
@@ -123,6 +131,33 @@ public class TaskManagerBot extends AbilityBot {
             // Handle back to main menu
             if (messageText.equals("Main Menu")) {
                 start.startMainMenu(this, chatId, userId);
+            }
+
+            if (messageText.equals("➕ Create Project")) {
+                projectAbility.createProject(this, chatId, userId);
+            }
+
+            // Handle state update for project creation
+            if (state == UserState.PROJECT_CREATE_NAME
+                    || state == UserState.PROJECT_CREATE_DESCRIPTION
+                    || state == UserState.PROJECT_CREATE_MANAGER
+                    || state == UserState.PROJECT_CREATE_TEAM_DECISION
+                    || state == UserState.PROJECT_CREATE_TEAM_SELECT
+                    || state == UserState.PROJECT_CREATE_CONFIRMATION
+            ) {
+                createProjectAbility.handleCreateProject(this, update);
+            }
+
+            if (messageText.equals("❌ Delete Project")) {
+                projectAbility.deleteProject(this, chatId, userId);
+            }
+
+            if (state == UserState.PROJECT_DELETE ) {
+                deleteProjectAbility.deleteProject(this, update);
+            }
+
+            if (state == UserState.PROJECT_DELETE_CONFIRM) {
+                deleteProjectAbility.confirmDelete(this, update);
             }
 
             // Handle logout

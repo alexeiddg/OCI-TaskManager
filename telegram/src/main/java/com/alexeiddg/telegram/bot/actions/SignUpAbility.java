@@ -4,7 +4,7 @@ import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import com.alexeiddg.telegram.bot.util.DynamicReplyKeyboard;
 import com.alexeiddg.telegram.bot.util.ReplyKeyboard;
-import com.alexeiddg.telegram.bot.util.TempUserDataStore;
+import com.alexeiddg.telegram.bot.util.tempDataStore.TempUserDataStore;
 import com.alexeiddg.telegram.service.AppUserService;
 import enums.UserRole;
 import lombok.RequiredArgsConstructor;

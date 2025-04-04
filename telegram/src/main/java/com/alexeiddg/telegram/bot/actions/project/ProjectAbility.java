@@ -12,6 +12,7 @@ import model.Project;
 import org.springframework.stereotype.Component;
 import org.telegram.abilitybots.api.bot.BaseAbilityBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class ProjectAbility {
     private final UserSessionManager userSessionManager;
     private final AppUserService appUserService;
     private final ProjectService projectService;
+    private final CreateProjectAbility createProjectAbility;
+    private final DeleteProjectAbility deleteProjectAbility;
 
     public void ViewProjects(BaseAbilityBot bot, Long chatId, Long telegramUserId) {
         userSessionManager.setState(telegramUserId, UserState.PROJECT);
@@ -65,6 +68,14 @@ public class ProjectAbility {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void createProject(BaseAbilityBot bot, Long chatId, Long telegramUserId) {
+        createProjectAbility.startProjectCreation(bot, chatId, telegramUserId);
+    }
+
+    public void deleteProject(BaseAbilityBot bot, Long chatId, Long projectId) {
+        deleteProjectAbility.selectProjectDelete(bot, chatId, projectId);
     }
 
 }

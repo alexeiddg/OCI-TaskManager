@@ -1,4 +1,4 @@
-package com.alexeiddg.telegram.bot.util;
+package com.alexeiddg.telegram.bot.util.tempDataStore;
 
 import model.AppUser;
 import org.springframework.stereotype.Component;
