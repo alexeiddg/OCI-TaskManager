@@ -36,4 +36,10 @@ public enum UserState {
     PROJECT_DELETE_CONFIRM,
     // Sprint state
     SPRINT,
+    // Sprint creation flow
+    SPRINT_CREATE_PROJECT_SELECT,
+    SPRINT_CREATE_NAME,
+    SPRINT_CREATE_START_DATE,
+    SPRINT_CREATE_END_DATE,
+    SPRINT_CREATE_CONFIRMATION,
 }

@@ -4,6 +4,7 @@ import com.alexeiddg.telegram.bot.actions.*;
 import com.alexeiddg.telegram.bot.actions.project.CreateProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
+import com.alexeiddg.telegram.bot.actions.sprint.CreateSprintAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
@@ -36,6 +37,7 @@ public class TaskManagerBot extends AbilityBot {
     private final CreateProjectAbility createProjectAbility;
     private final DeleteProjectAbility deleteProjectAbility;
     private final SprintAbility sprintAbility;
+    private final CreateSprintAbility createSprintAbility;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
@@ -48,8 +50,9 @@ public class TaskManagerBot extends AbilityBot {
             ProjectAbility projectAbility,
             CreateProjectAbility createProjectAbility,
             DeleteProjectAbility deleteProjectAbility,
-            SprintAbility sprintAbility
-            ) {
+            SprintAbility sprintAbility,
+            CreateSprintAbility createSprintAbility
+    ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
 
@@ -62,6 +65,7 @@ public class TaskManagerBot extends AbilityBot {
         this.createProjectAbility = createProjectAbility;
         this.deleteProjectAbility = deleteProjectAbility;
         this.sprintAbility = sprintAbility;
+        this.createSprintAbility = createSprintAbility;
     }
 
     /**
@@ -166,6 +170,19 @@ public class TaskManagerBot extends AbilityBot {
 
             if (messageText.equals("View Current Sprint")) {
                 sprintAbility.viewSprints(this, chatId, userId);
+            }
+
+            if (messageText.equals("➕ Create Sprint")) {
+                createSprintAbility.createSprint(this, chatId, userId);
+            }
+
+            if (state == UserState.SPRINT_CREATE_PROJECT_SELECT
+                    || state == UserState.SPRINT_CREATE_NAME
+                    || state == UserState.SPRINT_CREATE_START_DATE
+                    || state == UserState.SPRINT_CREATE_END_DATE
+                    || state == UserState.SPRINT_CREATE_CONFIRMATION
+            ) {
+                createSprintAbility.handleCreateSprint(this, update);
             }
 
             // Handle logout

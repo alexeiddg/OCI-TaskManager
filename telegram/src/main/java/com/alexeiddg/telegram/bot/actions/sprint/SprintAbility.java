@@ -31,7 +31,7 @@ public class SprintAbility {
             bot.silent().send("User not found.", chatId);
         }
 
-        List<Sprint> sprints = sprintService.getSprintsByProjectId(user.getId());
+        List<Sprint> sprints = sprintService.getSprintsForUser(user.getId());
         List<Sprint> activeSprints = sprints.stream()
                 .filter(Sprint::isActive)
                 .toList();

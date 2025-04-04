@@ -61,6 +61,18 @@ public class DynamicReplyKeyboard {
                 actionsRow.add("🔒 Logout");
                 keyboard.add(actionsRow);
             }
+
+            case SPRINT_CREATE_PROJECT_SELECT -> {
+                KeyboardRow MenuRow = new KeyboardRow();
+                MenuRow.add("Main Menu");
+                keyboard.add(MenuRow);
+
+                for (String project : options) {
+                    KeyboardRow projectsRow = new KeyboardRow();
+                    projectsRow.add(project);
+                    keyboard.add(projectsRow);
+                }
+            }
         }
 
         markup.setKeyboard(keyboard);

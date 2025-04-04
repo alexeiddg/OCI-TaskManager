@@ -10,8 +10,6 @@ import repository.AppUserRepository;
 import repository.ProjectRepository;
 import repository.SprintRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,19 +21,7 @@ public class SprintService {
     private final ProjectRepository projectRepository;
     private final AppUserRepository appUserRepository;
 
-    public Sprint createSprint(Sprint sprint, Long projectId) {
-        Optional<Project> projectOpt = projectRepository.findById(projectId);
-        if (projectOpt.isEmpty()) {
-            throw new IllegalArgumentException("Project not found with ID: " + projectId);
-        }
-
-        sprint.setProject(projectOpt.get());
-        sprint.setCreatedAt(LocalDateTime.now());
-        sprint.setActive(true);
-        sprint.setCompletedTasks(0);
-        sprint.setTotalTasks(0);
-        sprint.setCompletionRate(0.0f);
-
+    public Sprint createSprint(Sprint sprint) {
         return sprintRepository.save(sprint);
     }
 
@@ -59,32 +45,28 @@ public class SprintService {
         return sprintRepository.findByProjectId(projectId);
     }
 
+    // TODO retrieve only active sprints
     public List<Sprint> getSprintsForUser(Long userId) {
-        AppUser user = appUserRepository.findById(userId).orElse(null);
-
-        if (user == null) {
-            throw new IllegalArgumentException("User not found");
-        }
+        AppUser user = appUserRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         List<Project> projects;
 
-        if (user.getRole().equals(UserRole.MANAGER)) {
+        if (user.getRole() == UserRole.MANAGER) {
             projects = projectRepository.findAllByManagerId(user.getId());
-        } else if (user.getRole().equals(UserRole.DEVELOPER)) {
+        } else if (user.getRole() == UserRole.DEVELOPER) {
             projects = projectRepository.findAllByDeveloperId(user.getId());
         } else {
             throw new IllegalArgumentException("User role not supported");
         }
 
-        List<Sprint> allSprints = new ArrayList<>();
+        List<Long> projectIds = projects.stream()
+                .map(Project::getId)
+                .toList();
 
-        for (Project project : projects) {
-            if (project.getSprints() != null) {
-                allSprints.addAll(project.getSprints());
-            }
-        }
+        if (projectIds.isEmpty()) return List.of();
 
-        return allSprints;
+        return sprintRepository.findByProjectIdIn(projectIds);
     }
 
     public void deactivateSprint(Long sprintId) {
