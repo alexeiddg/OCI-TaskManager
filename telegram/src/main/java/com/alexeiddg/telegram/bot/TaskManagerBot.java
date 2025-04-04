@@ -7,6 +7,7 @@ import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.CreateSprintAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
 import com.alexeiddg.telegram.bot.actions.task.CreateTaskAbility;
+import com.alexeiddg.telegram.bot.actions.task.TaskAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -39,6 +40,7 @@ public class TaskManagerBot extends AbilityBot {
     private final DeleteProjectAbility deleteProjectAbility;
     private final SprintAbility sprintAbility;
     private final CreateSprintAbility createSprintAbility;
+    private final TaskAbility taskAbility;
     private final CreateTaskAbility createTaskAbility;
 
     public TaskManagerBot(
@@ -53,7 +55,7 @@ public class TaskManagerBot extends AbilityBot {
             CreateProjectAbility createProjectAbility,
             DeleteProjectAbility deleteProjectAbility,
             SprintAbility sprintAbility,
-            CreateSprintAbility createSprintAbility,
+            CreateSprintAbility createSprintAbility, TaskAbility taskAbility,
             CreateTaskAbility createTaskAbility
     ) {
         super(botToken, botUsername);
@@ -69,6 +71,7 @@ public class TaskManagerBot extends AbilityBot {
         this.deleteProjectAbility = deleteProjectAbility;
         this.sprintAbility = sprintAbility;
         this.createSprintAbility = createSprintAbility;
+        this.taskAbility = taskAbility;
         this.createTaskAbility = createTaskAbility;
     }
 
@@ -189,7 +192,7 @@ public class TaskManagerBot extends AbilityBot {
                 createSprintAbility.handleCreateSprint(this, update);
             }
 
-            if (messageText.equals("📝 Create Task")) {
+            if (messageText.equals("📝 Create Task") || messageText.equals("➕ Create Task")) {
                 createTaskAbility.createTask(this, chatId, userId);
             }
 
@@ -205,6 +208,38 @@ public class TaskManagerBot extends AbilityBot {
                     || state == UserState.TASK_CREATE_CONFIRMATION
             ) {
                 createTaskAbility.handleCreateTask(this, update);
+            }
+
+            if (messageText.equals("📋 View Tasks")) {
+               taskAbility.viewTasks(this, chatId, userId);
+            }
+
+            if (messageText.equals("Start Task")) {
+                taskAbility.startTask(this, chatId, userId);
+            }
+
+            if (state == UserState.TASK_SELECT_START) {
+                taskAbility.handleStartTask(this, update);
+            }
+
+            if (messageText.equals("Complete Task")) {
+                taskAbility.completeTask(this, chatId, userId);
+            }
+
+            if (state == UserState.TASK_SELECT_COMPLETE) {
+                taskAbility.handleCompleteTask(this, update);
+            }
+
+            if (messageText.equals("Reopen Task")) {
+                taskAbility.reopenTask(this, chatId, userId);
+            }
+
+            if (state == UserState.TASK_SELECT_REOPEN) {
+                taskAbility.handleReopenTask(this, update);
+            }
+
+            if (state == UserState.TASK) {
+                taskAbility.handleTaskDetails(this, update);
             }
 
             // Handle logout

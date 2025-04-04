@@ -1,10 +1,12 @@
 package com.alexeiddg.telegram.service;
 
+import enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
 import model.Task;
 import org.springframework.stereotype.Service;
 import repository.TaskRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +41,21 @@ public class TaskService {
 
     public List<Task> getTasksAssignedToUser(Long userId) {
         return taskRepository.findAllByAssignedToId(userId);
+    }
+
+
+    public boolean markTaskAsCompleted(Long taskId) {
+        Optional<Task> taskOpt = taskRepository.findById(taskId);
+
+        if (taskOpt.isPresent()) {
+            Task task = taskOpt.get();
+            task.setStatus(TaskStatus.DONE);
+            task.setIsActive(false);
+            task.setCompletedAt(LocalDateTime.now());
+            taskRepository.save(task);
+            return true;
+        }
+
+        return false;
     }
 }

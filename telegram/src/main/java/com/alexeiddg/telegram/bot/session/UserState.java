@@ -44,6 +44,10 @@ public enum UserState {
     SPRINT_CREATE_CONFIRMATION,
     // Task state
     TASK,
+    TASK_SELECT_START,
+    TASK_SELECT_COMPLETE,
+    TASK_SELECT_REOPEN,
+    TASK_DETAILS,
     // Task creation flow
     TASK_CREATE,
     TASK_CREATE_NAME,
