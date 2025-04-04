@@ -6,6 +6,7 @@ import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.CreateSprintAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
+import com.alexeiddg.telegram.bot.actions.task.CreateTaskAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -38,6 +39,7 @@ public class TaskManagerBot extends AbilityBot {
     private final DeleteProjectAbility deleteProjectAbility;
     private final SprintAbility sprintAbility;
     private final CreateSprintAbility createSprintAbility;
+    private final CreateTaskAbility createTaskAbility;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
@@ -51,7 +53,8 @@ public class TaskManagerBot extends AbilityBot {
             CreateProjectAbility createProjectAbility,
             DeleteProjectAbility deleteProjectAbility,
             SprintAbility sprintAbility,
-            CreateSprintAbility createSprintAbility
+            CreateSprintAbility createSprintAbility,
+            CreateTaskAbility createTaskAbility
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
@@ -66,6 +69,7 @@ public class TaskManagerBot extends AbilityBot {
         this.deleteProjectAbility = deleteProjectAbility;
         this.sprintAbility = sprintAbility;
         this.createSprintAbility = createSprintAbility;
+        this.createTaskAbility = createTaskAbility;
     }
 
     /**
@@ -183,6 +187,24 @@ public class TaskManagerBot extends AbilityBot {
                     || state == UserState.SPRINT_CREATE_CONFIRMATION
             ) {
                 createSprintAbility.handleCreateSprint(this, update);
+            }
+
+            if (messageText.equals("📝 Create Task")) {
+                createTaskAbility.createTask(this, chatId, userId);
+            }
+
+            if (state == UserState.TASK_CREATE_NAME
+                    || state == UserState.TASK_CREATE_DESCRIPTION
+                    || state == UserState.TASK_CREATE_ASSIGNEE
+                    || state == UserState.TASK_CREATE_SPRINT
+                    || state == UserState.TASK_CREATE_PRIORITY
+                    || state == UserState.TASK_CREATE_STATUS
+                    || state == UserState.TASK_CREATE_TYPE
+                    || state == UserState.TASK_CREATE_STORY_POINTS
+                    || state == UserState.TASK_CREATE_DUE_DATE
+                    || state == UserState.TASK_CREATE_CONFIRMATION
+            ) {
+                createTaskAbility.handleCreateTask(this, update);
             }
 
             // Handle logout

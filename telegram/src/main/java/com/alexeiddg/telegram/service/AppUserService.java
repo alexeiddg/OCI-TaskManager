@@ -55,4 +55,9 @@ public class AppUserService {
     public List<AppUser> getAllUsers() {
         return appUserRepository.findAll();
     }
+
+    // getAllUsersByRole
+    public List<AppUser> getAllUsersByRole(UserRole role) {
+        return appUserRepository.findAllByRole(role);
+    }
 }

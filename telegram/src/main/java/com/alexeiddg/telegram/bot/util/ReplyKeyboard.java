@@ -39,6 +39,31 @@ public class ReplyKeyboard {
                 row.add("🔒 Logout");
                 keyboard.add(row);
             }
+
+            case TASK_CREATE_PRIORITY -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("Low");
+                row.add("Medium");
+                row.add("High");
+                keyboard.add(row);
+            }
+
+            case TASK_CREATE_TYPE -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("Bug");
+                row.add("Feature");
+                row.add("Improvement");
+                keyboard.add(row);
+            }
+
+            case TASK_CREATE_STORY_POINTS -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("1");
+                row.add("2");
+                row.add("3");
+                row.add("4");
+                keyboard.add(row);
+            }
         }
 
         markup.setKeyboard(keyboard);

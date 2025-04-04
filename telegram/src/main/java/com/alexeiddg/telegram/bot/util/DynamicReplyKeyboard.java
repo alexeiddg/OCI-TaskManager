@@ -73,6 +73,54 @@ public class DynamicReplyKeyboard {
                     keyboard.add(projectsRow);
                 }
             }
+
+            case TASK -> {
+                KeyboardRow MenuRow = new KeyboardRow();
+                MenuRow.add("Main Menu");
+                keyboard.add(MenuRow);
+
+                KeyboardRow tasksOptionsRow = new KeyboardRow();
+                tasksOptionsRow.add("Start Task");
+                tasksOptionsRow.add("Complete Task");
+                tasksOptionsRow.add("Reopen Task");
+                keyboard.add(tasksOptionsRow);
+
+                for (String task : options) {
+                    KeyboardRow tasksRow = new KeyboardRow();
+                    tasksRow.add(task);
+                    keyboard.add(tasksRow);
+                }
+
+                KeyboardRow actionsRow = new KeyboardRow();
+                actionsRow.add("➕ Create Task");
+                actionsRow.add("📝 Update Task");
+                actionsRow.add("❌ Delete Task");
+                keyboard.add(actionsRow);
+
+                KeyboardRow logoutRow = new KeyboardRow();
+                logoutRow.add("🔒 Logout");
+                keyboard.add(logoutRow);
+            }
+
+            case TASK_CREATE_ASSIGNEE -> {
+                KeyboardRow MenuRow = new KeyboardRow();
+                MenuRow.add("Assign to self");
+                keyboard.add(MenuRow);
+
+                KeyboardRow usersRow = new KeyboardRow();
+                for (String user : options) {
+                    usersRow.add(user);
+                }
+                keyboard.add(usersRow);
+            }
+
+            case TASK_CREATE_SPRINT -> {
+                for (String sprint : options) {
+                    KeyboardRow sprintsRow = new KeyboardRow();
+                    sprintsRow.add(sprint);
+                    keyboard.add(sprintsRow);
+                }
+            }
         }
 
         markup.setKeyboard(keyboard);
