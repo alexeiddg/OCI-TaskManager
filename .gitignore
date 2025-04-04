@@ -49,5 +49,6 @@ lib!**/src/main/**/target/
 lib!**/src/test/**/target/
 /lib/target/
 
-.wallet
-.wallet/
+#.wallet
+#.wallet/
+#.dockerLogin

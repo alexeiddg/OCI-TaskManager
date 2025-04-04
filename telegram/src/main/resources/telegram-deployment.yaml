@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telegram-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegram
+  template:
+    metadata:
+      labels:
+        app: telegram
+        version: v1
+    spec:
+      imagePullSecrets:
+        - name: ocir-secret
+      containers:
+        - name: telegram-container
+          image: mx-queretaro-1.ocir.io/ax83el69bkfn/oci-task-manager/telegram:0.0.1
+          imagePullPolicy: Always
+          env:
+            # Database configuration (adjust values as needed)
+            - name: DB_USER
+              value: "ADMIN"
+            - name: DB_URL
+              value: "jdbc:oracle:thin:@mtdrdb_tp?TNS_ADMIN=/mnt/wallet"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dbuser
+                  key: dbpassword
+            - name: DRIVER_CLASS_NAME
+              value: "oracle.jdbc.OracleDriver"
+            # Telegram bot token from secret
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: telegram-secret
+                  key: bot-token
+            # Additional environment variables (if any) can be added here
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          volumeMounts:
+            - name: wallet-volume
+              mountPath: /mnt/wallet
+      volumes:
+        - name: wallet-volume
+          secret:
+            secretName: db-wallet-secret
