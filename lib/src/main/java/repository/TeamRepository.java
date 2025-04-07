@@ -7,15 +7,21 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Long> {
+
+    Optional<Team> findByTeamName(String teamName);
 
     @Query("SELECT t FROM Team t WHERE t.project.id = :projectId")
     List<Team> findByProjectId(@Param("projectId") Long projectId);
 
     @Query("SELECT t FROM Team t WHERE t.manager.id = :managerId")
     List<Team> findByManagerId(@Param("managerId") Long managerId);
+
+    @Query("SELECT t FROM Team t WHERE t.isActive = true")
+    List<Team> findAllActiveTeams();
 
     @Query("""
         SELECT DISTINCT t

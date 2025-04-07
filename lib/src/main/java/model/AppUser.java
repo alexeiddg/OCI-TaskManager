@@ -30,6 +30,9 @@ public class AppUser {
     @Column(name = "telegram_id", unique = true)
     private String telegramId;
 
+    @Column(name = "email", unique = true, length = 100)
+    private String email;
+
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 

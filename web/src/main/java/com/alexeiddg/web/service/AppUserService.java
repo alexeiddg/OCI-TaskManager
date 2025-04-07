@@ -1,6 +1,7 @@
 package com.alexeiddg.web.service;
 
 import enums.UserRole;
+import lombok.RequiredArgsConstructor;
 import model.AppUser;
 import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
@@ -9,55 +10,59 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AppUserService {
+
     private final AppUserRepository appUserRepository;
 
-    public AppUserService(AppUserRepository appUserRepository) {
-        this.appUserRepository = appUserRepository;
-    }
-
-    // createUser
+    // Create User
     public AppUser createUser(AppUser appUser) {
-        return appUserRepository.save(appUser);
+        appUserRepository.save(appUser);
+        return appUser;
     }
 
-    // getUserById
+    // Read User by Id
     public Optional<AppUser> getUserById(Long id) {
         return appUserRepository.findById(id);
     }
 
-    // getUserByUsername
+    // Read User by Username
     public Optional<AppUser> getUserByUsername(String username) {
         return appUserRepository.findByUsername(username);
     }
 
-    // gerUserByTelegramId
+    // Read User by Telegram Id
     public Optional<AppUser> getUserByTelegramId(String telegramId) {
         return appUserRepository.findByTelegramId(telegramId);
     }
 
-    // updateUser
+    // Read user by Email
+    public Optional<AppUser> getUserByEmail(String email) {
+        return appUserRepository.findByEmail(email);
+    }
+
+    // Update User
     public AppUser updateUser(AppUser appUser) {
         return appUserRepository.save(appUser);
     }
 
-    // deleteUser
+    // Delete User
     public void deleteUser(Long id) {
         appUserRepository.deleteById(id);
     }
 
-    // getAllManagers
-    public List<AppUser> getAllManagers() {
-        return appUserRepository.findAllByRole(UserRole.MANAGER);
+    // Get All Users by team where user is manager
+    public List<AppUser> getDevelopersByTeam(Long teamId) {
+        return appUserRepository.findByTeamIdAndRole(teamId, UserRole.DEVELOPER);
     }
 
-    // getAllUsers - protected route
+    // Get All Users by team where user is developer
+    public List<AppUser> getManagersByTeam(Long teamId) {
+        return appUserRepository.findByTeamIdAndRole(teamId, UserRole.MANAGER);
+    }
+
+    // Get all users - protected route
     public List<AppUser> getAllUsers() {
         return appUserRepository.findAll();
-    }
-
-    // getAllUsersByRole
-    public List<AppUser> getAllUsersByRole(UserRole role) {
-        return appUserRepository.findAllByRole(role);
     }
 }
