@@ -50,6 +50,7 @@ public class Project {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.isActive = true;
     }
 
     @PreUpdate

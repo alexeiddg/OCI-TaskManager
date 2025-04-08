@@ -1,7 +1,9 @@
 package com.alexeiddg.web.service;
 
+import model.AppUser;
 import model.Team;
 import org.springframework.stereotype.Service;
+import repository.AppUserRepository;
 import repository.TeamRepository;
 
 import java.util.List;
@@ -11,9 +13,11 @@ import java.util.Optional;
 public class TeamService {
 
     private final TeamRepository teamRepository;
+    private final AppUserRepository appUserRepository;
 
-    public TeamService(TeamRepository teamRepository) {
+    public TeamService(TeamRepository teamRepository, AppUserRepository appUserRepository) {
         this.teamRepository = teamRepository;
+        this.appUserRepository = appUserRepository;
     }
 
     // Create Team
@@ -54,5 +58,19 @@ public class TeamService {
     // Get team by user id
     public List<Team> getTeamsByUserId(Long userId) {
         return teamRepository.findByMembersId(userId);
+    }
+
+    // Create solo team
+    public Team createSoloTeam(Long userId) {
+        AppUser user = appUserRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Team team = new Team();
+        team.setTeamName(user.getUsername() + "-team");
+        team.setManager(user);
+        team.setMembers(List.of(user));
+        team.setIsActive(true);
+
+        return teamRepository.save(team);
     }
 }

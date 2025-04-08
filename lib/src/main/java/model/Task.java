@@ -73,6 +73,7 @@ public class Task {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.isActive = true;
     }
 
     @PreUpdate

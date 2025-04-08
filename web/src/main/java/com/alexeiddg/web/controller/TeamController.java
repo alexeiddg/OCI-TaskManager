@@ -72,4 +72,11 @@ public class TeamController {
     public ResponseEntity<List<Team>> getTeamsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(teamService.getTeamsByUserId(userId));
     }
+
+    // Create solo team
+    @PostMapping("/create-solo")
+    public ResponseEntity<Team> createSoloTeam(@RequestParam Long userId) {
+        Team team = teamService.createSoloTeam(userId);
+        return ResponseEntity.ok(team);
+    }
 }
