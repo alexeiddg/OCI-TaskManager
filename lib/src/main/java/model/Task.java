@@ -32,12 +32,15 @@ public class Task {
     @Column(name = "task_description", nullable = false)
     private String taskDescription;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "priority", nullable = false)
     private TaskPriority priority;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TaskStatus status;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private TaskType type;
 

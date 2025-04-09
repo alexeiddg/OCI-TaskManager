@@ -33,15 +33,13 @@ public class AppUser {
     @Column(name = "email", unique = true, length = 100)
     private String email;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private AppUser manager;
-
-    @OneToMany(mappedBy = "manager")
-    private List<AppUser> teamMembers;
 
     @ManyToOne
     @JoinColumn(name = "team_id")
