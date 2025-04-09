@@ -25,6 +25,10 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
     </dependencies>
 
     <artifactId>lib</artifactId>

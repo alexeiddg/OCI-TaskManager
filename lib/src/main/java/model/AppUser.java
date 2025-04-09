@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "app_user")
@@ -26,6 +25,9 @@ public class AppUser {
 
     @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
+
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @Column(name = "telegram_id", unique = true)
     private String telegramId;

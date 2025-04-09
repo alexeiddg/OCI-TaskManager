@@ -3,6 +3,7 @@ package com.alexeiddg.web.service;
 import enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import model.AppUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
 
@@ -14,9 +15,12 @@ import java.util.Optional;
 public class AppUserService {
 
     private final AppUserRepository appUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Create User
     public AppUser createUser(AppUser appUser) {
+        String hashed = passwordEncoder.encode(appUser.getPassword());
+        appUser.setPassword(hashed);
         appUserRepository.save(appUser);
         return appUser;
     }
