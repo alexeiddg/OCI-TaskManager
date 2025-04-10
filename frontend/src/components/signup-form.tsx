@@ -24,42 +24,35 @@ export function SignupForm({
         {/* Name */}
         <div className="grid gap-3">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" type="text" placeholder="Jane Doe" required />
+          <Input id="name" name="name" type="text" placeholder="Jane Doe" required />
         </div>
 
         {/* Username */}
         <div className="grid gap-3">
           <Label htmlFor="username">Username</Label>
-          <Input id="username" type="text" placeholder="jane_doe" required />
+          <Input id="username" name="username" type="text" placeholder="jane_doe" required />
         </div>
 
         {/* Email */}
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="jane@example.com"
-            required
-          />
+          <Input id="email" name="email" type="email" placeholder="jane@example.com" required />
         </div>
 
         {/* Password */}
         <div className="grid gap-3">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" required />
+          <Input id="password" name="password" type="password" required />
         </div>
 
         {/* Role */}
         <div className="grid gap-3">
           <Label htmlFor="role">Role</Label>
           <select
-            id="role"
-            className={cn(
-              // match the default Input styles as closely as possible
-              "block w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-            )}
-            required
+              id="role"
+              name="role"
+              className={cn("block w-full ...")}
+              required
           >
             <option value="">Select your role</option>
             <option value={UserRole.MANAGER}>Manager</option>
@@ -73,7 +66,8 @@ export function SignupForm({
         </Button>
 
         {/* Or continue with (optional) */}
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+        <div
+            className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             Or continue with
           </span>

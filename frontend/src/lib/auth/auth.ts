@@ -25,32 +25,34 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const { username, password } = credentials || {};
 
         if (!username || !password) {
-          throw new Error("Missing username or password");
+          console.error("🔐 Missing credentials");
+          return null
         }
 
         // Call Spring Boot backend login endpoint
-        const res = await fetch(
-          `${process.env.BACKEND_URL}/api/v2/auth/login`,
-          {
+        try {
+          const res = await fetch(`${process.env.BACKEND_URL}/api/v2/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
-          },
-        );
+          });
 
-        if (!res.ok) {
-          throw new Error("Invalid username or password");
+          if (!res.ok) {
+            console.warn("🛑 Backend login failed with status:", res.status);
+            return null;
+          }
+
+          const user = await res.json();
+          return {
+            id: String(user.id),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("❌ Failed to reach backend:", error);
+          return null;
         }
-
-        const user = await res.json();
-
-        // Convert numeric ID to string because NextAuth expects the id as a string internally.
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
       },
     }),
   ],

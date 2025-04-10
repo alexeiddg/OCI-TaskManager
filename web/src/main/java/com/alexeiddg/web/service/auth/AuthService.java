@@ -66,6 +66,10 @@ public class AuthService {
 
         AppUser savedUser = appUserService.createUser(newUser);
 
-        return new SignupResponse(savedUser.getId(), savedUser.getUsername(), "Account created successfully");
+        return new SignupResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                "Account created successfully"
+        );
     }
 }
