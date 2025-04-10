@@ -1,18 +1,16 @@
-'use client'
+"use client";
 
 import { GalleryVerticalEnd } from "lucide-react";
 import { Mosaic } from "@/components/right-mosaic";
 import Link from "next/link";
 import { SignupForm } from "@/components/signup-form";
 import { useRouter } from "next/navigation";
-import {useState} from "react";
-import {submitSignupForm} from "@/server/auth/signup";
-import {signIn} from "next-auth/react";
-import {toast} from "sonner";
-
+import { useState } from "react";
+import { submitSignupForm } from "@/server/auth/signup";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
-
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -22,33 +20,47 @@ export default function LoginPage() {
 
     const formData = new FormData(e.currentTarget);
 
-    const { success, message } = await submitSignupForm(
-        formData,
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v2/auth/signup`
-    );
+    try {
+      const { success, message } = await submitSignupForm(
+          formData,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v2/auth/signup`,
+      );
 
-    if (success) {
-      toast.success("Account created successfully!");
+      if (success) {
+        toast.success("Account created successfully!");
 
-      const username = formData.get("username") as string;
-      const password = formData.get("password") as string;
+        const username = formData.get("username") as string;
+        const password = formData.get("password") as string;
 
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-      });
+        const result = await signIn("credentials", {
+          username,
+          password,
+          redirect: false,
+        });
 
-      if (result?.ok) {
-        toast.success("Logged in 🎉");
-        router.push("/dashboard");
+        if (result?.ok) {
+          toast.success("Account created successfully!", {
+            description: "Welcome aboard! Redirecting you to the dashboard...",
+          });
+          router.push("/dashboard");
+        } else {
+          toast.warning("login failed.", {
+            description: "Please try logging in manually.",
+          });
+          setError("Signup successful, but login failed.");
+        }
       } else {
-        toast.warning("Signup ok, but login failed.");
-        setError("Signup successful, but login failed.");
+        toast.error("Signup failed", {
+          description: message || "Something went wrong",
+        });
+        setError(message || "Something went wrong");
       }
-    } else {
-      toast.error(message || "Something went wrong");
-      setError(message || "Something went wrong");
+    } catch (error) {
+      console.error("❌ Signup error:", error);
+      toast.error("Network error", {
+        description: "Could not reach the server. Please try again later.",
+      });
+      setError("Could not reach the server");
     }
   };
 

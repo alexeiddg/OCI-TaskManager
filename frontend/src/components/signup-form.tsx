@@ -24,19 +24,37 @@ export function SignupForm({
         {/* Name */}
         <div className="grid gap-3">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" type="text" placeholder="Jane Doe" required />
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Jane Doe"
+            required
+          />
         </div>
 
         {/* Username */}
         <div className="grid gap-3">
           <Label htmlFor="username">Username</Label>
-          <Input id="username" name="username" type="text" placeholder="jane_doe" required />
+          <Input
+            id="username"
+            name="username"
+            type="text"
+            placeholder="jane_doe"
+            required
+          />
         </div>
 
         {/* Email */}
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" placeholder="jane@example.com" required />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="jane@example.com"
+            required
+          />
         </div>
 
         {/* Password */}
@@ -49,10 +67,10 @@ export function SignupForm({
         <div className="grid gap-3">
           <Label htmlFor="role">Role</Label>
           <select
-              id="role"
-              name="role"
-              className={cn("block w-full ...")}
-              required
+            id="role"
+            name="role"
+            className={cn("block w-full ...")}
+            required
           >
             <option value="">Select your role</option>
             <option value={UserRole.MANAGER}>Manager</option>
@@ -66,8 +84,7 @@ export function SignupForm({
         </Button>
 
         {/* Or continue with (optional) */}
-        <div
-            className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
           <span className="bg-background text-muted-foreground relative z-10 px-2">
             Or continue with
           </span>

@@ -26,16 +26,19 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         if (!username || !password) {
           console.error("🔐 Missing credentials");
-          return null
+          return null;
         }
 
         // Call Spring Boot backend login endpoint
         try {
-          const res = await fetch(`${process.env.BACKEND_URL}/api/v2/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
+          const res = await fetch(
+            `${process.env.BACKEND_URL}/api/v2/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, password }),
+            },
+          );
 
           if (!res.ok) {
             console.warn("🛑 Backend login failed with status:", res.status);
