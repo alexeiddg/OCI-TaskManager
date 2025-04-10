@@ -1,5 +1,5 @@
 export enum TaskType {
-    BUG = 'BUG',
-    FEATURE =  'FEATURE',
-    IMPROVEMENT =  'IMPROVEMENT',
+  BUG = "BUG",
+  FEATURE = "FEATURE",
+  IMPROVEMENT = "IMPROVEMENT",
 }
