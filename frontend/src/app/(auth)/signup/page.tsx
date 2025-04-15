@@ -40,9 +40,9 @@ export default function LoginPage() {
 
         if (result?.ok) {
           toast.success("Account created successfully!", {
-            description: "Welcome aboard! Redirecting you to the dashboard...",
+            description: "Welcome aboard!",
           });
-          router.push("/dashboard");
+          router.push("/redirect");
         } else {
           toast.warning("login failed.", {
             description: "Please try logging in manually.",

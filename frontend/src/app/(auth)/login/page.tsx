@@ -22,7 +22,7 @@ export default function LoginPage() {
 
     if (success) {
       toast.success("✅ Logged in successfully!");
-      router.push("/dashboard");
+      router.push("/redirect");
     } else {
       toast.error("❌ Login failed", {
         description: "Check your username and password.",

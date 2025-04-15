@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import {SessionProvider} from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <SessionProvider refetchInterval={5 * 60}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -38,6 +40,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+      </SessionProvider>
       </body>
     </html>
   );

@@ -51,6 +51,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             name: user.name,
             email: user.email,
             role: user.role,
+            teamId: user.teamId ?? null,
           };
         } catch (error) {
           console.error("❌ Failed to reach backend:", error);
@@ -66,6 +67,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.name = user.name;
         token.email = user.email;
+        token.teamId = user.teamId;
       }
       return token;
     },
@@ -75,6 +77,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.role = token.role as UserRole;
         session.user.name = token.name as string;
         session.user.email = token.email as string;
+        session.user.teamId = token.teamId as string;
       }
       return session;
     },
