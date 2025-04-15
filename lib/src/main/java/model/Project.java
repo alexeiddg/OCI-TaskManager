@@ -1,8 +1,6 @@
 package model;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,22 +16,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "project_name", nullable = false)
+    @Column(name = "project_name", nullable = false, length = 150)
     private String projectName;
 
-    @Column(name = "project_description", nullable = false)
+    @Column(name = "project_description", nullable = false, length = 500)
     private String projectDescription;
 
     @ManyToOne
-    @JoinColumn(name = "manager_id")
+    @JoinColumn(name = "manager_id", nullable = false)
     private AppUser manager;
 
-    @OneToMany(mappedBy = "project")
-    private List<Team> teams;
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprint> sprints;
@@ -58,3 +58,5 @@ public class Project {
         this.updatedAt = LocalDateTime.now();
     }
 }
+
+// Revised 3NF compliance

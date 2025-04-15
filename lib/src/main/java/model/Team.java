@@ -27,11 +27,10 @@ public class Team {
     @JoinColumn(name = "manager_id")
     private AppUser manager;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<Project> projects;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AppUser> members;
 
     @Column(name = "is_active")
@@ -59,3 +58,5 @@ public class Team {
         this.isActive = false;
     }
 }
+
+// Revised 3NF compliance

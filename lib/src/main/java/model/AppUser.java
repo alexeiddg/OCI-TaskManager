@@ -64,3 +64,5 @@ public class AppUser {
         this.updatedAt = LocalDateTime.now();
     }
 }
+
+// Revised 3NF compliance
