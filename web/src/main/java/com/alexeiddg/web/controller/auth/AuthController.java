@@ -4,13 +4,14 @@ import DTO.auth.LoginRequest;
 import DTO.auth.LoginResponse;
 import DTO.auth.SignupRequest;
 import DTO.auth.SignupResponse;
+import com.alexeiddg.web.security.util.JwtTokenProvider;
 import com.alexeiddg.web.service.auth.AuthService;
+import model.AppUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import repository.AppUserRepository;
 
 import java.util.Optional;
 
@@ -19,9 +20,13 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthService authService;
+    private final AppUserRepository appUserRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, AppUserRepository appUserRepository, JwtTokenProvider jwtTokenProvider) {
         this.authService = authService;
+        this.appUserRepository = appUserRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     /**
@@ -55,5 +60,32 @@ public class AuthController {
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        LoginResponse refreshed = authService.refreshToken(token);
+        return ResponseEntity.ok(refreshed);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<LoginResponse> getCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = jwtTokenProvider.generateToken(user);
+
+        return ResponseEntity.ok(new LoginResponse(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getManager() != null ? user.getManager().getId() : null,
+                user.getTeam() != null ? user.getTeam().getId() : null,
+                token
+        ));
     }
 }

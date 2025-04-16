@@ -11,6 +11,7 @@ declare module "next-auth" {
       id: number | string;
       role: UserRole;
       teamId: number | string | null;
+      accessToken?: string;
     } & DefaultSession["user"];
   }
 
@@ -20,6 +21,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     role: UserRole;
     teamId: number | string | null;
+    accessToken?: string;
   }
 }
 
@@ -31,5 +33,6 @@ declare module "next-auth/jwt" {
     id: number | string;
     role: UserRole;
     teamId: number | string | null;
+    accessToken?: string;
   }
 }

@@ -8,4 +8,5 @@ export interface LoginResponse {
   role: UserRole;
   managerId: number;
   teamId: number;
+  token: string;
 }

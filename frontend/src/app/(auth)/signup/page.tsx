@@ -22,8 +22,8 @@ export default function LoginPage() {
 
     try {
       const { success, message } = await submitSignupForm(
-          formData,
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v2/auth/signup`,
+        formData,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v2/auth/signup`,
       );
 
       if (success) {

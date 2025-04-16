@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v2/team")
@@ -57,7 +58,7 @@ public class TeamController {
 
     // get team by project id
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<Team>> getTeamsByProjectId(@PathVariable Long projectId) {
+    public ResponseEntity<Optional<Team>> getTeamsByProjectId(@PathVariable Long projectId) {
         return ResponseEntity.ok(teamService.getTeamsByProjectId(projectId));
     }
 

@@ -4,8 +4,10 @@ import DTO.auth.LoginRequest;
 import DTO.auth.LoginResponse;
 import DTO.auth.SignupRequest;
 import DTO.auth.SignupResponse;
+import com.alexeiddg.web.security.util.JwtTokenProvider;
 import com.alexeiddg.web.service.AppUserService;
 import enums.UserRole;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import model.AppUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,7 @@ public class AuthService {
     private final AppUserRepository appUserRepository;
     private final AppUserService appUserService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // Validate credentials and map to a LoginResponse DTO
     public Optional<LoginResponse> login(LoginRequest loginRequest) {
@@ -34,17 +37,18 @@ public class AuthService {
             return Optional.empty();
         }
 
-        // Convert to LoginResponse DTO
-        LoginResponse response = new LoginResponse(
+        String token = jwtTokenProvider.generateToken(user);
+
+        return Optional.of(new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole(),
                 user.getManager() != null ? user.getManager().getId() : null,
-                user.getTeam() != null ? user.getTeam().getId() : null
-        );
-        return Optional.of(response);
+                user.getTeam() != null ? user.getTeam().getId() : null,
+                token
+        ));
     }
 
     // Validate uniqueness, create and save the user, then return a SignupResponse
@@ -66,10 +70,35 @@ public class AuthService {
 
         AppUser savedUser = appUserService.createUser(newUser);
 
+        String token = jwtTokenProvider.generateToken(savedUser);
+
         return new SignupResponse(
                 savedUser.getId(),
                 savedUser.getUsername(),
-                "Account created successfully"
+                "Account created successfully",
+                token
         );
     }
+
+    public LoginResponse refreshToken(String token) {
+        Claims claims = jwtTokenProvider.getClaims(token);
+        Long userId = claims.get("id", Long.class);
+
+        AppUser user = appUserRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String newToken = jwtTokenProvider.generateToken(user);
+
+        return new LoginResponse(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getManager() != null ? user.getManager().getId() : null,
+                user.getTeam() != null ? user.getTeam().getId() : null,
+                newToken
+        );
+    }
+
 }

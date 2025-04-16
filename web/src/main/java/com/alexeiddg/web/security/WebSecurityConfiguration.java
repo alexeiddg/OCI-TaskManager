@@ -1,8 +1,9 @@
 package com.alexeiddg.web.security;
 
 import com.alexeiddg.web.security.util.JwtAuthenticationFilter;
-import com.alexeiddg.web.security.util.JwtTokenProvider;
 import com.alexeiddg.web.service.AppUserService;
+import jakarta.servlet.Filter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,28 +11,33 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 public class WebSecurityConfiguration {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final AppUserService appUserService;
 
-    public WebSecurityConfiguration(JwtTokenProvider jwtTokenProvider, AppUserService appUserService) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    @Value("${auth.secret}")
+    private String authSecret;
+
+    public WebSecurityConfiguration(AppUserService appUserService) {
         this.appUserService = appUserService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        Filter jwtFilter = new JwtAuthenticationFilter(appUserService, authSecret);
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v2/**").permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/v2/auth/login",
+                                "/api/v2/auth/signup"
+                        ).permitAll()
+                        .requestMatchers("/api/v2/setup/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, appUserService),
-                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
 

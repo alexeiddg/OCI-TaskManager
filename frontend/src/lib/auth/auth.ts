@@ -52,6 +52,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             email: user.email,
             role: user.role,
             teamId: user.teamId ?? null,
+            accessToken: user.token,
           };
         } catch (error) {
           console.error("❌ Failed to reach backend:", error);
@@ -63,11 +64,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id as string;
         token.role = user.role;
         token.name = user.name;
         token.email = user.email;
         token.teamId = user.teamId;
+        token.accessToken = user.accessToken;
       }
       return token;
     },
@@ -78,6 +80,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.name = token.name as string;
         session.user.email = token.email as string;
         session.user.teamId = token.teamId as string;
+        session.user.accessToken = token.accessToken as string;
       }
       return session;
     },
@@ -85,7 +88,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/login",
     newUser: "/signup",
-    signOut: "/signOut",
+    signOut: "/sign-out",
   },
   secret: process.env.AUTH_SECRET,
 });

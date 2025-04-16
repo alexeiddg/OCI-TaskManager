@@ -18,4 +18,5 @@ public class LoginResponse {
     private UserRole role;
     private Long managerId;
     private Long teamId;
+    private String token;
 }

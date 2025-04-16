@@ -18,12 +18,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("""
            SELECT DISTINCT p
            FROM Project p
-           JOIN p.teams t
+           JOIN p.team t
            JOIN t.members m
            WHERE m.id = :developerId
            """)
     List<Project> findAllByDeveloperId(@Param("developerId") Long developerId);
 
-    @Query("SELECT p FROM Project p JOIN p.teams t WHERE t.id = :teamId")
+    @Query("SELECT p FROM Project p JOIN p.team t WHERE t.id = :teamId")
     Optional<Project> findByTeamsId(@Param("teamId") Long teamId);
 }

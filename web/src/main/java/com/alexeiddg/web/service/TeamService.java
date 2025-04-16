@@ -1,11 +1,18 @@
 package com.alexeiddg.web.service;
 
+import DTO.helpers.TeamCreationRequest;
 import model.AppUser;
+import model.Project;
+import model.Sprint;
 import model.Team;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import repository.AppUserRepository;
+import repository.ProjectRepository;
+import repository.SprintRepository;
 import repository.TeamRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,10 +21,19 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final AppUserRepository appUserRepository;
+    private final ProjectRepository projectRepository;
+    private final SprintRepository sprintRepository;
 
-    public TeamService(TeamRepository teamRepository, AppUserRepository appUserRepository) {
+    public TeamService(
+            TeamRepository teamRepository,
+            AppUserRepository appUserRepository,
+            ProjectRepository projectRepository,
+            SprintRepository sprintRepository
+    ) {
         this.teamRepository = teamRepository;
         this.appUserRepository = appUserRepository;
+        this.projectRepository = projectRepository;
+        this.sprintRepository = sprintRepository;
     }
 
     // Create Team
@@ -46,8 +62,8 @@ public class TeamService {
     }
 
     // get team by project id
-    public List<Team> getTeamsByProjectId(Long projectId) {
-        return teamRepository.findByProjectId(projectId);
+    public Optional<Team> getTeamsByProjectId(Long projectId) {
+        return teamRepository.findTeamByProjectId(projectId);
     }
 
     // Get team by manager id
@@ -72,5 +88,44 @@ public class TeamService {
         team.setIsActive(true);
 
         return teamRepository.save(team);
+    }
+
+    @Transactional
+    public void createTeamWithProjectAndSprint(TeamCreationRequest request, String username) {
+        AppUser manager = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 1. Create Team
+        Team team = new Team();
+        team.setTeamName(request.getTeamName());
+        team.setManager(manager);
+        team.setMembers(new ArrayList<>(List.of(manager)));
+        team = teamRepository.save(team);
+
+        // 2. Add team to manager
+        manager.setTeam(team);
+        appUserRepository.save(manager);
+
+        // 3. Create Project
+        Project project = new Project();
+        project.setProjectName(request.getProject().getName());
+        project.setProjectDescription(request.getProject().getDescription());
+        project.setManager(manager);
+        project.setTeam(team);
+        project = projectRepository.save(project);
+
+        // 3. Add project to team
+        List<Project> existingProjects = team.getProjects() != null ? team.getProjects() : new ArrayList<>();
+        existingProjects.add(project);
+        team.setProjects(existingProjects);
+        teamRepository.save(team);
+
+        // 4. Create Sprint
+        Sprint sprint = new Sprint();
+        sprint.setSprintName(request.getSprint().getName());
+        sprint.setStartDate(request.getSprint().getStartDate());
+        sprint.setEndDate(request.getSprint().getEndDate());
+        sprint.setProject(project);
+        sprintRepository.save(sprint);
     }
 }

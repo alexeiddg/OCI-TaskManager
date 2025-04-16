@@ -25,7 +25,6 @@ export async function submitSignupForm(
   }
 
   const responseBody = await res.json();
-  console.log("Signup response body:", responseBody); //TODO: Remove this for release
   return {
     success: true,
     message: responseBody.message,
