@@ -10,6 +10,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import data from "./data.json";
+import FloatingTelegramButton from "@/components/FloatingTelegramButton";
 
 export default function Page() {
   const { data: session, status } = useSession();
@@ -35,7 +36,14 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
+      <AppSidebar
+        variant="inset"
+        user={{
+          name: session?.user?.name ?? "Unknown",
+          email: session?.user?.email ?? "unknown@example.com",
+          avatar: "/avatars/default.png",
+        }}
+      />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -49,6 +57,7 @@ export default function Page() {
             </div>
           </div>
         </div>
+          <FloatingTelegramButton/>
       </SidebarInset>
     </SidebarProvider>
   );

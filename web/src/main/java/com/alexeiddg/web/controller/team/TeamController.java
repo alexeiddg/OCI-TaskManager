@@ -1,4 +1,4 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.team;
 
 import com.alexeiddg.web.service.TeamService;
 import model.Team;

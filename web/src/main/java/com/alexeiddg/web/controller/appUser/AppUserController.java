@@ -1,4 +1,4 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.appUser;
 
 import com.alexeiddg.web.service.AppUserService;
 import model.AppUser;

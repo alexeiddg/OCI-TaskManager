@@ -1,4 +1,4 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.task;
 
 import com.alexeiddg.web.service.TaskService;
 import enums.TaskPriority;

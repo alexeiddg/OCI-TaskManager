@@ -4,7 +4,7 @@ import DTO.auth.LoginRequest;
 import DTO.auth.LoginResponse;
 import DTO.auth.SignupRequest;
 import DTO.auth.SignupResponse;
-import com.alexeiddg.web.security.util.JwtTokenProvider;
+import com.alexeiddg.web.security.JwtTokenProvider;
 import com.alexeiddg.web.service.AppUserService;
 import enums.UserRole;
 import io.jsonwebtoken.Claims;

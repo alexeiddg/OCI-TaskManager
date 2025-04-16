@@ -21,7 +21,7 @@ export default function LoginPage() {
     const { success, message } = await submitLoginForm(formData);
 
     if (success) {
-      toast.success("✅ Logged in successfully!");
+      toast.success("Logged in successfully!");
       router.push("/redirect");
     } else {
       toast.error("❌ Login failed", {

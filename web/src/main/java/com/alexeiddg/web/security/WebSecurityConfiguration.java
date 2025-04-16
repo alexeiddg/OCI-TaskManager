@@ -1,6 +1,5 @@
 package com.alexeiddg.web.security;
 
-import com.alexeiddg.web.security.util.JwtAuthenticationFilter;
 import com.alexeiddg.web.service.AppUserService;
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Value;

@@ -16,8 +16,8 @@ import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import {TeamCreationFormValues} from "@/lib/types/DTO/model/teamCreationForm";
-import {useRouter} from "next/navigation";
+import { TeamCreationFormValues } from "@/lib/types/DTO/model/teamCreationForm";
+import { useRouter } from "next/navigation";
 
 const TOTAL_STEPS = 3;
 
@@ -43,13 +43,13 @@ export function MultiStepForm() {
   const [step, setStep] = useState(0);
   const form = useForm<TeamCreationFormValues>({
     defaultValues: {
-      teamName: '',
-      managerId: '',
-      projectName: '',
-      projectDescription: '',
-      sprintName: '',
-      startDate: '',
-      endDate: '',
+      teamName: "",
+      managerId: "",
+      projectName: "",
+      projectDescription: "",
+      sprintName: "",
+      startDate: "",
+      endDate: "",
     },
   });
 
@@ -67,7 +67,6 @@ export function MultiStepForm() {
   const handleBack = () => {
     if (step > 0) setStep(step - 1);
   };
-
 
   const onSubmit = async (data: TeamCreationFormValues) => {
     if (step < TOTAL_STEPS - 1) {

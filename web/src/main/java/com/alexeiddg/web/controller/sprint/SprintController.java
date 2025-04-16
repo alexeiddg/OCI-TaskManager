@@ -1,4 +1,4 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.sprint;
 
 import com.alexeiddg.web.service.SprintService;
 import model.Sprint;

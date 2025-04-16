@@ -1,4 +1,4 @@
-package com.alexeiddg.web.security.util;
+package com.alexeiddg.web.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

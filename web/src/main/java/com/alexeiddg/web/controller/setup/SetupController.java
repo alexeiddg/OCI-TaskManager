@@ -1,6 +1,6 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.setup;
 
-import DTO.helpers.TeamCreationRequest;
+import DTO.setup.TeamCreationRequest;
 import com.alexeiddg.web.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

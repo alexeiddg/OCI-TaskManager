@@ -15,7 +15,7 @@ export default function PostLoginRouter() {
   const [progress, setProgress] = useState(0);
 
   console.log(session);
-  console.log('token:' + session?.user.accessToken) // TODO: Please remove this for V1
+  console.log("token:" + session?.user.accessToken); // TODO: Please remove this for V1
 
   // Animate progress bar
   useEffect(() => {

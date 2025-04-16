@@ -1,4 +1,4 @@
-package com.alexeiddg.web.controller;
+package com.alexeiddg.web.controller.project;
 
 import com.alexeiddg.web.service.ProjectService;
 import model.Project;

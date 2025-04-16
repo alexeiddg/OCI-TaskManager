@@ -1,6 +1,6 @@
 package com.alexeiddg.web.service;
 
-import DTO.helpers.TeamCreationRequest;
+import DTO.setup.TeamCreationRequest;
 import model.AppUser;
 import model.Project;
 import model.Sprint;
