@@ -32,7 +32,6 @@ import {
   IconLayoutColumns,
   IconLoader,
   IconPlus,
-  IconTrendingUp,
 } from "@tabler/icons-react";
 import {
   ColumnDef,
@@ -49,19 +48,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { toast } from "sonner";
 import { z } from "zod";
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
@@ -90,7 +81,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -100,18 +90,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Task as schema } from "@/lib/types/DTO/model/Task"
+import {Separator} from "@/components/ui/separator";
 
-export const schema = z.object({
-  id: z.number(),
-  header: z.string(),
-  type: z.string(),
-  status: z.string(),
-  target: z.string(),
-  limit: z.string(),
-  reviewer: z.string(),
-});
-
-// Create a separate component for the drag handle
+/**
+ * separate component for the drag handle
+ **/
 function DragHandle({ id }: { id: number }) {
   const { attributes, listeners } = useSortable({
     id,
@@ -131,11 +115,17 @@ function DragHandle({ id }: { id: number }) {
   );
 }
 
+
+/**
+ * Columns for data table
+ **/
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
+  /* ─────────── drag / checkbox ─────────── */
   {
     id: "drag",
     header: () => null,
     cell: ({ row }) => <DragHandle id={row.original.id} />,
+    enableHiding: false,
   },
   {
     id: "select",
@@ -163,125 +153,88 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+
+  /* ─────────── task core fields ─────────── */
   {
-    accessorKey: "header",
-    header: "Header",
-    cell: ({ row }) => {
-      return <TableCellViewer item={row.original} />;
-    },
+    accessorKey: "taskName",
+    header: "Task",
+    cell: ({ row }) => <TableCellViewer item={row.original} />,
     enableHiding: false,
   },
   {
-    accessorKey: "type",
-    header: "Section Type",
+    accessorKey: "taskType",
+    header: "Type",
     cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.type}
+        <Badge variant="outline" className="px-1.5 capitalize">
+          {row.original.taskType}
         </Badge>
-      </div>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "taskStatus",
     header: "Status",
     cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "Done" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+        <Badge variant="outline" className="px-1.5 capitalize flex items-center gap-1">
+          {row.original.taskStatus === "DONE" ? (
+              <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
+          ) : (
+              <IconLoader className="size-4" />
+          )}
+          {row.original.taskStatus.replace("_", " ")}
+        </Badge>
+    ),
+  },
+  {
+    accessorKey: "taskPriority",
+    header: "Priority",
+    cell: ({ row }) => (
+        <Badge
+            className="px-1.5 capitalize"
+            variant={
+              row.original.taskPriority === "HIGH"
+                  ? "destructive"
+                  : row.original.taskPriority === "MEDIUM"
+                      ? "secondary"
+                      : "outline"
+            }
+        >
+          {row.original.taskPriority}
+        </Badge>
+    ),
+  },
+  {
+    accessorKey: "storyPoints",
+    header: () => <div className="text-center w-full">SP</div>,
+    cell: ({ row }) => (
+        <div className="text-center w-full">{row.original.storyPoints}</div>
+    ),
+  },
+  {
+    accessorKey: "sprint",
+    header: "Sprint",
+  },
+  {
+    accessorKey: "dueDate",
+    header: "Due",
+    cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          {new Date(row.original.dueDate).toLocaleDateString()}
+        </div>
+    ),
+  },
+  {
+    accessorKey: "blocked",
+    header: "Blocked",
+    cell: ({ row }) =>
+        row.original.blocked ? (
+            <Badge variant="destructive">Yes</Badge>
         ) : (
-          <IconLoader />
-        )}
-        {row.original.status}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "target",
-    header: () => <div className="w-full text-right">Target</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          });
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.target}
-          id={`${row.original.id}-target`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          });
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "reviewer",
-    header: "Reviewer",
-    cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer";
-
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
-
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      );
-    },
+            <Badge variant="outline">No</Badge>
+        ),
   },
   {
     id: "actions",
+    enableHiding: false,
     cell: () => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -360,6 +313,16 @@ export function DataTable({
     [data],
   );
 
+  const statusCounts = React.useMemo(() => {
+    const c = { ALL: data.length, TODO: 0, IN_PROGRESS: 0, DONE: 0 };
+    data.forEach(t => { c[t.taskStatus] += 1; });
+    return c;
+  }, [data]);
+
+  const statusValues = ["ALL", "TODO", "IN_PROGRESS", "DONE"] as const;
+  const [currentTab, setCurrentTab] =
+      React.useState<(typeof statusValues)[number]>("ALL");
+
   const table = useReactTable({
     data,
     columns,
@@ -385,6 +348,7 @@ export function DataTable({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
@@ -397,134 +361,141 @@ export function DataTable({
   }
 
   return (
-    <Tabs
-      defaultValue="outline"
-      className="w-full flex-col justify-start gap-6"
-    >
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select defaultValue="outline">
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            size="sm"
-            id="view-selector"
-          >
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
-          </SelectContent>
-        </Select>
-        <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
-          <TabsTrigger value="past-performance">
-            Past Performance <Badge variant="secondary">3</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="key-personnel">
-            Key Personnel <Badge variant="secondary">2</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
-        </TabsList>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconLayoutColumns />
-                <span className="hidden lg:inline">Customize Columns</span>
-                <span className="lg:hidden">Columns</span>
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide(),
-                )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Section</span>
-          </Button>
-        </div>
-      </div>
-      <TabsContent
-        value="outline"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+      <Tabs
+        value={currentTab}
+        onValueChange={(val) => {
+          setCurrentTab(val as typeof currentTab);
+          if (val === "ALL") {
+            table.resetColumnFilters();
+          } else {
+            table.setColumnFilters([{ id: "taskStatus", value: val }]);
+          }
+        }}
+        className="flex flex-col gap-6 w-full"
       >
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
+        {/* ------- header bar ------- */}
+        <div className="flex items-center justify-between px-4 lg:px-6">
+
+          {/* view selector (mobile) */}
+          <Label htmlFor="status-selector" className="sr-only">
+            Status filter
+          </Label>
+          <Select
+            value={currentTab}
+            onValueChange={(val) => {
+              setCurrentTab(val as (typeof statusValues)[number]);
+              if (val === "ALL") {
+                table.resetColumnFilters();
+              } else {
+                table.setColumnFilters([{ id: "taskStatus", value: val }]);
+              }
+            }}
           >
-            <Table>
-              <TableHeader className="bg-muted sticky top-0 z-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
+            <SelectTrigger
+              id="status-selector"
+              size="sm"
+              className="flex w-fit @4xl/main:hidden"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {statusValues.map((st) => (
+                <SelectItem key={st} value={st}>
+                  {st === "ALL" ? "All Tasks" : st.replace("_", " ")}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* status tabs (desktop) */}
+          <TabsList className="hidden @4xl/main:flex **:data-[slot=badge]:px-1">
+            {statusValues.map((st) => (
+                <TabsTrigger key={st} value={st}>
+                  {st === "ALL" ? "All Tasks" : st.replace("_", " ")}{" "}
+                  <Badge variant="secondary">{statusCounts[st]}</Badge>
+                </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {/* right‑hand controls */}
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconLayoutColumns />
+                  <span className="hidden lg:inline">Customize Columns</span>
+                  <span className="lg:hidden">Columns</span>
+                  <IconChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {table.getAllColumns()
+                    .filter(col => col.getCanHide())
+                    .map(col => (
+                        <DropdownMenuCheckboxItem
+                            key={col.id}
+                            checked={col.getIsVisible()}
+                            onCheckedChange={v => col.toggleVisibility(!!v)}
+                            className="capitalize"
+                        >
+                          {col.id}
+                        </DropdownMenuCheckboxItem>
                     ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="outline" size="sm">
+              <IconPlus />
+              <span className="hidden lg:inline">Create New</span>
+            </Button>
+          </div>
         </div>
+
+        {/* ------- table ------- */}
+        <TabsContent
+          value={currentTab}
+          forceMount
+          className="px-4 lg:px-6 flex flex-col gap-4"
+        >
+          <div className="border rounded-lg overflow-hidden">
+            <DndContext
+                sensors={sensors}
+                id={sortableId}
+                modifiers={[restrictToVerticalAxis]}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-muted">
+                  {table.getHeaderGroups().map(hg => (
+                      <TableRow key={hg.id}>
+                        {hg.headers.map(h => (
+                            <TableHead key={h.id} colSpan={h.colSpan}>
+                              {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
+                            </TableHead>
+                        ))}
+                      </TableRow>
+                  ))}
+                </TableHeader>
+
+                <TableBody>
+                  {table.getRowModel().rows.length ? (
+                      <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
+                        {table.getRowModel().rows.map(r => <DraggableRow key={r.id} row={r} />)}
+                      </SortableContext>
+                  ) : (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="text-center h-24">
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </DndContext>
+          </div>
+
+        {/* pagination */}
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
@@ -622,181 +593,136 @@ export function DataTable({
   );
 }
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
-
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
-  },
-} satisfies ChartConfig;
-
 function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile();
 
   return (
-    <Drawer direction={isMobile ? "bottom" : "right"}>
-      <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.header}
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>{item.header}</DrawerTitle>
-          <DrawerDescription>
-            Showing total visitors for the last 6 months
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-          {!isMobile && (
-            <>
-              <ChartContainer config={chartConfig}>
-                <AreaChart
-                  accessibilityLayer
-                  data={chartData}
-                  margin={{
-                    left: 0,
-                    right: 10,
-                  }}
-                >
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                    hide
-                  />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
-                  <Area
-                    dataKey="mobile"
-                    type="natural"
-                    fill="var(--color-mobile)"
-                    fillOpacity={0.6}
-                    stroke="var(--color-mobile)"
-                    stackId="a"
-                  />
-                  <Area
-                    dataKey="desktop"
-                    type="natural"
-                    fill="var(--color-desktop)"
-                    fillOpacity={0.4}
-                    stroke="var(--color-desktop)"
-                    stackId="a"
-                  />
-                </AreaChart>
-              </ChartContainer>
-              <Separator />
-              <div className="grid gap-2">
-                <div className="flex gap-2 leading-none font-medium">
-                  Trending up by 5.2% this month{" "}
-                  <IconTrendingUp className="size-4" />
+      <Drawer direction={isMobile ? "bottom" : "right"}>
+        {/* ---------- trigger (the cell link) ---------- */}
+        <DrawerTrigger asChild>
+          <Button
+              variant="link"
+              className="text-foreground w-fit px-0 text-left"
+          >
+            {item.taskName}
+          </Button>
+        </DrawerTrigger>
+
+        {/* ---------- drawer panel ---------- */}
+        <DrawerContent>
+          <DrawerHeader className="gap-1">
+            <DrawerTitle>{item.taskName}</DrawerTitle>
+            <DrawerDescription>
+              Quick‑edit details for this task
+            </DrawerDescription>
+          </DrawerHeader>
+
+          {/* body */}
+          <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+            <form className="flex flex-col gap-4">
+
+              {/* ---- type & status ---- */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="taskType">Type</Label>
+                  <Select defaultValue={item.taskType}>
+                    <SelectTrigger id="taskType">
+                      <SelectValue placeholder="Type"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["BUG", "FEATURE", "IMPROVEMENT"].map(t => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="text-muted-foreground">
-                  Showing total visitors for the last 6 months. This is just
-                  some random text to test the layout. It spans multiple lines
-                  and should wrap around.
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="taskStatus">Status</Label>
+                  <Select defaultValue={item.taskStatus}>
+                    <SelectTrigger id="taskStatus">
+                      <SelectValue placeholder="Status"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["TODO", "IN_PROGRESS", "DONE"].map(s => (
+                          <SelectItem key={s} value={s}>{s.replace("_", " ")}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <Separator />
-            </>
-          )}
-          <form className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.header} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="type">Type</Label>
-                <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Table of Contents">
-                      Table of Contents
-                    </SelectItem>
-                    <SelectItem value="Executive Summary">
-                      Executive Summary
-                    </SelectItem>
-                    <SelectItem value="Technical Approach">
-                      Technical Approach
-                    </SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Capabilities">Capabilities</SelectItem>
-                    <SelectItem value="Focus Documents">
-                      Focus Documents
-                    </SelectItem>
-                    <SelectItem value="Narrative">Narrative</SelectItem>
-                    <SelectItem value="Cover Page">Cover Page</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              {/* ---- priority & story points ---- */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="priority">Priority</Label>
+                  <Select defaultValue={item.taskPriority}>
+                    <SelectTrigger id="priority">
+                      <SelectValue placeholder="Priority"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["LOW", "MEDIUM", "HIGH"].map(p => (
+                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="storyPoints">Story Points</Label>
+                  <Input
+                      type="number"
+                      id="storyPoints"
+                      defaultValue={item.storyPoints}
+                      min={0}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Done">Done</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              {/* ---- sprint & due date ---- */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="sprint">Sprint</Label>
+                  <Input id="sprint" defaultValue={item.sprint}/>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="dueDate">Due date</Label>
+                  <Input
+                      id="dueDate"
+                      type="date"
+                      defaultValue={item.dueDate?.slice(0, 10)}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.target} />
+
+              {/* ---- blocked flag ---- */}
+              <div className="flex items-center gap-2">
+                <Checkbox
+                    id="blocked"
+                    defaultChecked={item.blocked}
+                    className="mr-2"
+                />
+                <Label htmlFor="blocked">Blocked</Label>
               </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.limit} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select a reviewer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                  <SelectItem value="Jamik Tashpulatov">
-                    Jamik Tashpulatov
-                  </SelectItem>
-                  <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </form>
-        </div>
-        <DrawerFooter>
-          <Button>Submit</Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Done</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+            </form>
+
+            <Separator/>
+            <p className="text-xs text-muted-foreground">
+              Created {new Date(item.createdAt).toLocaleString()}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Updated {new Date(item.updatedAt).toLocaleString()}
+            </p>
+          </div>
+
+          <DrawerFooter>
+            <Button disabled>Save</Button>
+            <DrawerClose asChild>
+              <Button variant="outline">Close</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
   );
 }
