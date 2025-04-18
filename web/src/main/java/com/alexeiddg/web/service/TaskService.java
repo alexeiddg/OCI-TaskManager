@@ -1,14 +1,15 @@
 package com.alexeiddg.web.service;
 
+import DTO.setup.TaskCreationRequest;
+import enums.ChangeType;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import enums.TaskType;
 import lombok.RequiredArgsConstructor;
-import model.AppUser;
-import model.Task;
+import model.*;
 import org.springframework.stereotype.Service;
-import repository.AppUserRepository;
-import repository.TaskRepository;
+import org.springframework.transaction.annotation.Transactional;
+import repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +20,66 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final AppUserRepository userRepository;
+    private final SprintRepository sprintRepository;
+    private final TaskLogRepository taskLogRepository;
+    private final TaskAuditRepository taskAuditRepository;
+    private final TaskFavoriteRepository taskFavoriteRepository;
 
     // Create
     public Task createTask(Task task) {
         return taskRepository.save(task);
+    }
+
+    // Create with logging
+    @Transactional
+    public Task createTaskWithLogging(TaskCreationRequest req) {
+        Sprint sprint = sprintRepository.findById(req.sprintId())
+                .orElseThrow(() -> new RuntimeException("Sprint not found"));
+        AppUser creator = userRepository.findById(req.createdBy())
+                .orElseThrow(() -> new RuntimeException("Creator not found"));
+        AppUser assignee = userRepository.findById(req.assignedTo())
+                .orElseThrow(() -> new RuntimeException("Assignee not found"));
+
+        Task task = new Task();
+        task.setTaskName(req.taskName());
+        task.setTaskDescription(req.taskDescription());
+        task.setPriority(req.taskPriority());
+        task.setStatus(req.taskStatus());
+        task.setType(req.taskType());
+        task.setStoryPoints(req.storyPoints());
+        task.setDueDate(req.dueDate());
+        task.setSprint(sprint);
+        task.setCreatedBy(creator);
+        task.setAssignedTo(assignee);
+        task.setCreatedAt(LocalDateTime.now());
+
+        Task savedTask = taskRepository.save(task);
+
+        // Initial TaskLog (0 hours)
+        TaskLog log = new TaskLog();
+        log.setTask(savedTask);
+        log.setUser(creator);
+        log.setHoursLogged(0.0);
+        log.setLogDate(LocalDateTime.now());
+        taskLogRepository.save(log);
+
+        // TaskAudit for CREATE
+        TaskAudit audit = new TaskAudit();
+        audit.setTask(savedTask);
+        audit.setChangedBy(creator);
+        audit.setChangeType(ChangeType.CREATE);
+        audit.setChangedAt(LocalDateTime.now());
+        taskAuditRepository.save(audit);
+
+        // TaskFavorite
+        if (req.isFavorite()) {
+            TaskFavorite favorite = new TaskFavorite();
+            favorite.setTask(savedTask);
+            favorite.setUser(creator);
+            taskFavoriteRepository.save(favorite);
+        }
+
+        return savedTask;
     }
 
     // Update

@@ -1,5 +1,6 @@
 package com.alexeiddg.web.service;
 
+import DTO.domian.AppUserDto;
 import DTO.setup.TeamCreationRequest;
 import model.AppUser;
 import model.Project;
@@ -13,6 +14,7 @@ import repository.SprintRepository;
 import repository.TeamRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,5 +129,20 @@ public class TeamService {
         sprint.setEndDate(request.getSprint().getEndDate());
         sprint.setProject(project);
         sprintRepository.save(sprint);
+    }
+
+    public List<Project> getTeamProjects(Long teamId) {
+        return teamRepository.findById(teamId)
+                .map(Team::getProjects)
+                .orElse(Collections.emptyList());
+    }
+
+    public List<AppUserDto> getTeamMembers(Long teamId) {
+        return teamRepository
+                .findById(teamId)
+                .map(t -> t.getMembers().stream()
+                        .map(u -> new AppUserDto(u.getId(), u.getName(), u.getEmail()))
+                        .toList())
+                .orElse(List.of());
     }
 }

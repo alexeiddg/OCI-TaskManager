@@ -1,5 +1,6 @@
 package com.alexeiddg.web.service;
 
+import DTO.domian.SprintDto;
 import lombok.RequiredArgsConstructor;
 import model.Sprint;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,22 @@ public class SprintService {
 
     // Get by Project Id
     public List<Sprint> getSprintsByProjectId(Long projectId) {
-        return sprintRepository.findByProjectId(projectId);
+        return sprintRepository.findByProject_Id(projectId);
+    }
+
+    public List<Sprint> getSprintsByTeamId(Long teamId) {
+        return sprintRepository.findByProject_Team_Id(teamId);
+    }
+
+    public List<SprintDto> getTeamSprints(Long teamId) {
+        return sprintRepository
+                .findByProject_Team_Id(teamId)
+                .stream()
+                .map(s -> new SprintDto(
+                        s.getId(),
+                        s.getSprintName(),
+                        s.getStartDate(),
+                        s.getEndDate()))
+                .toList();
     }
 }

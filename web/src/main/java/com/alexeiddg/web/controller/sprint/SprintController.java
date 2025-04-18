@@ -1,5 +1,7 @@
 package com.alexeiddg.web.controller.sprint;
 
+import DTO.domian.SprintDto;
+import DTO.domian.mappers.SprintMapper;
 import com.alexeiddg.web.service.SprintService;
 import model.Sprint;
 import org.springframework.http.ResponseEntity;
@@ -25,28 +27,40 @@ public class SprintController {
 
     // updateSprint
     @PutMapping("/{id}")
-    public ResponseEntity<Sprint> updateSprint(@PathVariable Long id, @RequestBody Sprint sprint) {
+    public ResponseEntity<Sprint> updateSprint(@PathVariable("id") Long id, @RequestBody Sprint sprint) {
         sprint.setId(id);
         return ResponseEntity.ok(sprintService.updateSprint(sprint));
     }
 
     // deleteSprint
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSprint(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSprint(@PathVariable("id") Long id) {
         sprintService.deleteSprint(id);
         return ResponseEntity.noContent().build();
     }
 
     // getSprintById
     @GetMapping("/{id}")
-    public ResponseEntity<Sprint> getSprintById(@PathVariable Long id) {
+    public ResponseEntity<Sprint> getSprintById(@PathVariable("id") Long id) {
         Sprint sprint = sprintService.getSprintById(id);
         return sprint != null ? ResponseEntity.ok(sprint) : ResponseEntity.notFound().build();
     }
 
     // getSprintsByProjectId
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<Sprint>> getSprintsByProjectId(@PathVariable Long projectId) {
-        return ResponseEntity.ok(sprintService.getSprintsByProjectId(projectId));
+    public ResponseEntity<List<SprintDto>> getSprintsByProjectId(
+            @PathVariable("projectId") Long projectId) {
+
+        List<SprintDto> dto = sprintService.getSprintsByProjectId(projectId)
+                .stream()
+                .map(SprintMapper::toDto)
+                .toList();
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/team/{teamId}")
+    public ResponseEntity<List<SprintDto>> getSprintsByTeamId(@PathVariable("teamId") Long teamId) {
+        return ResponseEntity.ok(sprintService.getTeamSprints(teamId));
     }
 }

@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth/auth";
-import { TeamCreationRequest } from "@/lib/types/DTO/model/teamCreationReq";
+import { TeamCreationRequest } from "@/lib/types/DTO/setup/teamCreationReq";
 
 export async function submitSetupForm(data: TeamCreationRequest) {
   const session = await auth();

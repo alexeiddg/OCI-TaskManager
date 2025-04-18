@@ -20,56 +20,56 @@ export const sidebarData = {
       icon: IconDashboard,
     },
     {
-      title: "Projects",
+      title: "Projects (TODO)",
       url: "/dashboard/projects",
       icon: IconFolder,
     },
     {
-      title: "Sprints",
+      title: "Sprints (TODO)",
       url: "/dashboard/sprints",
       icon: IconListDetails,
     },
     {
-      title: "Tasks",
+      title: "Tasks (TODO)",
       url: "/dashboard/tasks",
       icon: IconFileDescription,
     },
     {
-      title: "Team",
+      title: "Team (TODO)",
       url: "/dashboard/team",
       icon: IconUsers,
     },
     {
-      title: "Analytics",
+      title: "Analytics (TODO)",
       url: "/dashboard/analytics",
       icon: IconChartBar,
     },
   ],
   navSecondary: [
     {
-      title: "Settings",
+      title: "Settings (TODO)",
       url: "/settings",
       icon: IconSettings,
     },
     {
-      title: "Help",
+      title: "Help (TODO)",
       url: "/help",
       icon: IconHelp,
     },
     {
-      title: "Search",
+      title: "Search (TODO)",
       url: "/search",
       icon: IconSearch,
     },
   ],
   documents: [
     {
-      name: "Reports",
+      name: "Reports (TODO)",
       url: "/dashboard/reports",
       icon: IconReport,
     },
     {
-      name: "Data Library",
+      name: "Data Library (TODO)",
       url: "/dashboard/data",
       icon: IconDatabase,
     },

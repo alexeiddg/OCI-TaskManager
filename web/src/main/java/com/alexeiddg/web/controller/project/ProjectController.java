@@ -24,39 +24,39 @@ public class ProjectController {
 
     // Update Project
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody Project project) {
+    public ResponseEntity<Project> updateProject(@PathVariable("id") Long id, @RequestBody Project project) {
         project.setId(id);
         return ResponseEntity.ok(projectService.updateProject(project));
     }
 
     // Delete Project
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProject(@PathVariable("id") Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
+    public ResponseEntity<Project> getProjectById(@PathVariable("id") Long id) {
         Project project = projectService.getProjectById(id);
         return project != null ? ResponseEntity.ok(project) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/by-team/{teamId}")
-    public ResponseEntity<Project> getProjectByTeamId(@PathVariable Long teamId) {
+    public ResponseEntity<Project> getProjectByTeamId(@PathVariable("teamId") Long teamId) {
         Project project = projectService.getProjectByTeamId(teamId);
         return project != null ? ResponseEntity.ok(project) : ResponseEntity.notFound().build();
     }
 
     // Get Projects by Manager Id
     @GetMapping("/by-manager/{managerId}")
-    public ResponseEntity<List<Project>> getProjectsByManagerId(@PathVariable Long managerId) {
+    public ResponseEntity<List<Project>> getProjectsByManagerId(@PathVariable("managerId") Long managerId) {
         return ResponseEntity.ok(projectService.getProjectByManagerId(managerId));
     }
 
     // Get Projects by Developer Id
     @GetMapping("/by-developer/{developerId}")
-    public ResponseEntity<List<Project>> getProjectsByDeveloperId(@PathVariable Long developerId) {
+    public ResponseEntity<List<Project>> getProjectsByDeveloperId(@PathVariable("developerId") Long developerId) {
         return ResponseEntity.ok(projectService.getProjectsByDeveloperId(developerId));
     }
 }

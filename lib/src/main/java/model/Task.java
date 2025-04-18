@@ -1,5 +1,6 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import enums.TaskType;
@@ -25,6 +26,7 @@ public class Task {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "sprint_id", nullable = false)
+    @JsonBackReference
     private Sprint sprint;
 
     @Column(name = "task_name", nullable = false, length = 100)
@@ -79,6 +81,7 @@ public class Task {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = this.createdAt;
         this.isActive = true;
+        this.blocked = false;
     }
 
     @PreUpdate

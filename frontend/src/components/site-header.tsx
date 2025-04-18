@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import {ModeToggle} from "@/components/theming/modeToggle";
+import { ModeToggle } from "@/components/theming/modeToggle";
 
 export function SiteHeader() {
   return (
@@ -13,7 +13,7 @@ export function SiteHeader() {
         />
         <h1 className="text-base font-medium">Workspace</h1>
         <div className="ml-auto flex items-center gap-2 pb-2">
-          <ModeToggle/>
+          <ModeToggle />
         </div>
       </div>
     </header>

@@ -16,7 +16,7 @@ import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { TeamCreationFormValues } from "@/lib/types/DTO/model/teamCreationForm";
+import { TeamCreationFormValues } from "@/lib/types/DTO/setup/teamCreationForm";
 import { useRouter } from "next/navigation";
 
 const TOTAL_STEPS = 3;

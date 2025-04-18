@@ -1,5 +1,8 @@
 package com.alexeiddg.web.controller.task;
 
+import DTO.domian.TaskDto;
+import DTO.domian.mappers.TaskMapper;
+import DTO.setup.TaskCreationRequest;
 import com.alexeiddg.web.service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
@@ -22,11 +25,11 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    // Create a new task
+    // Create a new task using logging
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        Task created = taskService.createTask(task);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<TaskDto> createTask(@RequestBody TaskCreationRequest request) {
+        Task createdTask = taskService.createTaskWithLogging(request);
+        return ResponseEntity.ok(TaskMapper.toDto(createdTask));
     }
 
     // Update an existing task
