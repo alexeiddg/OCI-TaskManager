@@ -1,6 +1,5 @@
 import {
   IconChartBar,
-  IconDashboard,
   IconDatabase,
   IconFileDescription,
   IconFolder,
@@ -15,14 +14,9 @@ import {
 export const sidebarData = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "Workspace",
       url: "/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Projects",
-      url: "/dashboard/projects",
-      icon: IconFolder,
+      icon: IconFileDescription,
     },
     {
       title: "Sprints",
@@ -30,9 +24,9 @@ export const sidebarData = {
       icon: IconListDetails,
     },
     {
-      title: "Tasks",
-      url: "/dashboard/tasks",
-      icon: IconFileDescription,
+      title: "Projects",
+      url: "/dashboard/projects",
+      icon: IconFolder,
     },
     {
       title: "Team (TODO)",

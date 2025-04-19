@@ -22,10 +22,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -70,7 +67,6 @@ type TeamMember = {
   avatar?: string;
   email: string;
   joinedDate: string;
-  skills: string[];
   availability: number; // percentage
   activeProjects: string[];
   activeSprints: string[];
@@ -137,10 +133,8 @@ const teamData: Team = {
       id: "user-1",
       name: "John Doe",
       role: "Team Lead",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "john.doe@example.com",
       joinedDate: "2024-01-15",
-      skills: ["React", "TypeScript", "Node.js", "Architecture"],
       availability: 70,
       activeProjects: ["project-1", "project-2"],
       activeSprints: ["sprint-1", "sprint-3"],
@@ -154,10 +148,8 @@ const teamData: Team = {
       id: "user-2",
       name: "Jane Smith",
       role: "Frontend Developer",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "jane.smith@example.com",
       joinedDate: "2024-01-20",
-      skills: ["React", "CSS", "UI/UX", "TypeScript"],
       availability: 100,
       activeProjects: ["project-1", "project-3"],
       activeSprints: ["sprint-1", "sprint-4"],
@@ -171,10 +163,8 @@ const teamData: Team = {
       id: "user-3",
       name: "Alice Johnson",
       role: "Backend Developer",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "alice.johnson@example.com",
       joinedDate: "2024-02-05",
-      skills: ["Node.js", "Express", "MongoDB", "API Design"],
       availability: 90,
       activeProjects: ["project-2", "project-4"],
       activeSprints: ["sprint-2", "sprint-5"],
@@ -188,10 +178,8 @@ const teamData: Team = {
       id: "user-4",
       name: "Bob Brown",
       role: "DevOps Engineer",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "bob.brown@example.com",
       joinedDate: "2024-02-10",
-      skills: ["Docker", "Kubernetes", "CI/CD", "AWS"],
       availability: 80,
       activeProjects: ["project-1", "project-2", "project-3"],
       activeSprints: ["sprint-1", "sprint-3"],
@@ -205,10 +193,8 @@ const teamData: Team = {
       id: "user-5",
       name: "Emma Wilson",
       role: "QA Engineer",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "emma.wilson@example.com",
       joinedDate: "2024-02-15",
-      skills: ["Testing", "Automation", "Cypress", "Jest"],
       availability: 100,
       activeProjects: ["project-1", "project-4"],
       activeSprints: ["sprint-2", "sprint-4"],
@@ -222,10 +208,8 @@ const teamData: Team = {
       id: "user-6",
       name: "Michael Chen",
       role: "UI/UX Designer",
-      avatar: "/placeholder.svg?height=40&width=40",
       email: "michael.chen@example.com",
       joinedDate: "2024-03-01",
-      skills: ["Figma", "UI Design", "UX Research", "Prototyping"],
       availability: 90,
       activeProjects: ["project-3", "project-5"],
       activeSprints: ["sprint-3", "sprint-5"],
@@ -419,10 +403,7 @@ export function TeamDashboard() {
     return teamData.members.filter(
       (member) =>
         member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        member.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        member.skills.some((skill) =>
-          skill.toLowerCase().includes(searchQuery.toLowerCase()),
-        ),
+        member.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery]);
 
@@ -450,24 +431,6 @@ export function TeamDashboard() {
     };
   }, []);
 
-  // Calculate skill distribution
-  const skillDistribution = React.useMemo(() => {
-    const skills: Record<string, number> = {};
-
-    teamData.members.forEach((member) => {
-      member.skills.forEach((skill) => {
-        if (skills[skill]) {
-          skills[skill]++;
-        } else {
-          skills[skill] = 1;
-        }
-      });
-    });
-
-    return Object.entries(skills)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, []);
 
   // Calculate project distribution
   const projectDistribution = React.useMemo(() => {
@@ -630,10 +593,9 @@ export function TeamDashboard() {
       </div>
 
       <Tabs defaultValue="members">
-        <TabsList className="grid grid-cols-4 mb-4">
+        <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="members">Team Members</TabsTrigger>
           <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="skills">Skills & Expertise</TabsTrigger>
           <TabsTrigger value="activity">Team Activity</TabsTrigger>
         </TabsList>
 
@@ -695,18 +657,6 @@ export function TeamDashboard() {
                       <span>{member.availability}%</span>
                     </div>
                     <Progress value={member.availability} className="h-1.5" />
-
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {member.skills.map((skill) => (
-                        <Badge
-                          key={skill}
-                          variant="secondary"
-                          className="text-xs"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
 
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
@@ -901,7 +851,6 @@ export function TeamDashboard() {
                     );
 
                     // Calculate position and width percentages
-                    const startPercent = 0;
                     const progressPercent =
                       (elapsedDuration / totalDuration) * 100;
                     const remainingPercent = 100 - progressPercent;
@@ -956,142 +905,6 @@ export function TeamDashboard() {
                     );
                   })}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Skills Tab */}
-        <TabsContent value="skills" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Team Skills Distribution</CardTitle>
-                <CardDescription>
-                  Skills and expertise across the team
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={skillDistribution}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        nameKey="name"
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {skillDistribution.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={`var(--color-chart-${(index % 5) + 1})`}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Skill Coverage</CardTitle>
-                <CardDescription>
-                  Number of team members with each skill
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {skillDistribution.slice(0, 8).map((skill) => (
-                    <div key={skill.name} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{skill.name}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {skill.value} member{skill.value !== 1 ? "s" : ""}
-                        </span>
-                      </div>
-                      <Progress
-                        value={(skill.value / teamData.members.length) * 100}
-                        className="h-2"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Skill Matrix</CardTitle>
-              <CardDescription>Team members and their skills</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px] text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left font-medium p-2 pl-0">
-                        Team Member
-                      </th>
-                      {Array.from(
-                        new Set(teamData.members.flatMap((m) => m.skills)),
-                      )
-                        .sort()
-                        .map((skill) => (
-                          <th
-                            key={skill}
-                            className="text-center font-medium p-2"
-                          >
-                            {skill}
-                          </th>
-                        ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {teamData.members.map((member) => (
-                      <tr key={member.id} className="border-b">
-                        <td className="py-3 pl-0">
-                          <div className="flex items-center">
-                            <Avatar className="h-6 w-6 mr-2">
-                              <AvatarImage
-                                src={member.avatar || "/placeholder.svg"}
-                                alt={member.name}
-                              />
-                              <AvatarFallback>
-                                {member.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{member.name}</span>
-                          </div>
-                        </td>
-                        {Array.from(
-                          new Set(teamData.members.flatMap((m) => m.skills)),
-                        )
-                          .sort()
-                          .map((skill) => (
-                            <td key={skill} className="text-center py-3">
-                              {member.skills.includes(skill) ? (
-                                <CheckCircle className="h-4 w-4 text-chart-2 mx-auto" />
-                              ) : (
-                                <span className="text-muted">-</span>
-                              )}
-                            </td>
-                          ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </CardContent>
           </Card>
