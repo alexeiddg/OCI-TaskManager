@@ -2,6 +2,8 @@ package com.alexeiddg.web.controller.sprint;
 
 import DTO.domian.SprintDto;
 import DTO.domian.mappers.SprintMapper;
+import DTO.helpers.SprintCardDto;
+import DTO.helpers.mappers.SprintCardMapper;
 import com.alexeiddg.web.service.SprintService;
 import model.Sprint;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +64,14 @@ public class SprintController {
     @GetMapping("/team/{teamId}")
     public ResponseEntity<List<SprintDto>> getSprintsByTeamId(@PathVariable("teamId") Long teamId) {
         return ResponseEntity.ok(sprintService.getTeamSprints(teamId));
+    }
+
+    @GetMapping("/project/{projectId}/sprints")
+    public ResponseEntity<List<SprintCardDto>> getSprintsWithTasks(@PathVariable("projectId") Long projectId) {
+        List<Sprint> sprints = sprintService.getActiveSprintsByProjectId(projectId);
+        List<SprintCardDto> result = sprints.stream()
+                .map(SprintCardMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(result);
     }
 }

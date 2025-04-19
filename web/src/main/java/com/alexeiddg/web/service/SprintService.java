@@ -54,4 +54,8 @@ public class SprintService {
                         s.getEndDate()))
                 .toList();
     }
+
+    public List<Sprint> getActiveSprintsByProjectId(Long projectId) {
+        return sprintRepository.findByProjectIdAndIsActiveTrue(projectId);
+    }
 }

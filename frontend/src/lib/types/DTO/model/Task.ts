@@ -21,3 +21,5 @@ export const Task = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export type TaskModel = z.infer<typeof Task>;

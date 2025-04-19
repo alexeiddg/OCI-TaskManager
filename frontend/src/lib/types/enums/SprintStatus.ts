@@ -1,0 +1,6 @@
+export enum SprintStatus {
+    ACTIVE = 'ACTIVE',
+    COMPLETED = 'COMPLETED',
+    PLANNING = 'PLANNING',
+    CANCELLED = 'CANCELLED',
+}

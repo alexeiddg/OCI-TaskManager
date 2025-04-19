@@ -2,6 +2,7 @@ package model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import enums.SprintStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,11 +26,17 @@ public class Sprint {
     @Column(name = "sprint_name", nullable = false)
     private String sprintName;
 
+    @Column(name = "sprint_description", columnDefinition = "TEXT")
+    private String sprintDescription;
+
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
+
+    @Column(name = "status")
+    private SprintStatus status;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
@@ -41,7 +48,7 @@ public class Sprint {
     private List<Task> tasks;
 
     @Column(name = "is_active")
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

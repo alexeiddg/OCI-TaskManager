@@ -25,7 +25,7 @@ export const sidebarData = {
       icon: IconFolder,
     },
     {
-      title: "Sprints (TODO)",
+      title: "Sprints",
       url: "/dashboard/sprints",
       icon: IconListDetails,
     },
