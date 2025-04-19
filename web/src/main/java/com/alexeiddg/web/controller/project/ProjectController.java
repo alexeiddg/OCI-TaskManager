@@ -1,11 +1,13 @@
 package com.alexeiddg.web.controller.project;
 
+import DTO.domian.ProjectDto;
 import com.alexeiddg.web.service.ProjectService;
 import model.Project;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v2/projects")
@@ -58,5 +60,25 @@ public class ProjectController {
     @GetMapping("/by-developer/{developerId}")
     public ResponseEntity<List<Project>> getProjectsByDeveloperId(@PathVariable("developerId") Long developerId) {
         return ResponseEntity.ok(projectService.getProjectsByDeveloperId(developerId));
+    }
+
+    // Get all projects by team id
+    @GetMapping("/team/{teamId}/user/{userId}")
+    public ResponseEntity<List<ProjectDto>> getProjectsByTeamAndUser(
+            @PathVariable("teamId") Long teamId,
+            @PathVariable("userId") Long userId
+    ) {
+        List<ProjectDto> projects = projectService.getProjectsByTeamId(teamId, userId);
+        return ResponseEntity.ok(projects);
+    }
+
+    // toggle project a favorite
+    @PostMapping("/{projectId}/favorite")
+    public ResponseEntity<Map<String, Boolean>> toggleFavoriteProject(
+            @PathVariable("projectId") Long projectId,
+            @RequestParam("userId") Long userId
+    ) {
+        boolean isNowFavorite = projectService.toggleFavorite(projectId, userId);
+        return ResponseEntity.ok(Map.of("favorite", isNowFavorite));
     }
 }

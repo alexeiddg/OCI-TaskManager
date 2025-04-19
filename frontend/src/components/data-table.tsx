@@ -450,7 +450,7 @@ export function DataTable({
 
           <Button variant="outline" size="sm">
             <IconPlus />
-            <Link href='/create/task'>
+            <Link href="/create/task">
               <span className="hidden lg:inline">Create New</span>
             </Link>
           </Button>

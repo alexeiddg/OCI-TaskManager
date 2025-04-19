@@ -1,1 +1,4 @@
-export interface SprintDto  { id: number; sprintName: string }
+export interface SprintDto {
+  id: number;
+  sprintName: string;
+}

@@ -20,7 +20,7 @@ export const sidebarData = {
       icon: IconDashboard,
     },
     {
-      title: "Projects (TODO)",
+      title: "Projects",
       url: "/dashboard/projects",
       icon: IconFolder,
     },
@@ -30,7 +30,7 @@ export const sidebarData = {
       icon: IconListDetails,
     },
     {
-      title: "Tasks (TODO)",
+      title: "Tasks",
       url: "/dashboard/tasks",
       icon: IconFileDescription,
     },

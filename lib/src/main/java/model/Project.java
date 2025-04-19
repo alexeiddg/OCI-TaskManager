@@ -49,6 +49,18 @@ public class Project {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Transient
+    public float getProgress() {
+        if (sprints == null || sprints.isEmpty()) return 0;
+
+        float total = 0;
+        for (Sprint sprint : sprints) {
+            total += sprint.getCompletionRate();
+        }
+
+        return total / sprints.size();
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
