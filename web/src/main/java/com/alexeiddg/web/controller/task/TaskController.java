@@ -2,6 +2,7 @@ package com.alexeiddg.web.controller.task;
 
 import DTO.domian.TaskDto;
 import DTO.domian.mappers.TaskMapper;
+import DTO.helpers.TaskFavoriteRequest;
 import DTO.setup.TaskCreationRequest;
 import com.alexeiddg.web.service.TaskService;
 import enums.TaskPriority;
@@ -29,7 +30,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskCreationRequest request) {
         Task createdTask = taskService.createTaskWithLogging(request);
-        return ResponseEntity.ok(TaskMapper.toDto(createdTask));
+        return ResponseEntity.ok(TaskMapper.toDto(createdTask, false));
     }
 
     // Update an existing task
@@ -45,22 +46,22 @@ public class TaskController {
 
      // Delete Task (hard delete)
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<Void> deleteTask(@PathVariable("taskId") Long taskId) {
         taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
 
     // Soft delete task
     @PatchMapping("/{taskId}/soft-delete")
-    public ResponseEntity<Void> softDeleteTask(@PathVariable Long taskId) {
+    public ResponseEntity<Void> softDeleteTask(@PathVariable("taskId") Long taskId) {
         taskService.softDeleteTask(taskId);
         return ResponseEntity.ok().build();
     }
 
     // Get tasks assigned to a user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Task>> getTasksAssignedToUser(@PathVariable Long userId) {
-        List<Task> tasks = taskService.getTasksAssignedToUser(userId);
+    public ResponseEntity<List<TaskDto>> getTasksAssignedToUser(@PathVariable("userId") Long userId) {
+        List<TaskDto> tasks = taskService.getTasksAssignedToUser(userId);
         return ResponseEntity.ok(tasks);
     }
 
@@ -166,7 +167,7 @@ public class TaskController {
 
     // Mark task as completed
     @PatchMapping("/{taskId}/complete")
-    public ResponseEntity<Void> markTaskAsCompleted(@PathVariable Long taskId) {
+    public ResponseEntity<Void> markTaskAsCompleted(@PathVariable("taskId") Long taskId) {
         taskService.markTaskAsCompleted(taskId);
         return ResponseEntity.ok().build();
     }
@@ -186,5 +187,20 @@ public class TaskController {
     public ResponseEntity<List<Task>> getOverdueTasksForUser(@PathVariable Long userId) {
         List<Task> tasks = taskService.getOverdueTasksForUser(userId);
         return ResponseEntity.ok(tasks);
+    }
+
+
+    @PostMapping("/toggle-favorite")
+    public ResponseEntity<Void> toggleFavorite(@RequestBody TaskFavoriteRequest request) {
+        taskService.toggleFavorite(request.userId(), request.taskId(), request.favorite());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/is-favorite")
+    public ResponseEntity<Boolean> isFavorite(
+            @RequestParam("userId") Long userId,
+            @RequestParam("taskId") Long taskId) {
+        boolean favorite = taskService.isFavorite(userId, taskId);
+        return ResponseEntity.ok(favorite);
     }
 }

@@ -1,5 +1,7 @@
 package com.alexeiddg.web.service;
 
+import DTO.domian.TaskDto;
+import DTO.domian.mappers.TaskMapper;
 import DTO.setup.TaskCreationRequest;
 import enums.ChangeType;
 import enums.TaskPriority;
@@ -13,13 +15,14 @@ import repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final AppUserRepository userRepository;
+    private final AppUserRepository appUserRepository;
     private final SprintRepository sprintRepository;
     private final TaskLogRepository taskLogRepository;
     private final TaskAuditRepository taskAuditRepository;
@@ -35,9 +38,9 @@ public class TaskService {
     public Task createTaskWithLogging(TaskCreationRequest req) {
         Sprint sprint = sprintRepository.findById(req.sprintId())
                 .orElseThrow(() -> new RuntimeException("Sprint not found"));
-        AppUser creator = userRepository.findById(req.createdBy())
+        AppUser creator = appUserRepository.findById(req.createdBy())
                 .orElseThrow(() -> new RuntimeException("Creator not found"));
-        AppUser assignee = userRepository.findById(req.assignedTo())
+        AppUser assignee = appUserRepository.findById(req.assignedTo())
                 .orElseThrow(() -> new RuntimeException("Assignee not found"));
 
         Task task = new Task();
@@ -100,9 +103,14 @@ public class TaskService {
         });
     }
 
-    // Get all tasks for a user
-    public List<Task> getTasksAssignedToUser(Long userId) {
-        return taskRepository.findAllByAssignedToId(userId);
+    public List<TaskDto> getTasksAssignedToUser(Long userId) {
+        return taskRepository.findAllByAssignedToIdAndIsActive(userId, true)
+                .stream()
+                .map(task -> {
+                    boolean isFavorite = taskFavoriteRepository.existsByTaskIdAndUserId(task.getId(), userId);
+                    return TaskMapper.toDto(task, isFavorite);
+                })
+                .toList();
     }
 
     // Get all tasks for a sprint
@@ -160,7 +168,7 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
 
-        AppUser user = userRepository.findById(userId)
+        AppUser user = appUserRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
         task.setAssignedTo(user);
@@ -189,5 +197,27 @@ public class TaskService {
     // Get overdue tasks for user
     public List<Task> getOverdueTasksForUser(Long userId) {
         return taskRepository.findAllByDueDateBeforeAndStatusNotAndAssignedToId(LocalDateTime.now(), TaskStatus.DONE, userId);
+    }
+
+    // toggle favorite status
+    public void toggleFavorite(Long userId, Long taskId, boolean favorite) {
+        Optional<TaskFavorite> existing = taskFavoriteRepository.findByUserIdAndTaskId(userId, taskId);
+
+        if (favorite) {
+            if (existing.isEmpty()) {
+                AppUser user = appUserRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                Task task = taskRepository.findById(taskId)
+                        .orElseThrow(() -> new RuntimeException("Task not found"));
+                TaskFavorite fav = new TaskFavorite(null, user, task, LocalDateTime.now());
+                taskFavoriteRepository.save(fav);
+            }
+        } else {
+            existing.ifPresent(taskFavoriteRepository::delete);
+        }
+    }
+
+    public boolean isFavorite(Long userId, Long taskId) {
+        return taskFavoriteRepository.findByUserIdAndTaskId(userId, taskId).isPresent();
     }
 }

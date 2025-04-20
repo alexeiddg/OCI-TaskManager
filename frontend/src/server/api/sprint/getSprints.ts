@@ -65,9 +65,9 @@ export const SprintCardsSchema = z.object({
         z.object({
             id: Task.shape.id,
             name: Task.shape.taskName,
-            assignee: Task.shape.assignedTo,
+            assignee: Task.shape.assignedToUsername,
             completed: z.boolean(),
-            priority: Task.shape.taskPriority,
+            priority: Task.shape.priority,
             estimate: Task.shape.storyPoints,
         })
     ),

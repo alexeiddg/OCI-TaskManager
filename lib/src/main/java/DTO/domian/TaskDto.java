@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 public record TaskDto(
         Long id,
+        Long sprintId,
+        String sprintName,
         String taskName,
         String taskDescription,
         TaskPriority priority,
@@ -16,11 +18,13 @@ public record TaskDto(
         int storyPoints,
         LocalDateTime dueDate,
         LocalDateTime completedAt,
-        Long sprintId,
         Long createdById,
-        Long assignedToId,
+        String createdByUsername,
+        String assignedToUsername,
         boolean blocked,
         Boolean isActive,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Boolean completed,
+        Boolean favorite
 ) {}

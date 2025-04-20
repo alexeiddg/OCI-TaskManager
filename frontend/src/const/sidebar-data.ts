@@ -41,29 +41,29 @@ export const sidebarData = {
   ],
   navSecondary: [
     {
-      title: "Settings (TODO)",
+      title: "Settings",
       url: "/settings",
       icon: IconSettings,
     },
     {
-      title: "Help (TODO)",
+      title: "Help",
       url: "/help",
       icon: IconHelp,
     },
     {
-      title: "Search (TODO)",
+      title: "Search",
       url: "/search",
       icon: IconSearch,
     },
   ],
   documents: [
     {
-      name: "Reports (TODO)",
+      name: "Reports (Coming Soon)",
       url: "/dashboard/reports",
       icon: IconReport,
     },
     {
-      name: "Data Library (TODO)",
+      name: "Data Library (Coming Soon)",
       url: "/dashboard/data",
       icon: IconDatabase,
     },
