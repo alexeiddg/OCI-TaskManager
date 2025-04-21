@@ -190,17 +190,5 @@ public class TaskManagerBot extends AbilityBot {
         return botAbilities.login().login(this);
     }
 
-//    public Ability signUp() {
-//        return signUp.signUp(this);
-//    }
-//
-//    public Ability login() {
-//        return login.login(this);
-//    }
-//
-//    public Ability stop() {
-//        return stop.stopAbility(this);
-//    }
-
     // TODO: Impl stateless abilities
 }

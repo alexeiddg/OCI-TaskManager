@@ -1,6 +1,7 @@
 package com.alexeiddg.telegram.bot.util;
 
 import com.alexeiddg.telegram.bot.session.UserState;
+import org.checkerframework.checker.units.qual.K;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -147,6 +148,24 @@ public class ReplyKeyboard {
                 row.add("IN_PROGRESS");
                 row.add("DONE");
                 keyboard.add(row);
+            }
+
+            case REPORTS_MENU -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("🏠 Main Menu");
+                keyboard.add(row);
+
+                KeyboardRow personalReportRow = new KeyboardRow();
+                personalReportRow.add("📊 Personal Report");
+                keyboard.add(personalReportRow);
+
+                KeyboardRow teamReportRow = new KeyboardRow();
+                teamReportRow.add("👥 Team Report");
+                keyboard.add(teamReportRow);
+
+                KeyboardRow logoutRow = new KeyboardRow();
+                logoutRow.add("🔒 Logout");
+                keyboard.add(logoutRow);
             }
         }
 

@@ -1,5 +1,6 @@
 package com.alexeiddg.telegram.service;
 
+import enums.SprintStatus;
 import enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import model.AppUser;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
 import repository.ProjectRepository;
 import repository.SprintRepository;
+import service.KpiSnapshotService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,7 @@ public class SprintService {
     private final SprintRepository sprintRepository;
     private final ProjectRepository projectRepository;
     private final AppUserRepository appUserRepository;
+    private final KpiSnapshotService kpiSnapshotService;
 
     public Sprint createSprint(Sprint sprint) {
         return sprintRepository.save(sprint);
@@ -74,5 +77,12 @@ public class SprintService {
             sprint.setIsActive(false);
             sprintRepository.save(sprint);
         });
+    }
+
+    public void markSprintAsCompleted(Sprint sprint) {
+        sprint.setStatus(SprintStatus.COMPLETED);
+        sprintRepository.save(sprint);
+
+        kpiSnapshotService.snapshotForSprint(sprint);
     }
 }

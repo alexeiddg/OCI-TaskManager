@@ -87,4 +87,8 @@ public enum UserState {
     // Task delete flow
     TASK_DELETE,
     TASK_DELETE_CONFIRM, TASK_UPDATE,
+
+
+    // Reports
+    REPORTS_MENU,
 }

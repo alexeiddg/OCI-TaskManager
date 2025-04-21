@@ -17,4 +17,11 @@ public interface TaskLogRepository extends JpaRepository<TaskLog, Long> {
 
     @Query("SELECT COALESCE(SUM(tl.hoursLogged), 0) FROM TaskLog tl WHERE tl.task = :task AND tl.user = :user")
     double sumHoursByTaskAndUser(@Param("task") Task task, @Param("user") AppUser user);
+
+    @Query("SELECT COALESCE(SUM(tl.hoursLogged), 0) " +
+            "FROM TaskLog tl " +
+            "WHERE tl.user = :user " +
+            "AND tl.task.sprint.id = :sprintId")
+    double sumHoursByUserAndSprint(@Param("user") AppUser user,
+                                   @Param("sprintId") Long sprintId);
 }

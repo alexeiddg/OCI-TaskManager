@@ -76,6 +76,26 @@ public class Task {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Transient
+    public boolean isBug() {
+        return type == TaskType.BUG;
+    }
+
+    @Transient
+    public boolean isFeature() {
+        return type == TaskType.FEATURE;
+    }
+
+    @Transient
+    public boolean wasCompletedOnTime() {
+        return completedAt != null && dueDate != null && !completedAt.isAfter(dueDate);
+    }
+
+    @Transient
+    public boolean isCompleted() {
+        return status == TaskStatus.DONE;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -87,11 +107,6 @@ public class Task {
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-    }
-
-    @Transient
-    public boolean isCompleted() {
-        return status == TaskStatus.DONE;
     }
 }
 
