@@ -71,7 +71,7 @@ public class SprintService {
 
     public void deactivateSprint(Long sprintId) {
         sprintRepository.findById(sprintId).ifPresent(sprint -> {
-            sprint.setActive(false);
+            sprint.setIsActive(false);
             sprintRepository.save(sprint);
         });
     }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import repository.TeamRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamService {
@@ -34,8 +35,8 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
-    public List<Team> getTeamsByProjectId(Long projectId) {
-        return teamRepository.findByProjectId(projectId);
+    public Optional<Team> getTeamsByProjectId(Long projectId) {
+        return teamRepository.findTeamByProjectId(projectId);
     }
 
     public List<Team> getTeamsByManagerId(Long managerId) {

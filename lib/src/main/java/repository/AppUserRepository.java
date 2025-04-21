@@ -17,4 +17,5 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     List<AppUser> findAllByRole(UserRole role);
     List<AppUser> findByTeamIdAndRole(Long teamId, UserRole role);
     boolean existsByIdAndTeamIsNotNull(Long userId);
+    List<AppUser> findByTeamId(Long teamId);
 }

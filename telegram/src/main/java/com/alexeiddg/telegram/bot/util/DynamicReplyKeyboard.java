@@ -76,7 +76,7 @@ public class DynamicReplyKeyboard {
 
             case TASK -> {
                 KeyboardRow MenuRow = new KeyboardRow();
-                MenuRow.add("Main Menu");
+                MenuRow.add("🏠 Main Menu");
                 keyboard.add(MenuRow);
 
                 KeyboardRow tasksOptionsRow = new KeyboardRow();

@@ -1,24 +1,31 @@
 package com.alexeiddg.telegram.bot.session;
 
 public enum UserState {
+    // 🚫 Generic / No State
     NONE,
-    // Signup state
-    SIGNUP,
+
+    // 🔐 Signup Flow
+    SIGNUP, // TODO: Check if possible to remove this state
     SIGNUP_NAME,
     SIGNUP_USERNAME,
     SIGNUP_ROLE,
     SIGNUP_MANAGER,
     SIGNUP_FINISH,
-    // Login state
+
+    // 🔐 Login Flow
     LOGIN_USERNAME,
-    // Main menu state
+    LOGIN_PASSWORD,
+
+    // 🧭 Main Menu
     MAIN_MENU,
-    MAIN_MENU_BEGIN,
-    MAIN_MENU_PROJECTS,
-    MAIN_MENU_SPRINT,
-    MAIN_MENU_TEAM,
-    MAIN_MENU_CREATE_TASK,
+    MAIN_MENU_BEGIN, // TODO: Check if possible to remove this state
     MAIN_MENU_VIEW_TASKS,
+    MAIN_MENU_CREATE_TASK,
+    MAIN_MENU_SPRINT,
+    MAIN_MENU_PROJECTS,
+    MAIN_MENU_TEAM,
+    MAIN_MENU_REPORTS,
+
     // Project state
     PROJECT,
     // Project create state
@@ -42,12 +49,15 @@ public enum UserState {
     SPRINT_CREATE_START_DATE,
     SPRINT_CREATE_END_DATE,
     SPRINT_CREATE_CONFIRMATION,
-    // Task state
+
+    // ✅ Task General
     TASK,
     TASK_SELECT_START,
     TASK_SELECT_COMPLETE,
+    TASK_LOG_HOURS,
     TASK_SELECT_REOPEN,
     TASK_DETAILS,
+
     // Task creation flow
     TASK_CREATE,
     TASK_CREATE_NAME,
@@ -60,10 +70,9 @@ public enum UserState {
     TASK_CREATE_STORY_POINTS,
     TASK_CREATE_DUE_DATE,
     TASK_CREATE_CONFIRMATION,
+
     // Task update flow
-    TASK_UPDATE,
     TASK_UPDATE_SELECT,
-    TASK_UPDATE_FIELD,
     TASK_UPDATE_NAME,
     TASK_UPDATE_DESCRIPTION,
     TASK_UPDATE_PRIORITY,
@@ -72,7 +81,10 @@ public enum UserState {
     TASK_UPDATE_STORY_POINTS,
     TASK_UPDATE_DUE_DATE,
     TASK_UPDATE_BLOCKED,
+    TASK_UPDATE_ASSIGNEE,
+    TASK_UPDATE_LOG_HOURS,
+
     // Task delete flow
     TASK_DELETE,
-    TASK_DELETE_CONFIRM,
+    TASK_DELETE_CONFIRM, TASK_UPDATE,
 }

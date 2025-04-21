@@ -100,10 +100,7 @@ public class CreateSprintAbility {
 
                     Sprint sprint = new Sprint();
                     sprint.setProject(selectedProject);
-                    sprint.setActive(true);
-                    sprint.setCompletedTasks(0);
-                    sprint.setTotalTasks(0);
-                    sprint.setCompletionRate(0.0f);
+                    sprint.setIsActive(true);
 
                     tempSprintDataStore.set(telegramUserId, sprint);
                     userSessionManager.setState(telegramUserId, UserState.SPRINT_CREATE_NAME);

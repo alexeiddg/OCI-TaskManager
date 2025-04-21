@@ -16,10 +16,13 @@ public class ReplyKeyboard {
 
         switch (state) {
             case SIGNUP -> {
-                KeyboardRow row = new KeyboardRow();
-                row.add("📝 Sign up");
-                row.add("👤 Login w/username");
-                keyboard.add(row);
+                KeyboardRow signuprow = new KeyboardRow();
+                signuprow.add("📝 Sign up");
+                keyboard.add(signuprow);
+
+                KeyboardRow loginrow = new KeyboardRow();
+                loginrow.add("👤 Login");
+                keyboard.add(loginrow);
             }
 
             case SIGNUP_ROLE -> {
@@ -31,13 +34,36 @@ public class ReplyKeyboard {
 
             case MAIN_MENU -> {
                 KeyboardRow row = new KeyboardRow();
-                row.add("View Current Projects");
-                row.add("View Current Sprint");
-                row.add("View Current Team");
-                row.add("📝 Create Task");
-                row.add("📋 View Tasks");
-                row.add("🔒 Logout");
+                row.add("🏠 Main Menu");
                 keyboard.add(row);
+
+                KeyboardRow viewTaskRow = new KeyboardRow();
+                viewTaskRow.add("📝 View Current Tasks");
+                keyboard.add(viewTaskRow);
+
+                KeyboardRow createTaskRow = new KeyboardRow();
+                createTaskRow.add("📝 Create Task");
+                keyboard.add(createTaskRow);
+
+                KeyboardRow sprintRow = new KeyboardRow();
+                sprintRow.add("🏃 Sprints");
+                keyboard.add(sprintRow);
+
+                KeyboardRow projectsRow = new KeyboardRow();
+                projectsRow.add("📁 Projects");
+                keyboard.add(projectsRow);
+
+                KeyboardRow teamsRow = new KeyboardRow();
+                teamsRow.add("👥 Team");
+                keyboard.add(teamsRow);
+
+                KeyboardRow reportsRow = new KeyboardRow();
+                reportsRow.add("📊 Reports");
+                keyboard.add(reportsRow);
+
+                KeyboardRow logoutRow = new KeyboardRow();
+                logoutRow.add("🔒 Logout");
+                keyboard.add(logoutRow);
             }
 
             case TASK_CREATE_PRIORITY -> {
@@ -62,6 +88,64 @@ public class ReplyKeyboard {
                 row.add("2");
                 row.add("3");
                 row.add("4");
+                keyboard.add(row);
+            }
+
+            case TASK_UPDATE -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("🏠 Main Menu");
+                keyboard.add(row);
+
+                KeyboardRow nameRow = new KeyboardRow();
+                nameRow.add("🔤 Update Name");
+                keyboard.add(nameRow);
+
+                KeyboardRow descRow = new KeyboardRow();
+                descRow.add("🗒️ Update Description");
+                keyboard.add(descRow);
+
+                KeyboardRow priorityRow = new KeyboardRow();
+                priorityRow.add("⚡ Change Priority");
+                keyboard.add(priorityRow);
+
+                KeyboardRow statusRow = new KeyboardRow();
+                statusRow.add("📊 Change Status");
+                keyboard.add(statusRow);
+
+                KeyboardRow typeRow = new KeyboardRow();
+                typeRow.add("🛠️ Change Type");
+                keyboard.add(typeRow);
+
+                KeyboardRow pointsRow = new KeyboardRow();
+                pointsRow.add("📏 Change Story Points");
+                keyboard.add(pointsRow);
+
+                KeyboardRow dueDateRow = new KeyboardRow();
+                dueDateRow.add("📅 Change Due Date");
+                keyboard.add(dueDateRow);
+
+                KeyboardRow blockRow = new KeyboardRow();
+                blockRow.add("🚧 Toggle Blocked");
+                keyboard.add(blockRow);
+
+                KeyboardRow hoursRow = new KeyboardRow();
+                hoursRow.add("⏱️ Log Hours");
+                keyboard.add(hoursRow);
+
+                KeyboardRow logoutRow = new KeyboardRow();
+                logoutRow.add("🔒 Logout");
+                keyboard.add(logoutRow);
+            }
+
+            case TASK_UPDATE_SELECT -> {
+                keyboard.addAll(generateKeyboardForState(UserState.TASK_UPDATE).getKeyboard());
+            }
+
+            case TASK_UPDATE_STATUS -> {
+                KeyboardRow row = new KeyboardRow();
+                row.add("TODO");
+                row.add("IN_PROGRESS");
+                row.add("DONE");
                 keyboard.add(row);
             }
         }

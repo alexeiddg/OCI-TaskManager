@@ -1,13 +1,6 @@
 package com.alexeiddg.telegram.bot;
 
 import com.alexeiddg.telegram.bot.actions.*;
-import com.alexeiddg.telegram.bot.actions.project.CreateProjectAbility;
-import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
-import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
-import com.alexeiddg.telegram.bot.actions.sprint.CreateSprintAbility;
-import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
-import com.alexeiddg.telegram.bot.actions.task.CreateTaskAbility;
-import com.alexeiddg.telegram.bot.actions.task.TaskAbility;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import jakarta.annotation.PostConstruct;
@@ -31,48 +24,17 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TaskManagerBot extends AbilityBot {
 
     private final UserSessionManager userSessionManager;
-    private final StartAbility start;
-    private final SignUpAbility signUp;
-    private final LoginAbility login;
-    private final StopAbility stop;
-    private final ProjectAbility projectAbility;
-    private final CreateProjectAbility createProjectAbility;
-    private final DeleteProjectAbility deleteProjectAbility;
-    private final SprintAbility sprintAbility;
-    private final CreateSprintAbility createSprintAbility;
-    private final TaskAbility taskAbility;
-    private final CreateTaskAbility createTaskAbility;
+    private final BotAbilities botAbilities;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
             @Value("${telegram.bot.token}") String botToken,
             UserSessionManager userSessionManager,
-            StartAbility start,
-            SignUpAbility signUp,
-            LoginAbility login,
-            StopAbility stop,
-            ProjectAbility projectAbility,
-            CreateProjectAbility createProjectAbility,
-            DeleteProjectAbility deleteProjectAbility,
-            SprintAbility sprintAbility,
-            CreateSprintAbility createSprintAbility, TaskAbility taskAbility,
-            CreateTaskAbility createTaskAbility
+            BotAbilities botAbilities
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
-
-        // Abilities Init
-        this.start = start;
-        this.signUp = signUp;
-        this.login = login;
-        this.stop = stop;
-        this.projectAbility = projectAbility;
-        this.createProjectAbility = createProjectAbility;
-        this.deleteProjectAbility = deleteProjectAbility;
-        this.sprintAbility = sprintAbility;
-        this.createSprintAbility = createSprintAbility;
-        this.taskAbility = taskAbility;
-        this.createTaskAbility = createTaskAbility;
+        this.botAbilities = botAbilities;
     }
 
     /**
@@ -113,138 +75,102 @@ public class TaskManagerBot extends AbilityBot {
             Long userId = update.getMessage().getFrom().getId();
             UserState state = userSessionManager.getState(userId);
 
+            System.out.println("DEBUG: Reached MainBot State with state = " + state);
+
             // Start Ability flow for signup
             if (messageText.equals("📝 Sign up")) {
-                signUp.beginSignup(this, chatId);
+                botAbilities.signUp().beginSignup(this, chatId);
             }
 
-            // Handle signup flow based on the current state
-            if (state == UserState.SIGNUP_NAME ||
-                    state == UserState.SIGNUP_USERNAME ||
-                    state == UserState.SIGNUP_ROLE ||
-                    state == UserState.SIGNUP_MANAGER
-            ) {
-
-                signUp.handleSignUp(this, update);
+            // Start Ability flow for login
+            if (messageText.equals("👤 Login")) {
+                botAbilities.login().beginLogin(this, chatId);
             }
 
-            // Begin Login on click
-            if (messageText.equals("👤 Login w/username")) {
-                login.beginLogin(this, chatId);
+            if (state == UserState.LOGIN_USERNAME || state == UserState.LOGIN_PASSWORD) {
+                botAbilities.login().handleLogin(this, update);
             }
 
-            // handle login
-            if (state == UserState.LOGIN_USERNAME) {
-                login.handleLogin(this, update);
+            /**
+             * Core functionality of the bot
+             * */
+
+            if (messageText.equals("🏠 Main Menu")) {
+                botAbilities.start().startMainMenu(this, chatId, userId);
             }
 
-            // Start projects workflow
-            if (messageText.equals("View Current Projects")) {
-                projectAbility.ViewProjects(this, chatId, userId);
-            }
-
-            // Handle back to main menu
-            if (messageText.equals("Main Menu")) {
-                start.startMainMenu(this, chatId, userId);
-            }
-
-            if (messageText.equals("➕ Create Project")) {
-                projectAbility.createProject(this, chatId, userId);
-            }
-
-            // Handle state update for project creation
-            if (state == UserState.PROJECT_CREATE_NAME
-                    || state == UserState.PROJECT_CREATE_DESCRIPTION
-                    || state == UserState.PROJECT_CREATE_MANAGER
-                    || state == UserState.PROJECT_CREATE_TEAM_DECISION
-                    || state == UserState.PROJECT_CREATE_TEAM_SELECT
-                    || state == UserState.PROJECT_CREATE_CONFIRMATION
-            ) {
-                createProjectAbility.handleCreateProject(this, update);
-            }
-
-            if (messageText.equals("❌ Delete Project")) {
-                projectAbility.deleteProject(this, chatId, userId);
-            }
-
-            if (state == UserState.PROJECT_DELETE ) {
-                deleteProjectAbility.deleteProject(this, update);
-            }
-
-            if (state == UserState.PROJECT_DELETE_CONFIRM) {
-                deleteProjectAbility.confirmDelete(this, update);
-            }
-
-            if (messageText.equals("View Current Sprint")) {
-                sprintAbility.viewSprints(this, chatId, userId);
-            }
-
-            if (messageText.equals("➕ Create Sprint")) {
-                createSprintAbility.createSprint(this, chatId, userId);
-            }
-
-            if (state == UserState.SPRINT_CREATE_PROJECT_SELECT
-                    || state == UserState.SPRINT_CREATE_NAME
-                    || state == UserState.SPRINT_CREATE_START_DATE
-                    || state == UserState.SPRINT_CREATE_END_DATE
-                    || state == UserState.SPRINT_CREATE_CONFIRMATION
-            ) {
-                createSprintAbility.handleCreateSprint(this, update);
-            }
-
-            if (messageText.equals("📝 Create Task") || messageText.equals("➕ Create Task")) {
-                createTaskAbility.createTask(this, chatId, userId);
-            }
-
-            if (state == UserState.TASK_CREATE_NAME
-                    || state == UserState.TASK_CREATE_DESCRIPTION
-                    || state == UserState.TASK_CREATE_ASSIGNEE
-                    || state == UserState.TASK_CREATE_SPRINT
-                    || state == UserState.TASK_CREATE_PRIORITY
-                    || state == UserState.TASK_CREATE_STATUS
-                    || state == UserState.TASK_CREATE_TYPE
-                    || state == UserState.TASK_CREATE_STORY_POINTS
-                    || state == UserState.TASK_CREATE_DUE_DATE
-                    || state == UserState.TASK_CREATE_CONFIRMATION
-            ) {
-                createTaskAbility.handleCreateTask(this, update);
-            }
-
-            if (messageText.equals("📋 View Tasks")) {
-               taskAbility.viewTasks(this, chatId, userId);
+            if (messageText.equals("📝 View Current Tasks")){
+                botAbilities.taskAbility().viewTasks(this, chatId, userId);
             }
 
             if (messageText.equals("Start Task")) {
-                taskAbility.startTask(this, chatId, userId);
+                botAbilities.taskAbility().startTask(this, chatId, userId);
             }
 
             if (state == UserState.TASK_SELECT_START) {
-                taskAbility.handleStartTask(this, update);
+                botAbilities.taskAbility().handleStartTask(this, update);
             }
 
             if (messageText.equals("Complete Task")) {
-                taskAbility.completeTask(this, chatId, userId);
+                botAbilities.taskAbility().completeTask(this, chatId, userId);
             }
 
             if (state == UserState.TASK_SELECT_COMPLETE) {
-                taskAbility.handleCompleteTask(this, update);
+                botAbilities.taskAbility().handleCompleteTask(this, update);
             }
 
             if (messageText.equals("Reopen Task")) {
-                taskAbility.reopenTask(this, chatId, userId);
+                botAbilities.taskAbility().reopenTask(this, chatId, userId);
             }
 
             if (state == UserState.TASK_SELECT_REOPEN) {
-                taskAbility.handleReopenTask(this, update);
+                botAbilities.taskAbility().handleReopenTask(this, update);
             }
 
             if (state == UserState.TASK) {
-                taskAbility.handleTaskDetails(this, update);
+                botAbilities.taskAbility().handleTaskDetails(this, update);
             }
 
-            // Handle logout
+            if (messageText.equals("📝 Create Task") || messageText.equals("➕ Create Task")) {
+                botAbilities.createTaskAbility().createTask(this, chatId, userId);
+            }
+
+
+            if (state == UserState.TASK_LOG_HOURS) {
+                botAbilities.taskAbility().handleLoggedHours(this, update);
+            }
+
+            if (messageText.equals("❌ Delete Task")) {
+                botAbilities.deleteTaskAbility().deleteTask(this, chatId, userId);
+            }
+
+            if (state == UserState.TASK_DELETE) {
+                botAbilities.deleteTaskAbility().handleDeleteTask(this, update);
+            }
+
+            if (messageText.equals("📝 Update Task")) {
+                botAbilities.updateTaskAbility().updateTask(this, chatId, userId);
+            }
+
+            if (
+                    state == UserState.TASK_UPDATE_SELECT ||
+                            state == UserState.TASK_UPDATE ||
+                            state == UserState.TASK_UPDATE_NAME ||
+                            state == UserState.TASK_UPDATE_DESCRIPTION ||
+                            state == UserState.TASK_UPDATE_PRIORITY ||
+                            state == UserState.TASK_UPDATE_STATUS ||
+                            state == UserState.TASK_UPDATE_TYPE ||
+                            state == UserState.TASK_UPDATE_STORY_POINTS ||
+                            state == UserState.TASK_UPDATE_DUE_DATE ||
+                            state == UserState.TASK_UPDATE_BLOCKED ||
+                            state == UserState.TASK_UPDATE_LOG_HOURS ||
+                            state == UserState.TASK_UPDATE_ASSIGNEE
+            ) {
+                botAbilities.updateTaskAbility().handleUpdateTask(this, update);
+            }
+
             if (messageText.equals("🔒 Logout")) {
-                stop.handleStop(this, userId, chatId);
+                botAbilities.stop().handleStop(this, userId, chatId);
             }
         }
     }
@@ -257,20 +183,24 @@ public class TaskManagerBot extends AbilityBot {
      */
 
     public Ability start() {
-        return start.start(this);
-    }
-
-    public Ability signUp() {
-        return signUp.signUp(this);
+        return botAbilities.start().start(this);
     }
 
     public Ability login() {
-        return login.login(this);
+        return botAbilities.login().login(this);
     }
 
-    public Ability stop() {
-        return stop.stopAbility(this);
-    }
+//    public Ability signUp() {
+//        return signUp.signUp(this);
+//    }
+//
+//    public Ability login() {
+//        return login.login(this);
+//    }
+//
+//    public Ability stop() {
+//        return stop.stopAbility(this);
+//    }
 
     // TODO: Impl stateless abilities
 }

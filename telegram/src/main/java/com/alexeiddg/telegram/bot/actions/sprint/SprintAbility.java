@@ -33,7 +33,7 @@ public class SprintAbility {
 
         List<Sprint> sprints = sprintService.getSprintsForUser(user.getId());
         List<Sprint> activeSprints = sprints.stream()
-                .filter(Sprint::isActive)
+                .filter(Sprint::getIsActive)
                 .toList();
 
         if (activeSprints.isEmpty()) {

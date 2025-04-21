@@ -1,5 +1,6 @@
 package com.alexeiddg.telegram.service;
 
+import com.alexeiddg.telegram.bot.security.PasswordConfig;
 import enums.UserRole;
 import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
@@ -11,9 +12,11 @@ import java.util.Optional;
 @Service
 public class AppUserService {
     private final AppUserRepository appUserRepository;
+    private final PasswordConfig passwordEncoder;
 
-    public AppUserService(AppUserRepository appUserRepository) {
+    public AppUserService(AppUserRepository appUserRepository, PasswordConfig passwordEncoder) {
         this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // createUser
@@ -59,5 +62,13 @@ public class AppUserService {
     // getAllUsersByRole
     public List<AppUser> getAllUsersByRole(UserRole role) {
         return appUserRepository.findAllByRole(role);
+    }
+
+    public boolean checkPassword(String rawPassword, String hashedPassword) {
+        return passwordEncoder.passwordEncoder().matches(rawPassword, hashedPassword);
+    }
+
+    public List<AppUser> getTeamMembers(Long teamId) {
+        return appUserRepository.findByTeamId(teamId);
     }
 }

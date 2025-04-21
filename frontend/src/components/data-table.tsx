@@ -908,6 +908,49 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
             </form>
 
             <Separator />
+            <div className="flex flex-col gap-2">
+              <Label className="text-base font-medium">Time Logged</Label>
+
+              {/* Simulated log data (replace later with fetched logs) */}
+              <div className="space-y-1 text-sm">
+                {[{ user: "alice", hours: 2, date: "2025-04-19" }, { user: "bob", hours: 3.5, date: "2025-04-20" }].map((log, i) => (
+                    <div key={i} className="flex justify-between text-muted-foreground border rounded-md p-2 bg-muted/40">
+                      <span>{log.user}</span>
+                      <span>{log.hours}h on {log.date}</span>
+                    </div>
+                ))}
+              </div>
+
+              {/* Add new log entry */}
+              <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.currentTarget;
+                    const input = form.elements.namedItem("logHours") as HTMLInputElement;
+                    const hours = parseFloat(input.value);
+                    if (!isNaN(hours)) {
+                      console.log(`Log ${hours}hours to task ${item.id}`);
+                      input.value = "";
+                    }
+                  }}
+                  className="flex gap-2 mt-2"
+              >
+                <Input
+                    name="logHours"
+                    type="number"
+                    step="0.25"
+                    min="0"
+                    placeholder="Log hours"
+                    className="w-24"
+                    required
+                />
+                <Button type="submit" variant="default">
+                  Add
+                </Button>
+              </form>
+            </div>
+
+            <Separator />
             <div className="text-xs text-muted-foreground space-y-1">
               <p>ID: {item.id}</p>
               <p>Created: {new Date(item.createdAt).toLocaleString()}</p>

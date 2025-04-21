@@ -40,7 +40,7 @@ public class TaskService {
     }
 
     public List<Task> getTasksAssignedToUser(Long userId) {
-        return taskRepository.findAllByAssignedToId(userId);
+        return taskRepository.findAllByAssignedToIdAndIsActive(userId, true);
     }
 
 
@@ -50,7 +50,7 @@ public class TaskService {
         if (taskOpt.isPresent()) {
             Task task = taskOpt.get();
             task.setStatus(TaskStatus.DONE);
-            task.setIsActive(false);
+            task.setIsActive(true);
             task.setCompletedAt(LocalDateTime.now());
             taskRepository.save(task);
             return true;

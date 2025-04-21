@@ -100,21 +100,17 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>10.20.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-database-oracle</artifactId>
-			<version>10.20.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 	</dependencies>
 

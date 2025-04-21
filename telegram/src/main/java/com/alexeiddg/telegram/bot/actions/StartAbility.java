@@ -45,17 +45,8 @@ public class StartAbility {
                         String response = String.format("👋 Hello, %s (@%s)! Let's get working!", name, username);
                         bot.silent().send(response, chatId);
 
-                        // build the main menu keyboard
-                        SendMessage message = new SendMessage();
-                        message.setChatId(chatId.toString());
-                        message.setText("📋 Main Menu");
-                        message.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
-
-                        try {
-                            bot.execute(message);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        // send the main menu keyboard
+                        startMainMenu(bot, chatId, telegramId);
                     }
 
                     else {
@@ -66,7 +57,7 @@ public class StartAbility {
 
                        SendMessage message = new SendMessage();
                        message.setChatId(chatId.toString());
-                       message.setText("Click '📝 Sign up' to begin registration! or Click '📝 Login w/username to login");
+                       message.setText("Click '📝 Sign up' to begin registration! or \n Click '👤 Login' to login");
                        message.setReplyMarkup(markup);
 
                        try {
@@ -84,7 +75,7 @@ public class StartAbility {
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
-        message.setText("📋 Main Menu");
+        message.setText("🏠 Main Menu");
         message.setReplyMarkup(ReplyKeyboard.generateKeyboardForState(UserState.MAIN_MENU));
 
         try {

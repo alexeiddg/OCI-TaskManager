@@ -3,7 +3,9 @@ package com.alexeiddg.telegram.bot.actions.task;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
 import com.alexeiddg.telegram.bot.util.DynamicReplyKeyboard;
+import com.alexeiddg.telegram.bot.util.tempDataStore.TempTaskDataStore;
 import com.alexeiddg.telegram.service.AppUserService;
+import com.alexeiddg.telegram.service.TaskLogService;
 import com.alexeiddg.telegram.service.TaskService;
 import enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class TaskAbility {
     private final UserSessionManager userSessionManager;
     private final AppUserService appUserService;
     private final TaskService taskService;
+    private final TaskLogService taskLogService;
+    private final TempTaskDataStore tempTaskDataStore;
 
     public void viewTasks(BaseAbilityBot bot, Long chatId, Long telegramId) {
         userSessionManager.setState(telegramId, UserState.TASK);
@@ -34,11 +38,11 @@ public class TaskAbility {
 
         if (userOpt.isPresent()) {
             AppUser user = userOpt.get();
-            List<Task> tasks = taskService.getTasksCreatedByUser(user.getId());
+            List<Task> tasks = taskService.getTasksAssignedToUser(user.getId());
 
             // Filter only active tasks
             List<Task> activeTasks = tasks.stream()
-                    .filter(task -> Boolean.TRUE.equals(task.getIsActive()))
+                    .filter(task -> task.getStatus() != TaskStatus.DONE)
                     .toList();
 
             if (activeTasks.isEmpty()) {
@@ -93,7 +97,7 @@ public class TaskAbility {
                 taskService.updateTask(task);
 
                 userSessionManager.setState(telegramId, UserState.TASK);
-                bot.silent().send("🚀 Task marked as *in progress*!", chatId);
+                bot.silent().send("🚀 Task marked as in progress!", chatId);
                 hotReloadKeyboard(bot, chatId, telegramId);
             } else {
                 bot.silent().send("⚠️ Task not found. Please make sure the ID is correct.", chatId);
@@ -118,18 +122,50 @@ public class TaskAbility {
 
         if (matcher.find()) {
             Long taskId = Long.parseLong(matcher.group(1));
+            Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
-            boolean updated = taskService.markTaskAsCompleted(taskId);
-
-            if (updated) {
-                bot.silent().send("✅ Task marked as completed!", chatId);
-                userSessionManager.setState(telegramId, UserState.TASK);
-                hotReloadKeyboard(bot, chatId, telegramId);
+            if (taskOpt.isPresent()) {
+                Task task = taskOpt.get();
+                tempTaskDataStore.set(telegramId, task);
+                userSessionManager.setState(telegramId, UserState.TASK_LOG_HOURS);
+                bot.silent().send("⏱️ Please enter the number of hours you spent on this task (e.g., 2.5):", chatId);
             } else {
-                bot.silent().send("⚠️ Failed to complete the task. Make sure the ID is correct.", chatId);
+                bot.silent().send("⚠️ Task not found. Make sure the ID is correct.", chatId);
             }
         } else {
             bot.silent().send("⚠️ Invalid format. Please select a task from the menu or type in the format: `{ID} Task Name`", chatId);
+        }
+    }
+
+    public void handleLoggedHours(BaseAbilityBot bot, Update update) {
+        Long chatId = update.getMessage().getChatId();
+        Long telegramId = update.getMessage().getFrom().getId();
+        String text = update.getMessage().getText();
+
+        double hours;
+        try {
+            hours = Double.parseDouble(text);
+            if (hours <= 0 || hours > 24) throw new IllegalArgumentException();
+        } catch (Exception e) {
+            bot.silent().send("⚠️ Invalid input. Please enter a number between 0.1 and 24.", chatId);
+            return;
+        }
+
+        Task task = tempTaskDataStore.get(telegramId);
+        Optional<AppUser> userOpt = appUserService.getUserByTelegramId(String.valueOf(telegramId));
+
+        if (userOpt.isPresent()) {
+            AppUser user = userOpt.get();
+
+            taskLogService.logHours(task, user, hours);
+            taskService.markTaskAsCompleted(task.getId());
+
+            bot.silent().send("✅ Task completed and hours logged successfully!", chatId);
+            userSessionManager.setState(telegramId, UserState.TASK);
+            tempTaskDataStore.clear(telegramId);
+            hotReloadKeyboard(bot, chatId, telegramId);
+        } else {
+            bot.silent().send("⚠️ Could not find task or user. Try again.", chatId);
         }
     }
 
@@ -182,21 +218,31 @@ public class TaskAbility {
                     task -> sendTaskDetails(bot, chatId, task),
                     () -> bot.silent().send("⚠️ Task not found.", chatId)
             );
-        } else {
-            bot.silent().send("⚠️ Please click a valid task from the list.", chatId);
         }
     }
 
     private void sendTaskDetails(BaseAbilityBot bot, Long chatId, Task task) {
+        Optional<AppUser> userOpt = appUserService.getUserByTelegramId(String.valueOf(task.getAssignedTo().getTelegramId()));
+        double hoursLogged = 0.0;
+
+        if (userOpt.isPresent()) {
+            AppUser assignedUser = userOpt.get();
+            try {
+                hoursLogged = taskLogService.getLoggedHours(task, assignedUser);
+            } catch (Exception e) {
+                hoursLogged = 0.0;
+            }
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("📌 *Task Details*\n\n");
-        sb.append("*ID:* ").append(task.getId()).append("\n");
         sb.append("*Name:* ").append(task.getTaskName()).append("\n");
         sb.append("*Description:* ").append(task.getTaskDescription()).append("\n");
         sb.append("*Priority:* ").append(task.getPriority()).append("\n");
         sb.append("*Status:* ").append(task.getStatus()).append("\n");
         sb.append("*Type:* ").append(task.getType()).append("\n");
-        sb.append("*Story Points:* ").append(task.getStoryPoints()).append("\n");
+        sb.append("*Story Points (Estimated):* ").append(task.getStoryPoints()).append("\n");
+        sb.append("*Hours Logged:* ").append(hoursLogged).append("\n");
         sb.append("*Blocked:* ").append(task.isBlocked() ? "Yes" : "No").append("\n");
         sb.append("*Due Date:* ").append(task.getDueDate() != null ? task.getDueDate().toLocalDate() : "N/A").append("\n");
         sb.append("*Created By:* ").append(task.getCreatedBy().getUsername()).append("\n");
@@ -224,7 +270,7 @@ public class TaskAbility {
         }
 
         List<Task> updatedTasks = taskService.getTasksCreatedByUser(userOpt.get().getId()).stream()
-                .filter(task -> Boolean.TRUE.equals(task.getIsActive()))
+                .filter(task -> Boolean.TRUE.equals(task.getIsActive()) && task.getStatus() != TaskStatus.DONE)
                 .toList();
 
         List<String> updatedTaskOptions = updatedTasks.stream()
@@ -254,8 +300,8 @@ public class TaskAbility {
             return;
         }
 
-        List<Task> inactiveTasks = taskService.getTasksCreatedByUser(userOpt.get().getId()).stream()
-                .filter(task -> Boolean.FALSE.equals(task.getIsActive()))
+        List<Task> inactiveTasks = taskService.getTasksAssignedToUser(userOpt.get().getId()).stream()
+                .filter(task -> task.getStatus() == TaskStatus.DONE)
                 .toList();
 
         if (inactiveTasks.isEmpty()) {

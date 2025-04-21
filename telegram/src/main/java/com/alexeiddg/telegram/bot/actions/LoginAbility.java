@@ -2,6 +2,7 @@ package com.alexeiddg.telegram.bot.actions;
 
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
+import com.alexeiddg.telegram.bot.util.tempDataStore.TempLoginDataStore;
 import com.alexeiddg.telegram.service.AppUserService;
 import lombok.RequiredArgsConstructor;
 import model.AppUser;
@@ -20,6 +21,8 @@ public class LoginAbility {
 
     private final AppUserService appUserService;
     private final UserSessionManager userSessionManager;
+    private final TempLoginDataStore tempLoginDataStore;
+    private final StartAbility startAbility;
 
     public void beginLogin(BaseAbilityBot bot, Long chatId) {
         userSessionManager.setState(chatId, UserState.LOGIN_USERNAME);
@@ -35,34 +38,57 @@ public class LoginAbility {
 
         UserState state = userSessionManager.getState(userId);
 
-        // Expect state to be LOGIN_USERNAME
         if (state == UserState.LOGIN_USERNAME) {
             Optional<AppUser> userOpt = appUserService.getUserByUsername(text);
 
-            // Check if user exists
             if (userOpt.isEmpty()) {
                 bot.silent().send("❌ Username not found. Please ensure you typed it correctly.", chatId);
                 userSessionManager.clearState(userId);
                 return;
             }
 
-            // Check if user exists
+            tempLoginDataStore.setTempUsername(userId, text);
+            userSessionManager.setState(userId, UserState.LOGIN_PASSWORD);
+            bot.silent().send("🔐 Please enter your password:", chatId);
+            return;
+        }
+
+        if (state == UserState.LOGIN_PASSWORD) {
+            String username = tempLoginDataStore.getTempUsername(userId);
+            if (username == null) {
+                bot.silent().send("⚠️ Session expired. Please /login again.", chatId);
+                userSessionManager.clearState(userId);
+                return;
+            }
+
+            Optional<AppUser> userOpt = appUserService.getUserByUsername(username);
+            if (userOpt.isEmpty()) {
+                bot.silent().send("❌ Unexpected error. Please /login again.", chatId);
+                userSessionManager.clearState(userId);
+                return;
+            }
+
             AppUser user = userOpt.get();
 
-            // If user has no telegram ID, link it
+            // Check password
+            if (!appUserService.checkPassword(text, user.getPassword())) {
+                bot.silent().send("❌ Incorrect password. Try again.", chatId);
+                return;
+            }
+
+            // Password is correct
             if (user.getTelegramId() == null || user.getTelegramId().isEmpty()) {
                 user.setTelegramId(userId.toString());
                 appUserService.updateUser(user);
-
-                userSessionManager.setState(userId, UserState.MAIN_MENU);
-                bot.silent().send("✅ Login successful. Your account is now linked to Telegram.", chatId);
-            } else if (user.getTelegramId().equals(userId.toString())) {
-                bot.silent().send("🔓 You’re already logged in.", chatId);
-                userSessionManager.setState(userId, UserState.MAIN_MENU);
-            } else {
-                bot.silent().send("❌ That username is already linked to a different Telegram user.", chatId);
+            } else if (!user.getTelegramId().equals(userId.toString())) {
+                bot.silent().send("🚫 That username is linked to another Telegram account.", chatId);
                 userSessionManager.clearState(userId);
+                return;
             }
+
+            tempLoginDataStore.clearTempUsername(userId);
+            bot.silent().send("✅ Login successful. Welcome back!", chatId);
+            startAbility.startMainMenu(bot, chatId, userId);
         }
     }
 

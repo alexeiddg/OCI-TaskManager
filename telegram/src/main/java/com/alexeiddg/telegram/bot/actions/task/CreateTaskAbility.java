@@ -7,6 +7,7 @@ import com.alexeiddg.telegram.bot.util.ReplyKeyboard;
 import com.alexeiddg.telegram.bot.util.tempDataStore.TempTaskDataStore;
 import com.alexeiddg.telegram.service.AppUserService;
 import com.alexeiddg.telegram.service.SprintService;
+import com.alexeiddg.telegram.service.TaskLogService;
 import com.alexeiddg.telegram.service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
@@ -37,6 +38,7 @@ public class CreateTaskAbility {
     private final TempTaskDataStore tempTaskDataStore;
     private final SprintService sprintService;
     private final TaskService taskService;
+    private final TaskLogService taskLogService;
 
     public void createTask(BaseAbilityBot bot, Long chatId, Long telegramId) {
         Optional<AppUser> userOpt = appUserService.getUserByTelegramId(String.valueOf(telegramId));
@@ -192,7 +194,8 @@ public class CreateTaskAbility {
                             if (userOpt.isPresent() && userOpt.get().getRole() == UserRole.MANAGER) {
                                 userSessionManager.setState(telegramId, UserState.TASK_CREATE_ASSIGNEE);
 
-                                List<AppUser> developers = appUserService.getAllUsersByRole(UserRole.DEVELOPER);
+                                Long teamId = userOpt.get().getTeam().getId();
+                                List<AppUser> developers = appUserService.getTeamMembers(teamId);
                                 List<String> developerUsernames = developers.stream()
                                         .map(AppUser::getUsername)
                                         .toList();
@@ -208,7 +211,6 @@ public class CreateTaskAbility {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-
                             } else {
                                 task.setAssignedTo(task.getCreatedBy());
                                 tempTaskDataStore.set(telegramId, task);
@@ -286,11 +288,11 @@ public class CreateTaskAbility {
                         return;
                     }
 
-                    Pattern sprintPattern = Pattern.compile("^(.*?)\\s*\\(.*?\\)\\s*\\(ID:\\s*(\\d+)\\)$");
-                    Matcher matcher = sprintPattern.matcher(text);
+                    Pattern sprintIdPattern = Pattern.compile("\\(ID:\\s*(\\d+)\\)$");
+                    Matcher matcher = sprintIdPattern.matcher(text);
 
                     if (matcher.find()) {
-                        Long sprintId = Long.parseLong(matcher.group(2));
+                        Long sprintId = Long.parseLong(matcher.group(1));
                         Optional<Sprint> sprintOpt = sprintService.getSprintById(sprintId);
 
                         if (sprintOpt.isPresent()) {
@@ -343,6 +345,7 @@ public class CreateTaskAbility {
 
                     if (text.equalsIgnoreCase("confirm")) {
                         taskService.createTask(task);
+                        taskLogService.createInitialLog(task, task.getAssignedTo());
 
                         bot.silent().send("✅ Task created successfully!", chatId);
 
