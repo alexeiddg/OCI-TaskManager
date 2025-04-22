@@ -169,6 +169,18 @@ public class TaskManagerBot extends AbilityBot {
                 botAbilities.updateTaskAbility().handleUpdateTask(this, update);
             }
 
+            if (messageText.equals("📊 Reports")){
+                botAbilities.reportsAbility().ReportsMenu(this, chatId, userId);
+            }
+
+            if (messageText.equals("📊 Personal Report")){
+                botAbilities.reportsAbility().showPersonalReport(this, chatId, userId);
+            }
+
+            if (messageText.equals("👥 Team Report")) {
+                botAbilities.reportsAbility().showTeamReport(this, chatId, userId);
+            }
+
             if (messageText.equals("🔒 Logout")) {
                 botAbilities.stop().handleStop(this, userId, chatId);
             }

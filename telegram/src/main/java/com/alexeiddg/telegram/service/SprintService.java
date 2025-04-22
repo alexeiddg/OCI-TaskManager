@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import repository.AppUserRepository;
 import repository.ProjectRepository;
 import repository.SprintRepository;
-import service.KpiSnapshotService;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,5 +83,14 @@ public class SprintService {
         sprintRepository.save(sprint);
 
         kpiSnapshotService.snapshotForSprint(sprint);
+    }
+
+    // find latest sprint
+    public Optional<Sprint> findLatestSprintForTeam(Long teamId) {
+        return sprintRepository.findLatestWithTasksByTeamId(teamId);
+    }
+
+    public Optional<Sprint> findLatestSprintWithAllRelations(Long teamId) {
+        return sprintRepository.findLatestSprintWithAllRelations(teamId);
     }
 }

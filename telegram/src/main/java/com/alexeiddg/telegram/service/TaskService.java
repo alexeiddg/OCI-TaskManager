@@ -2,6 +2,7 @@ package com.alexeiddg.telegram.service;
 
 import enums.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import model.AppUser;
 import model.Task;
 import org.springframework.stereotype.Service;
 import repository.TaskRepository;
@@ -42,7 +43,6 @@ public class TaskService {
     public List<Task> getTasksAssignedToUser(Long userId) {
         return taskRepository.findAllByAssignedToIdAndIsActive(userId, true);
     }
-
 
     public boolean markTaskAsCompleted(Long taskId) {
         Optional<Task> taskOpt = taskRepository.findById(taskId);

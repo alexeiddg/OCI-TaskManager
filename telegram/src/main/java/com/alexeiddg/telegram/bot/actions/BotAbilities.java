@@ -3,6 +3,7 @@ package com.alexeiddg.telegram.bot.actions;
 import com.alexeiddg.telegram.bot.actions.project.CreateProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.DeleteProjectAbility;
 import com.alexeiddg.telegram.bot.actions.project.ProjectAbility;
+import com.alexeiddg.telegram.bot.actions.reports.ReportsAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.CreateSprintAbility;
 import com.alexeiddg.telegram.bot.actions.sprint.SprintAbility;
 import com.alexeiddg.telegram.bot.actions.task.CreateTaskAbility;
@@ -25,5 +26,6 @@ public record BotAbilities(
         TaskAbility taskAbility,
         CreateTaskAbility createTaskAbility,
         DeleteTaskAbility deleteTaskAbility,
-        UpdateTaskAbility updateTaskAbility
+        UpdateTaskAbility updateTaskAbility,
+        ReportsAbility reportsAbility
 ) { }

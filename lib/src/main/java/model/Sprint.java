@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "sprints")
@@ -46,7 +47,7 @@ public class Sprint {
 
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Task> tasks;
+    private Set<Task> tasks;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
