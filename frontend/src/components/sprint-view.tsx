@@ -36,6 +36,14 @@ import {useSession} from "next-auth/react";
 import {fetchProjectOptions, fetchSprintCards, ProjectOption, SprintCards} from "@/server/api/sprint/getSprints";
 import {SprintStatus} from "@/lib/types/enums/SprintStatus";
 import {TaskPriority} from "@/lib/types/enums/TaskPriority";
+import {SprintEditModal} from "@/components/edit-sprint-modal";
+import {SprintStatusModal} from "@/components/sprint-status-modal";
+import {SprintSchemaValues} from "@/lib/types/DTO/model/SprintDto";
+import {TaskAddModal} from "@/components/create-task-modal";
+import {createTaskRequest} from "@/server/api/task/createTask";
+import {fetchTaskDeps} from "@/server/api/task/createTaskHelpers";
+import type {AppUserDto} from "@/lib/types/DTO/model/AppUserDto";
+import type {CreateTaskFormValues} from "@/lib/types/DTO/setup/TaskCreationSchema";
 
 export function SprintsView() {
   const { data: session } = useSession();
@@ -45,6 +53,19 @@ export function SprintsView() {
   const [statusFilter, setStatusFilter] = React.useState<SprintStatus | "all">("all",);
   const [localSprints, setLocalSprints] = useState<SprintCards[]>([]);
   const [view, setView] = React.useState<"list" | "board">("list");
+
+  // Add state for the edit modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSprint, setEditingSprint] = useState<SprintSchemaValues | null>(null);
+
+  // Add state for the status modal
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusEditingSprint, setStatusEditingSprint] = useState<{id: number, sprintName: string, status: SprintStatus} | null>(null);
+
+  // Add state for the task creation modal
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [taskCreationSprint, setTaskCreationSprint] = useState<{id: number, sprintName: string} | null>(null);
+  const [teamMembers, setTeamMembers] = useState<AppUserDto[]>([]);
 
   // Filter sprints based on selected project, search query, and status filter
   const filteredSprints = React.useMemo(() => {
@@ -89,13 +110,10 @@ export function SprintsView() {
             task.id === taskId ? { ...task, completed: !task.completed } : task,
           );
 
-          // Calculate new progress
+          // Calculate new progress - fixed calculation
           const completedTasks = updatedTasks.filter((t) => t.completed).length;
           const totalTasks = updatedTasks.length;
-          const newProgress =
-            totalTasks > 0
-              ? Math.round((completedTasks / totalTasks) * 100)
-              : 0;
+          const newProgress = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
 
           return {
             ...sprint,
@@ -108,6 +126,144 @@ export function SprintsView() {
     );
   };
 
+  // Handle edit sprint - map SprintCards to the Sprint interface expected by the modal
+  const handleEditSprint = (sprintCard: SprintCards) => {
+    const projectObj = projects.find((p) => p.id === sprintCard.projectId);
+    if (!projectObj) return;
+
+    // Map tasks from SprintCards format to the format expected by the modal
+    const mappedTasks = sprintCard.tasks.map(task => ({
+      id: task.id,
+      name: task.name,
+      completed: task.completed,
+    }));
+
+    // Calculate completion metrics if not provided
+    const completedTasks = sprintCard.tasks.filter(task => task.completed).length;
+    const totalTasks = sprintCard.tasks.length;
+    const completionRate = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
+
+    setTimeout(() => {
+      const projectObj = projects.find((p) => p.id === sprintCard.projectId);
+      if (!projectObj) return;
+
+      // Map tasks from SprintCards format to the format expected by the modal
+      const mappedTasks = sprintCard.tasks.map(task => ({
+        id: task.id,
+        name: task.name,
+        completed: task.completed,
+      }));
+
+      // Calculate completion metrics if not provided
+      const completedTasks = sprintCard.tasks.filter(task => task.completed).length;
+      const totalTasks = sprintCard.tasks.length;
+      const completionRate = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
+
+      setEditingSprint({
+        id: sprintCard.id,
+        sprintName: sprintCard.name,
+        sprintDescription: sprintCard.goal || "",
+        startDate: sprintCard.startDate,
+        endDate: sprintCard.endDate,
+        status: sprintCard.status ?? SprintStatus.PLANNING,
+        projectId: sprintCard.projectId,
+        project: { id: projectObj.id, name: projectObj.name },
+        tasks: mappedTasks,
+        isActive: sprintCard.status === SprintStatus.ACTIVE,
+        completedTasks: completedTasks,
+        totalTasks: totalTasks,
+        completionRate: sprintCard.progress ?? completionRate,
+        createdAt: sprintCard.startDate,
+        updatedAt: null,
+      });
+
+      setIsModalOpen(true);
+    }, 10);
+  };
+
+  // Handle change status - prepare sprint data for status modal
+  const handleChangeStatus = (sprintCard: SprintCards) => {
+    setStatusEditingSprint({
+      id: sprintCard.id,
+      sprintName: sprintCard.name,
+      status: sprintCard.status ?? SprintStatus.PLANNING
+    });
+    setIsStatusModalOpen(true);
+  };
+
+  // Handle status update - update sprint status in local state
+  const handleStatusUpdate = async (sprintId: number, newStatus: SprintStatus): Promise<void> => {
+    // This would be replaced with actual API calls in production
+    console.log("Sprint status updated:", sprintId, newStatus);
+
+    // Update local state
+    setLocalSprints(prev =>
+      prev.map(sprint => {
+        if (sprint.id === sprintId) {
+          return {
+            ...sprint,
+            status: newStatus
+          };
+        }
+        return sprint;
+      })
+    );
+  };
+
+  // Handle add task - prepare sprint data for task modal
+  const handleAddTask = (sprintCard: SprintCards) => {
+    setTaskCreationSprint({
+      id: sprintCard.id,
+      sprintName: sprintCard.name
+    });
+    setIsTaskModalOpen(true);
+  };
+
+  // Handle task creation - create a new task and add it to the sprint
+  const handleTaskCreate = async (taskData: CreateTaskFormValues): Promise<void> => {
+    // This would be replaced with actual API calls in production
+    console.log("Task created:", taskData);
+
+    try {
+      // Call the API to create the task
+      const createdTask = await createTaskRequest(taskData);
+
+      // Update local state with the new task
+      setLocalSprints(prev =>
+        prev.map(sprint => {
+          if (sprint.id === taskData.sprint) {
+            // Create a new task object in the format expected by SprintCards
+            const newTask = {
+              id: createdTask.id || Math.floor(Math.random() * 10000), // Use API response ID or generate a temporary one
+              name: taskData.taskName,
+              assignee: session?.user?.name || null,
+              completed: taskData.taskStatus === "DONE",
+              priority: taskData.taskPriority,
+              estimate: taskData.storyPoints,
+            };
+
+            // Calculate new progress
+            const updatedTasks = [...sprint.tasks, newTask];
+            const completedTasks = updatedTasks.filter(t => t.completed).length;
+            const totalTasks = updatedTasks.length;
+            const newProgress = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
+
+            return {
+              ...sprint,
+              tasks: updatedTasks,
+              progress: newProgress
+            };
+          }
+          return sprint;
+        })
+      );
+
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      return Promise.reject(error);
+    }
+  };
 
   useEffect(() => {
     const teamId = session?.user?.teamId;
@@ -120,17 +276,40 @@ export function SprintsView() {
           setSelectedProject(data[0]?.id);
         })
         .catch((err) => console.error("Failed to fetch projects:", err));
+
+    // Fetch team members for task assignment
+    if (teamId) {
+      fetchTaskDeps(teamId.toString())
+        .then(({ members }) => {
+          setTeamMembers(members);
+        })
+        .catch((err) => console.error("Failed to fetch team members:", err));
+    }
   }, [session]);
 
   useEffect(() => {
     if (!selectedProject) return;
 
     fetchSprintCards(Number(selectedProject))
-        .then(setLocalSprints)
-        .catch((err) => {
-          console.error("Failed to fetch sprints:", err);
-          setLocalSprints([]);
+      .then((sprints) => {
+        // Calculate initial progress for each sprint
+        const sprintsWithProgress = sprints.map(sprint => {
+          const completedTasks = sprint.tasks.filter(task => task.completed).length;
+          const totalTasks = sprint.tasks.length;
+          const progress = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
+
+          return {
+            ...sprint,
+            progress: progress
+          };
         });
+
+        setLocalSprints(sprintsWithProgress);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch sprints:", err);
+        setLocalSprints([]);
+      });
   }, [selectedProject]);
 
   return (
@@ -160,7 +339,13 @@ export function SprintsView() {
               Manage sprints for {selectedProjectName}
             </p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
+          <Button
+            className="bg-primary hover:bg-primary/90"
+            onClick={() => {
+              setEditingSprint(null);
+              setIsModalOpen(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             New Sprint
           </Button>
@@ -258,6 +443,9 @@ export function SprintsView() {
                     onToggleTask={(taskId) =>
                       toggleTaskCompletion(sprint.id, taskId)
                     }
+                    onEditSprint={handleEditSprint}
+                    onChangeStatus={handleChangeStatus}
+                    onAddTask={handleAddTask}
                   />
                 ))
               ) : (
@@ -282,11 +470,17 @@ export function SprintsView() {
                 title="Planning"
                 sprints={filteredSprints.filter((s) => s.status === SprintStatus.PLANNING)}
                 onToggleTask={toggleTaskCompletion}
+                onEditSprint={handleEditSprint}
+                onChangeStatus={handleChangeStatus}
+                onAddTask={handleAddTask}
               />
               <SprintColumn
                 title="Active"
                 sprints={filteredSprints.filter((s) => s.status === SprintStatus.ACTIVE)}
                 onToggleTask={toggleTaskCompletion}
+                onEditSprint={handleEditSprint}
+                onChangeStatus={handleChangeStatus}
+                onAddTask={handleAddTask}
               />
               <SprintColumn
                 title="Completed"
@@ -294,11 +488,132 @@ export function SprintsView() {
                   (s) => s.status === SprintStatus.COMPLETED,
                 )}
                 onToggleTask={toggleTaskCompletion}
+                onEditSprint={handleEditSprint}
+                onChangeStatus={handleChangeStatus}
+                onAddTask={handleAddTask}
               />
             </div>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Render the SprintEditModal */}
+      <SprintEditModal
+        open={isModalOpen}
+        onOpenChange={(open) => {
+            setIsModalOpen(open);
+            // If modal is closing, ensure we clean up any editing state
+            if (!open) {
+                // Reset editing sprint if needed
+                setEditingSprint(null);
+            }
+        }}
+        sprint={editingSprint}
+        projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+        onSave={async (updatedSprint) => {
+          // This would be replaced with actual API calls in production
+          console.log("Sprint updated:", updatedSprint);
+
+          if (updatedSprint.id) {
+            // Update existing sprint
+            const refreshedSprints = localSprints.map(sprint => {
+              if (sprint.id === updatedSprint.id) {
+                // Map tasks from the modal format back to SprintCards format
+                const updatedTasks = updatedSprint.tasks.map(task => ({
+                  id: task.id,
+                  name: task.name,
+                  assignee: sprint.tasks.find(t => t.id === task.id)?.assignee || "",
+                  completed: task.completed,
+                  priority: sprint.tasks.find(t => t.id === task.id)?.priority || "MEDIUM",
+                  estimate: sprint.tasks.find(t => t.id === task.id)?.estimate || 0,
+                }));
+
+                // Calculate progress based on completed tasks
+                const completedTasks = updatedTasks.filter(task => task.completed).length;
+                const totalTasks = updatedTasks.length;
+                const progress = totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
+
+                // Update the sprint with all new values
+                return {
+                  ...sprint,
+                  name: updatedSprint.sprintName,
+                  goal: updatedSprint.sprintDescription,
+                  startDate: updatedSprint.startDate.toString(),
+                  endDate: updatedSprint.endDate.toString(),
+                  status: updatedSprint.status,
+                  projectId: updatedSprint.project.id,
+                  tasks: updatedTasks,
+                  progress: progress,
+                };
+              }
+              return sprint;
+            });
+
+            setLocalSprints(refreshedSprints);
+          } else {
+            // Create new sprint
+            // In a real app, this would be an API call that returns the new sprint with an ID
+            // For now, we'll simulate it by generating a temporary ID
+            const newId = Math.max(0, ...localSprints.map(s => s.id)) + 1;
+
+            // Create a new SprintCards object from the form data
+            const newSprint: SprintCards = {
+              id: newId,
+              name: updatedSprint.sprintName,
+              goal: updatedSprint.sprintDescription || null,
+              projectId: updatedSprint.project.id,
+              startDate: updatedSprint.startDate.toString(),
+              endDate: updatedSprint.endDate.toString(),
+              status: updatedSprint.status,
+              progress: 0,
+              tasks: updatedSprint.tasks.map(task => ({
+                id: task.id || Math.floor(Math.random() * 10000), // Generate temporary ID for new tasks
+                name: task.name,
+                assignee: "",
+                completed: task.completed,
+                priority: "MEDIUM",
+                estimate: 0,
+              })),
+            };
+
+            setLocalSprints([...localSprints, newSprint]);
+          }
+
+          setIsModalOpen(false);
+        }}
+      />
+
+      {/* Render the SprintStatusModal */}
+      <SprintStatusModal
+        open={isStatusModalOpen}
+        onOpenChange={(open) => {
+          setIsStatusModalOpen(open);
+          // If modal is closing, ensure we clean up any editing state
+          if (!open) {
+            setStatusEditingSprint(null);
+          }
+        }}
+        sprint={statusEditingSprint!}
+        onStatusChange={handleStatusUpdate}
+      />
+
+      {/* Render the TaskAddModal */}
+      <TaskAddModal
+        open={isTaskModalOpen}
+        onOpenChange={(open) => {
+          setIsTaskModalOpen(open);
+          // If modal is closing, ensure we clean up any editing state
+          if (!open) {
+            setTaskCreationSprint(null);
+          }
+        }}
+        onSubmit={handleTaskCreate}
+        sprints={localSprints.map(sprint => ({ id: sprint.id, sprintName: sprint.name }))}
+        users={teamMembers}
+        currentUser={session?.user ? { id: session.user.id, name: session.user.name || "Current User" } : { id: "0", name: "Current User" }}
+        defaultSprintId={taskCreationSprint?.id}
+        session={session}
+      />
     </div>
   );
 }
@@ -306,11 +621,45 @@ export function SprintsView() {
 function SprintCard({
   sprint,
   onToggleTask,
+  onEditSprint,
+  onChangeStatus,
+  onAddTask,
 }: {
   sprint: SprintCards;
   onToggleTask: (taskId: number) => void;
+  onEditSprint: (sprint: SprintCards) => void;
+  onChangeStatus: (sprint: SprintCards) => void;
+  onAddTask: (sprint: SprintCards) => void;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState<Record<number, boolean>>({});
+
+  const handleEditSprint = (sprintCard: SprintCards) => {
+    setDropdownOpen(prev => ({
+      ...prev,
+      [sprintCard.id]: false
+    }));
+
+    onEditSprint(sprintCard);
+  };
+
+  const handleChangeStatus = (sprintCard: SprintCards) => {
+    setDropdownOpen(prev => ({
+      ...prev,
+      [sprintCard.id]: false
+    }));
+
+    onChangeStatus(sprintCard);
+  };
+
+  const handleAddTask = (sprintCard: SprintCards) => {
+    setDropdownOpen(prev => ({
+      ...prev,
+      [sprintCard.id]: false
+    }));
+
+    onAddTask(sprintCard);
+  };
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -392,7 +741,16 @@ function SprintCard({
             </div>
           </div>
 
-          <DropdownMenu>
+          <DropdownMenu
+              open={dropdownOpen[sprint.id] || false}
+              onOpenChange={(open) => {
+                setDropdownOpen(prev => ({
+                  ...prev,
+                  [sprint.id]: open
+                }));
+              }}
+
+          >
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
@@ -400,9 +758,21 @@ function SprintCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Edit sprint</DropdownMenuItem>
-              <DropdownMenuItem>Change status</DropdownMenuItem>
-              <DropdownMenuItem>Add tasks</DropdownMenuItem>
+              <DropdownMenuItem
+                  onClick={() => handleEditSprint(sprint)}
+              >
+                Edit sprint
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                  onClick={() => handleChangeStatus(sprint)}
+              >
+                Change status
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                  onClick={() => handleAddTask(sprint)}
+              >
+                Add tasks
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive">
                 Delete sprint
@@ -529,10 +899,16 @@ function SprintColumn({
   title,
   sprints,
   onToggleTask,
+  onEditSprint,
+  onChangeStatus,
+  onAddTask,
 }: {
   title: string;
   sprints: SprintCards[];
   onToggleTask: (sprintId: number, taskId: number) => void;
+  onEditSprint: (sprint: SprintCards) => void;
+  onChangeStatus: (sprint: SprintCards) => void;
+  onAddTask: (sprint: SprintCards) => void;
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -549,6 +925,9 @@ function SprintColumn({
                 key={sprint.id}
                 sprint={sprint}
                 onToggleTask={(taskId) => onToggleTask(sprint.id, taskId)}
+                onEditSprint={onEditSprint}
+                onChangeStatus={onChangeStatus}
+                onAddTask={onAddTask}
               />
             ))}
           </div>

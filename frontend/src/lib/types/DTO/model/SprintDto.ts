@@ -23,3 +23,5 @@ export const SprintSchema = z.object({
   completionRate: z.number().nullable(),
   tasks: z.array(Task).optional(),
 })
+
+export type SprintSchemaValues = z.infer<typeof SprintSchema>;
