@@ -75,13 +75,16 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Task, TaskModel} from "@/lib/types/DTO/model/Task";
 import {Separator} from "@/components/ui/separator";
-import Link from "next/link";
 import {fetchTasksByUserId} from "@/server/api/task/getTask";
 import {useSession} from "next-auth/react";
 import {toggleFavorite} from "@/server/api/task/toggleFavorite";
 import {FavoriteButton} from "@/components/ui/FavoriteButton";
 import {apiCompleteTask, apiCopyTask, apiDeleteTask} from "@/server/helpers/data-table-helpers";
 import {TaskStatus} from "@/lib/types/enums/TaskStatus";
+import {TaskAddModal} from "@/components/create-task-modal";
+import {createTaskRequest} from "@/server/api/task/createTask";
+import {fetchTaskDeps} from "@/server/api/task/createTaskHelpers";
+import type {CreateTaskFormValues} from "@/lib/types/DTO/setup/TaskCreationSchema";
 
 /**
  * separate component for the drag handle
@@ -394,6 +397,9 @@ export function DataTable() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([]);
+  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>([]);
   const { data: session } = useSession();
   const userId = Number(session?.user?.id)
 
@@ -404,6 +410,19 @@ export function DataTable() {
         .catch((err) => console.error("Failed to load tasks:", err))
         .finally(() => setLoading(false));
   }, [userId]);
+
+  // Fetch team members and sprints for task creation
+  useEffect(() => {
+    const teamId = session?.user?.teamId;
+    if (!teamId) return;
+
+    fetchTaskDeps(teamId.toString())
+      .then(({ members, sprints }) => {
+        setTeamMembers(members);
+        setSprints(sprints || []);
+      })
+      .catch((err) => console.error("Failed to fetch task dependencies:", err));
+  }, [session]);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -492,6 +511,25 @@ export function DataTable() {
       toast.error("Copy failed");
     }
   }
+
+  /* ---------- CREATE TASK ---------- */
+  const handleTaskCreate = async (taskData: CreateTaskFormValues): Promise<void> => {
+    try {
+      const createdTask = await createTaskRequest(taskData);
+      // Refresh the task list after creating a new task
+      if (userId) {
+        fetchTasksByUserId(userId)
+          .then((tasks) => setData(tasks))
+          .catch((err) => console.error("Failed to load tasks:", err));
+      }
+      toast.success("Task created successfully");
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      toast.error("Failed to create task");
+      return Promise.reject(error);
+    }
+  };
 
   if (loading) {
     return (
@@ -585,11 +623,13 @@ export function DataTable() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsTaskModalOpen(true)}
+          >
             <IconPlus />
-            <Link href="/create/task">
-              <span className="hidden lg:inline">Create New</span>
-            </Link>
+            <span className="hidden lg:inline">Create New</span>
           </Button>
         </div>
       </div>
@@ -745,6 +785,19 @@ export function DataTable() {
       >
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent>
+
+      {/* Task Creation Modal */}
+      <TaskAddModal
+        open={isTaskModalOpen}
+        onOpenChange={(open) => {
+          setIsTaskModalOpen(open);
+        }}
+        onSubmit={handleTaskCreate}
+        sprints={sprints}
+        users={teamMembers}
+        currentUser={session?.user ? { id: session.user.id, name: session.user.name || "Current User" } : { id: "0", name: "Current User" }}
+        session={session}
+      />
     </Tabs>
   );
 }

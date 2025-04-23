@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
+import { useSession } from "next-auth/react";
+import { IconLoader } from "@tabler/icons-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
@@ -26,150 +28,217 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { fetchTeamMembers } from "@/server/api/task/createTaskHelpers";
+import { fetchTasksByUserId } from "@/server/api/task/getTask";
+import type { TaskModel } from "@/lib/types/DTO/model/Task";
+import type { AppUserDto } from "@/lib/types/DTO/model/AppUserDto";
+import { TaskStatus } from "@/lib/types/enums/TaskStatus";
 
-export const description = "An interactive area chart";
-
-const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 75, mobile: 130 },
-  { date: "2024-04-27", desktop: 383, mobile: 420 },
-  { date: "2024-04-28", desktop: 122, mobile: 180 },
-  { date: "2024-04-29", desktop: 315, mobile: 240 },
-  { date: "2024-04-30", desktop: 454, mobile: 380 },
-  { date: "2024-05-01", desktop: 165, mobile: 220 },
-  { date: "2024-05-02", desktop: 293, mobile: 310 },
-  { date: "2024-05-03", desktop: 247, mobile: 190 },
-  { date: "2024-05-04", desktop: 385, mobile: 420 },
-  { date: "2024-05-05", desktop: 481, mobile: 390 },
-  { date: "2024-05-06", desktop: 498, mobile: 520 },
-  { date: "2024-05-07", desktop: 388, mobile: 300 },
-  { date: "2024-05-08", desktop: 149, mobile: 210 },
-  { date: "2024-05-09", desktop: 227, mobile: 180 },
-  { date: "2024-05-10", desktop: 293, mobile: 330 },
-  { date: "2024-05-11", desktop: 335, mobile: 270 },
-  { date: "2024-05-12", desktop: 197, mobile: 240 },
-  { date: "2024-05-13", desktop: 197, mobile: 160 },
-  { date: "2024-05-14", desktop: 448, mobile: 490 },
-  { date: "2024-05-15", desktop: 473, mobile: 380 },
-  { date: "2024-05-16", desktop: 338, mobile: 400 },
-  { date: "2024-05-17", desktop: 499, mobile: 420 },
-  { date: "2024-05-18", desktop: 315, mobile: 350 },
-  { date: "2024-05-19", desktop: 235, mobile: 180 },
-  { date: "2024-05-20", desktop: 177, mobile: 230 },
-  { date: "2024-05-21", desktop: 82, mobile: 140 },
-  { date: "2024-05-22", desktop: 81, mobile: 120 },
-  { date: "2024-05-23", desktop: 252, mobile: 290 },
-  { date: "2024-05-24", desktop: 294, mobile: 220 },
-  { date: "2024-05-25", desktop: 201, mobile: 250 },
-  { date: "2024-05-26", desktop: 213, mobile: 170 },
-  { date: "2024-05-27", desktop: 420, mobile: 460 },
-  { date: "2024-05-28", desktop: 233, mobile: 190 },
-  { date: "2024-05-29", desktop: 78, mobile: 130 },
-  { date: "2024-05-30", desktop: 340, mobile: 280 },
-  { date: "2024-05-31", desktop: 178, mobile: 230 },
-  { date: "2024-06-01", desktop: 178, mobile: 200 },
-  { date: "2024-06-02", desktop: 470, mobile: 410 },
-  { date: "2024-06-03", desktop: 103, mobile: 160 },
-  { date: "2024-06-04", desktop: 439, mobile: 380 },
-  { date: "2024-06-05", desktop: 88, mobile: 140 },
-  { date: "2024-06-06", desktop: 294, mobile: 250 },
-  { date: "2024-06-07", desktop: 323, mobile: 370 },
-  { date: "2024-06-08", desktop: 385, mobile: 320 },
-  { date: "2024-06-09", desktop: 438, mobile: 480 },
-  { date: "2024-06-10", desktop: 155, mobile: 200 },
-  { date: "2024-06-11", desktop: 92, mobile: 150 },
-  { date: "2024-06-12", desktop: 492, mobile: 420 },
-  { date: "2024-06-13", desktop: 81, mobile: 130 },
-  { date: "2024-06-14", desktop: 426, mobile: 380 },
-  { date: "2024-06-15", desktop: 307, mobile: 350 },
-  { date: "2024-06-16", desktop: 371, mobile: 310 },
-  { date: "2024-06-17", desktop: 475, mobile: 520 },
-  { date: "2024-06-18", desktop: 107, mobile: 170 },
-  { date: "2024-06-19", desktop: 341, mobile: 290 },
-  { date: "2024-06-20", desktop: 408, mobile: 450 },
-  { date: "2024-06-21", desktop: 169, mobile: 210 },
-  { date: "2024-06-22", desktop: 317, mobile: 270 },
-  { date: "2024-06-23", desktop: 480, mobile: 530 },
-  { date: "2024-06-24", desktop: 132, mobile: 180 },
-  { date: "2024-06-25", desktop: 141, mobile: 190 },
-  { date: "2024-06-26", desktop: 434, mobile: 380 },
-  { date: "2024-06-27", desktop: 448, mobile: 490 },
-  { date: "2024-06-28", desktop: 149, mobile: 200 },
-  { date: "2024-06-29", desktop: 103, mobile: 160 },
-  { date: "2024-06-30", desktop: 446, mobile: 400 },
-];
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
-  },
-} satisfies ChartConfig;
+type ChartDataPoint = {
+  date: string;
+  [username: string]: number | string;
+};
 
 export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const { data: session } = useSession();
+  const [timeRange, setTimeRange] = useState("90d");
+  const [loading, setLoading] = useState(true);
+  const [teamMembers, setTeamMembers] = useState<AppUserDto[]>([]);
+  const [tasksData, setTasksData] = useState<TaskModel[]>([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [userColors, setUserColors] = useState<Record<string, string>>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMobile) {
       setTimeRange("7d");
     }
   }, [isMobile]);
 
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date);
-    const referenceDate = new Date("2024-06-30");
+  useEffect(() => {
+    const teamId = session?.user?.teamId;
+    if (!teamId) return;
+
+    setLoading(true);
+
+    fetchTeamMembers(teamId.toString())
+      .then(async (members) => {
+        setTeamMembers(members);
+
+        const colors: Record<string, string> = {};
+        const baseColors = [
+          "var(--chart-1)",
+          "var(--chart-2)",
+          "var(--chart-3)",
+          "var(--chart-4)",
+          "var(--chart-5)",
+        ];
+
+        members.forEach((member, index) => {
+          colors[member.name] = baseColors[index % baseColors.length];
+        });
+        setUserColors(colors);
+
+        const allTasks: TaskModel[] = [];
+        for (const member of members) {
+          try {
+            const tasks = await fetchTasksByUserId(member.id);
+            allTasks.push(...tasks);
+          } catch (error) {
+            console.error(`Failed to fetch tasks for user ${member.id}:`, error);
+          }
+        }
+
+        setTasksData(allTasks);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch team members:", error);
+        setLoading(false);
+      });
+  }, [session]);
+
+  useEffect(() => {
+    if (tasksData.length === 0) return;
+    const tasksByDate: Record<string, Record<string, number>> = {};
+
+    tasksData.forEach(task => {
+      if ((task.status === TaskStatus.DONE || task.completed) && task.assignedToUsername) {
+        const completionDate = task.completedAt || task.updatedAt || task.createdAt;
+        if (!completionDate) {
+          console.log("Task has no completion date:", task);
+          return;
+        }
+
+        const completedDate = new Date(completionDate).toISOString().split('T')[0];
+        if (!tasksByDate[completedDate]) {
+          tasksByDate[completedDate] = {};
+        }
+
+        if (!tasksByDate[completedDate][task.assignedToUsername]) {
+          tasksByDate[completedDate][task.assignedToUsername] = 0;
+        }
+
+        tasksByDate[completedDate][task.assignedToUsername]++;
+      }
+    });
+
+    const usernameToNameMap: Record<string, string> = {};
+
+    tasksData.forEach(task => {
+      if (task.assignedToUsername) {
+        const member = teamMembers.find(m =>
+          m.name.replace(/\s+/g, '') === task.assignedToUsername?.replace(/\s+/g, '') ||
+          task.assignedToUsername?.includes(m.name) ||
+          m.name.includes(task.assignedToUsername ?? 'No Assigned To Username')
+        );
+
+        if (member) {
+          usernameToNameMap[task.assignedToUsername] = member.name;
+        }
+      }
+    });
+
+    const today = new Date();
+    const threeMonthsAgo = new Date(today);
+    threeMonthsAgo.setDate(today.getDate() - 90);
+
+    const allDates: string[] = [];
+    const currentDate = new Date(threeMonthsAgo);
+
+    while (currentDate <= today) {
+      allDates.push(currentDate.toISOString().split('T')[0]);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    const chartDataArray = allDates.map(date => {
+      const dataPoint: ChartDataPoint = { date };
+
+      teamMembers.forEach(member => {
+        const usernames = Object.entries(usernameToNameMap)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          .filter(([_, name]) => name === member.name)
+          .map(([username]) => username);
+
+        let totalTasks = 0;
+
+        if (tasksByDate[date]) {
+          usernames.forEach(username => {
+            totalTasks += tasksByDate[date][username] || 0;
+          });
+
+          if (usernames.length === 0) {
+            totalTasks = tasksByDate[date][member.name] || 0;
+          }
+        }
+
+        dataPoint[member.name] = totalTasks;
+      });
+
+      return dataPoint;
+    });
+
+    setChartData(chartDataArray);
+  }, [tasksData, teamMembers]);
+
+  const dynamicChartConfig = React.useMemo(() => {
+    const config: ChartConfig = { tasks: { label: "Tasks Completed" } };
+
+    teamMembers.forEach(member => {
+      config[member.name] = {
+        label: member.name,
+        color: userColors[member.name] || "var(--primary)",
+      };
+    });
+
+    return config;
+  }, [teamMembers, userColors]);
+
+  const filteredData = React.useMemo(() => {
+    if (chartData.length === 0) return [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     let daysToSubtract = 90;
+
     if (timeRange === "30d") {
       daysToSubtract = 30;
     } else if (timeRange === "7d") {
       daysToSubtract = 7;
     }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - daysToSubtract);
+
+    const filtered = chartData.filter((item) => {
+      const date = new Date(item.date);
+      date.setHours(0, 0, 0, 0);
+      return date >= startDate && date <= today;
+    });
+
+    return filtered;
+  }, [chartData, timeRange]);
+
+  if (loading) {
+    return (
+      <Card className="@container/card">
+        <CardContent className="flex items-center justify-center h-[300px]">
+          <IconLoader className="animate-spin size-6 text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+        <CardTitle>Tasks Completed by User</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Total for the last 3 months
+            Tasks completed over time
           </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
+          <span className="@[540px]/card:hidden">Team performance</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -206,83 +275,81 @@ export function ChartAreaInteractive() {
         </CardAction>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <AreaChart data={filteredData}>
-            <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={1.0}
+        {filteredData.length > 0 ? (
+          <ChartContainer
+            config={dynamicChartConfig}
+            className="aspect-auto h-[250px] w-full"
+          >
+            <AreaChart data={filteredData}>
+              <defs>
+                {teamMembers.map((member) => (
+                  <linearGradient
+                    key={member.id}
+                    id={`fill-${member.name.replace(/\s+/g, '-')}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="5%"
+                      stopColor={userColors[member.name] || "var(--primary)"}
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={userColors[member.name] || "var(--primary)"}
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                ))}
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={10}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+                interval={timeRange === "7d" ? 0 : timeRange === "30d" ? 2 : 7}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                      labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      });
+                    }}
+                    indicator="dot"
+                  />
+                }
+              />
+              {teamMembers.map((member) => (
+                <Area
+                  key={member.id}
+                  dataKey={member.name}
+                  type="monotone"
+                  fill={`url(#fill-${member.name.replace(/\s+/g, '-')})`}
+                  stroke={userColors[member.name] || "var(--primary)"}
                 />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-              }}
-            />
-            <ChartTooltip
-              cursor={false}
-              defaultIndex={isMobile ? -1 : 10}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                  indicator="dot"
-                />
-              }
-            />
-            <Area
-              dataKey="mobile"
-              type="natural"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
-              stackId="a"
-            />
-            <Area
-              dataKey="desktop"
-              type="natural"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
-              stackId="a"
-            />
-          </AreaChart>
-        </ChartContainer>
+              ))}
+            </AreaChart>
+          </ChartContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[250px] text-muted-foreground">
+            <p>No completed tasks found in the selected time range</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
