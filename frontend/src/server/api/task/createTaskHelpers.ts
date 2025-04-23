@@ -6,7 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 export async function fetchTeamMembers(teamId: string) {
   const r = await fetch(`${BASE}/api/v2/team/${teamId}/members`);
   if (!r.ok) throw new Error(r.statusText);
-  return r.json() as Promise<AppUserDto[]>;
+  return (await r.json()) as Promise<AppUserDto[]>;
 }
 
 export async function fetchTeamSprints(teamId: string) {

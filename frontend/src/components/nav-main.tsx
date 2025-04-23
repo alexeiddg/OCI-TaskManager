@@ -15,9 +15,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { TaskAddModal } from "@/components/create-task-modal";
-import { createTaskRequest } from "@/server/api/task/createTask";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
-import type { CreateTaskFormValues } from "@/lib/types/DTO/setup/TaskCreationSchema";
 
 export function NavMain({
   items,
@@ -31,10 +29,13 @@ export function NavMain({
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([]);
-  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>([]);
+  const [teamMembers, setTeamMembers] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>(
+    [],
+  );
 
-  // Fetch team members for task assignment
   useEffect(() => {
     const teamId = session?.user?.teamId;
     if (!teamId) return;
@@ -46,17 +47,6 @@ export function NavMain({
       })
       .catch((err) => console.error("Failed to fetch task dependencies:", err));
   }, [session]);
-
-  // Handle task creation
-  const handleTaskCreate = async (taskData: CreateTaskFormValues): Promise<void> => {
-    try {
-      await createTaskRequest(taskData);
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Failed to create task:", error);
-      return Promise.reject(error);
-    }
-  };
 
   return (
     <SidebarGroup>
@@ -89,7 +79,8 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => {
             const isActive =
-              pathname === item.url || pathname.startsWith(item.url + "/dashboard");
+              pathname === item.url ||
+              pathname.startsWith(item.url + "/dashboard");
 
             return (
               <SidebarMenuItem key={item.title}>
@@ -117,10 +108,16 @@ export function NavMain({
         onOpenChange={(open) => {
           setIsTaskModalOpen(open);
         }}
-        onSubmit={handleTaskCreate}
         sprints={sprints}
         users={teamMembers}
-        currentUser={session?.user ? { id: session.user.id, name: session.user.name || "Current User" } : { id: "0", name: "Current User" }}
+        currentUser={
+          session?.user
+            ? {
+                id: Number(session.user.id),
+                name: session.user.name || "Current User",
+              }
+            : { id: 0, name: "No User Found" }
+        }
         session={session}
       />
     </SidebarGroup>

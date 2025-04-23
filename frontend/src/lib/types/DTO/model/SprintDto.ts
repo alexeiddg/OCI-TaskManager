@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import {Task} from "@/lib/types/DTO/model/Task";
-import {SprintStatus} from "@/lib/types/enums/SprintStatus";
+import { z } from "zod";
+import { Task } from "@/lib/types/DTO/model/Task";
+import { SprintStatus } from "@/lib/types/enums/SprintStatus";
 
 export interface SprintDto {
   id: number;
@@ -22,6 +22,6 @@ export const SprintSchema = z.object({
   totalTasks: z.number().nullable(),
   completionRate: z.number().nullable(),
   tasks: z.array(Task).optional(),
-})
+});
 
 export type SprintSchemaValues = z.infer<typeof SprintSchema>;

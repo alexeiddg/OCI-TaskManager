@@ -1,6 +1,6 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const UserSummaryDtoSchema = z.object({
-    id: z.number(),
-    fullName: z.string(),
+  id: z.number(),
+  fullName: z.string(),
 });

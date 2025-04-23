@@ -403,7 +403,7 @@ export function TeamDashboard() {
     return teamData.members.filter(
       (member) =>
         member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        member.role.toLowerCase().includes(searchQuery.toLowerCase())
+        member.role.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [searchQuery]);
 
@@ -430,7 +430,6 @@ export function TeamDashboard() {
       teamProgress,
     };
   }, []);
-
 
   // Calculate project distribution
   const projectDistribution = React.useMemo(() => {

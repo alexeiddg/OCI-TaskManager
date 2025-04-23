@@ -12,8 +12,8 @@ export const CreateTaskSchema = z.object({
   storyPoints: z.number().min(1).max(4),
   sprint: z.number(),
   dueDate: z.string(),
-  createdBy: z.string(),
-  assignedTo: z.string(),
+  createdBy: z.number(),
+  assignedTo: z.number(),
   isFavorite: z.boolean(),
 });
 

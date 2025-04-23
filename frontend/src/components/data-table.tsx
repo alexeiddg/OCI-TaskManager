@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -13,9 +13,14 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
-import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy,} from "@dnd-kit/sortable";
-import {CSS} from "@dnd-kit/utilities";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -44,12 +49,12 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import {toast} from "sonner";
-import {z} from "zod";
-import {useIsMobile} from "@/hooks/use-mobile";
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
-import {Checkbox} from "@/components/ui/checkbox";
+import { toast } from "sonner";
+import { z } from "zod";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -68,23 +73,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Task, TaskModel} from "@/lib/types/DTO/model/Task";
-import {Separator} from "@/components/ui/separator";
-import {fetchTasksByUserId} from "@/server/api/task/getTask";
-import {useSession} from "next-auth/react";
-import {toggleFavorite} from "@/server/api/task/toggleFavorite";
-import {FavoriteButton} from "@/components/ui/FavoriteButton";
-import {apiCompleteTask, apiCopyTask, apiDeleteTask} from "@/server/helpers/data-table-helpers";
-import {TaskStatus} from "@/lib/types/enums/TaskStatus";
-import {TaskAddModal} from "@/components/create-task-modal";
-import {createTaskRequest} from "@/server/api/task/createTask";
-import {fetchTaskDeps} from "@/server/api/task/createTaskHelpers";
-import type {CreateTaskFormValues} from "@/lib/types/DTO/setup/TaskCreationSchema";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Task, TaskModel } from "@/lib/types/DTO/model/Task";
+import { Separator } from "@/components/ui/separator";
+import { fetchTasksByUserId } from "@/server/api/task/getTask";
+import { useSession } from "next-auth/react";
+import { toggleFavorite } from "@/server/api/task/toggleFavorite";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import {
+  apiCompleteTask,
+  apiCopyTask,
+  apiDeleteTask,
+} from "@/server/helpers/data-table-helpers";
+import { TaskStatus } from "@/lib/types/enums/TaskStatus";
+import { TaskAddModal } from "@/components/create-task-modal";
+import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
 
 /**
  * separate component for the drag handle
@@ -107,8 +127,6 @@ function DragHandle({ id }: { id: number }) {
     </Button>
   );
 }
-
-
 
 /**
  * Columns for data table
@@ -168,17 +186,17 @@ const columns: ColumnDef<z.infer<typeof Task>>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-        <Badge
-            variant="outline"
-            className="px-1.5 capitalize flex items-center gap-1"
-        >
-          {row.original.status === "DONE" ? (
-              <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
-          ) : (
-              <IconLoader className="size-4" />
-          )}
-          {row.original.status?.replace("_", " ") ?? "Unknown"}
-        </Badge>
+      <Badge
+        variant="outline"
+        className="px-1.5 capitalize flex items-center gap-1"
+      >
+        {row.original.status === "DONE" ? (
+          <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
+        ) : (
+          <IconLoader className="size-4" />
+        )}
+        {row.original.status?.replace("_", " ") ?? "Unknown"}
+      </Badge>
     ),
   },
   {
@@ -210,9 +228,9 @@ const columns: ColumnDef<z.infer<typeof Task>>[] = [
     accessorKey: "assignedToUsername",
     header: "Assigned To",
     cell: ({ row }) => (
-        <div className="whitespace-nowrap">
-          {row.original.assignedToUsername ?? "—"}
-        </div>
+      <div className="whitespace-nowrap">
+        {row.original.assignedToUsername ?? "—"}
+      </div>
     ),
   },
   {
@@ -246,10 +264,10 @@ const columns: ColumnDef<z.infer<typeof Task>>[] = [
       const { toggleFavorite } = table.options.meta!;
 
       return (
-          <FavoriteButton
-              isFavorite={task.favorite ?? false}
-              onToggle={() => toggleFavorite(task.id)}
-          />
+        <FavoriteButton
+          isFavorite={task.favorite ?? false}
+          onToggle={() => toggleFavorite(task.id)}
+        />
       );
     },
     enableSorting: false,
@@ -260,44 +278,40 @@ const columns: ColumnDef<z.infer<typeof Task>>[] = [
     enableHiding: false,
     cell: ({ row, table }) => {
       const task = row.original;
-      const {
-        toggleFavorite,
-        completeTask,
-        deleteTask,
-        copyTask,
-      } = table.options.meta!;
+      const { toggleFavorite, completeTask, deleteTask, copyTask } =
+        table.options.meta!;
 
       return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                  variant="ghost"
-                  className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-                  size="icon"
-              >
-                <IconDotsVertical />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={() => completeTask(task.id)}>
-                {task.status === "DONE" ? "Re-open" : "Complete"}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => copyTask(task)}>
-                Make a copy
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toggleFavorite(task.id)}>
-                {task.favorite ? "Unfavorite" : "Favorite"}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                  onClick={() => deleteTask(task.id)}
-                  className="text-destructive"
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem onClick={() => completeTask(task.id)}>
+              {task.status === "DONE" ? "Re-open" : "Complete"}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => copyTask(task)}>
+              Make a copy
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toggleFavorite(task.id)}>
+              {task.favorite ? "Unfavorite" : "Favorite"}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => deleteTask(task.id)}
+              className="text-destructive"
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },
@@ -331,11 +345,8 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
 export function DataTable() {
   const [data, setData] = React.useState<TaskModel[]>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([],);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -398,17 +409,21 @@ export function DataTable() {
 
   const [loading, setLoading] = useState(true);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([]);
-  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>([]);
+  const [teamMembers, setTeamMembers] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>(
+    [],
+  );
   const { data: session } = useSession();
-  const userId = Number(session?.user?.id)
+  const userId = Number(session?.user?.id);
 
   useEffect(() => {
     if (!userId) return;
     fetchTasksByUserId(userId)
-        .then((tasks) => setData(tasks))
-        .catch((err) => console.error("Failed to load tasks:", err))
-        .finally(() => setLoading(false));
+      .then((tasks) => setData(tasks))
+      .catch((err) => console.error("Failed to load tasks:", err))
+      .finally(() => setLoading(false));
   }, [userId]);
 
   // Fetch team members and sprints for task creation
@@ -445,45 +460,62 @@ export function DataTable() {
 
     // Optimistically update UI
     setData((prev) =>
-        prev.map((t) =>
-            t.id === taskId ? { ...t, favorite: newFavoriteState } : t
-        )
+      prev.map((t) =>
+        t.id === taskId ? { ...t, favorite: newFavoriteState } : t,
+      ),
     );
 
     toggleFavorite(userId, taskId, newFavoriteState)
-        .then(() => {
-          toast.success(`Task ${newFavoriteState ? "added to" : "removed from"} favorites`);
-        })
-        .catch((err) => {
-          // Rollback on error
-          setData((prev) =>
-              prev.map((t) =>
-                  t.id === taskId ? { ...t, favorite: !newFavoriteState } : t
-              )
-          );
-          toast.error("Failed to update favorite");
-          console.error(err);
-        });
+      .then(() => {
+        toast.success(
+          `Task ${newFavoriteState ? "added to" : "removed from"} favorites`,
+        );
+      })
+      .catch((err) => {
+        // Rollback on error
+        setData((prev) =>
+          prev.map((t) =>
+            t.id === taskId ? { ...t, favorite: !newFavoriteState } : t,
+          ),
+        );
+        toast.error("Failed to update favorite");
+        console.error(err);
+      });
   }
 
   /* ---------- COMPLETE / REOPEN ---------- */
   function handleComplete(taskId: number) {
-    setData(prev =>
-        prev.map(t =>
-            t.id === taskId
-                ? {
-                  ...t,
-                  status: t.status === TaskStatus.DONE ? TaskStatus.TODO : TaskStatus.DONE,
-                  completedAt:
-                      t.status === TaskStatus.DONE ? null : new Date().toISOString(),
-                }
-                : t,
-        ),
+    setData((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status:
+                t.status === TaskStatus.DONE
+                  ? TaskStatus.TODO
+                  : TaskStatus.DONE,
+              completedAt:
+                t.status === TaskStatus.DONE ? null : new Date().toISOString(),
+            }
+          : t,
+      ),
     );
 
-    apiCompleteTask(taskId).catch(err => {
+    apiCompleteTask(taskId).catch((err) => {
       // rollback
-      setData(prev => prev.map(t => (t.id === taskId ? { ...t, status: t.status === TaskStatus.DONE ? TaskStatus.TODO : TaskStatus.DONE } : t)));
+      setData((prev) =>
+        prev.map((t) =>
+          t.id === taskId
+            ? {
+                ...t,
+                status:
+                  t.status === TaskStatus.DONE
+                    ? TaskStatus.TODO
+                    : TaskStatus.DONE,
+              }
+            : t,
+        ),
+      );
       console.error(err);
       toast.error("Could not update status");
     });
@@ -492,9 +524,9 @@ export function DataTable() {
   /* ---------- DELETE ---------- */
   function handleDelete(taskId: number) {
     const snapshot = data;
-    setData(prev => prev.filter(t => t.id !== taskId));
+    setData((prev) => prev.filter((t) => t.id !== taskId));
 
-    apiDeleteTask(taskId).catch(err => {
+    apiDeleteTask(taskId).catch((err) => {
       setData(snapshot);
       console.error(err);
       toast.error("Delete failed");
@@ -505,37 +537,18 @@ export function DataTable() {
   async function handleCopy(task: TaskModel) {
     try {
       const clone = await apiCopyTask(task, userId);
-      setData(prev => [clone, ...prev]);
+      setData((prev) => [clone, ...prev]);
     } catch (err) {
       console.error(err);
       toast.error("Copy failed");
     }
   }
 
-  /* ---------- CREATE TASK ---------- */
-  const handleTaskCreate = async (taskData: CreateTaskFormValues): Promise<void> => {
-    try {
-      const createdTask = await createTaskRequest(taskData);
-      // Refresh the task list after creating a new task
-      if (userId) {
-        fetchTasksByUserId(userId)
-          .then((tasks) => setData(tasks))
-          .catch((err) => console.error("Failed to load tasks:", err));
-      }
-      toast.success("Task created successfully");
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Failed to create task:", error);
-      toast.error("Failed to create task");
-      return Promise.reject(error);
-    }
-  };
-
   if (loading) {
     return (
-        <div className="flex justify-center items-center py-12">
-          <IconLoader className="animate-spin size-6 text-muted-foreground" />
-        </div>
+      <div className="flex justify-center items-center py-12">
+        <IconLoader className="animate-spin size-6 text-muted-foreground" />
+      </div>
     );
   }
 
@@ -614,7 +627,7 @@ export function DataTable() {
                   <DropdownMenuCheckboxItem
                     key={col.id}
                     checked={col.getIsVisible()}
-                    onCheckedChange={(v) => col.toggleVisibility(!!v)}
+                    onCheckedChange={(v) => col.toggleVisibility(v)}
                     className="capitalize"
                   >
                     {col.id}
@@ -792,11 +805,17 @@ export function DataTable() {
         onOpenChange={(open) => {
           setIsTaskModalOpen(open);
         }}
-        onSubmit={handleTaskCreate}
         sprints={sprints}
         users={teamMembers}
-        currentUser={session?.user ? { id: session.user.id, name: session.user.name || "Current User" } : { id: "0", name: "Current User" }}
-        session={session}
+        currentUser={
+          session?.user
+            ? {
+                id: Number(session.user.id),
+                name: session.user.name || "Current User",
+              }
+            : { id: 0, name: "No User Found" }
+        }
+        session={session!}
       />
     </Tabs>
   );
@@ -806,222 +825,237 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
   const isMobile = useIsMobile();
 
   return (
-      <Drawer direction={isMobile ? "bottom" : "right"}>
-        {/* ---------- trigger (the cell link) ---------- */}
-        <DrawerTrigger asChild>
-          <Button variant="link" className="text-foreground w-fit px-0 text-left">
-            {item.taskName}
-          </Button>
-        </DrawerTrigger>
+    <Drawer direction={isMobile ? "bottom" : "right"}>
+      {/* ---------- trigger (the cell link) ---------- */}
+      <DrawerTrigger asChild>
+        <Button variant="link" className="text-foreground w-fit px-0 text-left">
+          {item.taskName}
+        </Button>
+      </DrawerTrigger>
 
-        {/* ---------- drawer panel ---------- */}
-        <DrawerContent>
-          <DrawerHeader className="gap-1">
-            <DrawerTitle>{item.taskName}</DrawerTitle>
-            <DrawerDescription>
-              Quick‑edit details for this task
-            </DrawerDescription>
-          </DrawerHeader>
+      {/* ---------- drawer panel ---------- */}
+      <DrawerContent>
+        <DrawerHeader className="gap-1">
+          <DrawerTitle>{item.taskName}</DrawerTitle>
+          <DrawerDescription>
+            Quick‑edit details for this task
+          </DrawerDescription>
+        </DrawerHeader>
 
-          {/* body */}
-          <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
-            <form className="flex flex-col gap-4">
-              {/* ---- Task basics ---- */}
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="description">Description</Label>
-                <textarea
-                    id="description"
-                    className="min-h-[100px] resize-y rounded-md border p-2"
-                    defaultValue={item.taskDescription}
-                />
-              </div>
-
-              {/* ---- Type & Status ---- */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="taskType">Type</Label>
-                  <Select defaultValue={item.type}>
-                    <SelectTrigger id="taskType">
-                      <SelectValue placeholder="Type"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["BUG", "FEATURE", "IMPROVEMENT"].map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="taskStatus">Status</Label>
-                  <Select defaultValue={item.status}>
-                    <SelectTrigger id="taskStatus">
-                      <SelectValue placeholder="Status"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["TODO", "IN_PROGRESS", "DONE"].map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s.replace("_", " ")}
-                          </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* ---- Assignment & Priority ---- */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="assignedTo">Assigned To</Label>
-                  <Select defaultValue={item.assignedToUsername ?? ""}>
-                    <SelectTrigger id="assignedTo">
-                      <SelectValue placeholder="Unassigned"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["alice", "bob", "carol"].map((user) => (
-                          <SelectItem key={user} value={user}>
-                            {user}
-                          </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select defaultValue={item.priority}>
-                    <SelectTrigger id="priority">
-                      <SelectValue placeholder="Priority"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["LOW", "MEDIUM", "HIGH"].map((p) => (
-                          <SelectItem key={p} value={p}>
-                            {p}
-                          </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* ---- Sprint & Story Points ---- */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="sprint">Sprint</Label>
-                  <Select defaultValue={String(item.sprintId)}>
-                    <SelectTrigger id="sprint">
-                      <SelectValue placeholder="Select Sprint"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[
-                        {id: 1, name: "Sprint 1"},
-                        {id: 2, name: "Sprint 2"},
-                      ].map((s) => (
-                          <SelectItem key={s.id} value={String(s.id)}>
-                            {s.name}
-                          </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="storyPoints">Story Points</Label>
-                  <Input
-                      type="number"
-                      id="storyPoints"
-                      defaultValue={item.storyPoints}
-                      min={0}
-                  />
-                </div>
-              </div>
-
-              {/* ---- Due date & Completion ---- */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="dueDate">Due date</Label>
-                  <Input
-                      id="dueDate"
-                      type="date"
-                      defaultValue={item.dueDate?.slice(0, 10)}
-                  />
-                </div>
-              </div>
-
-              {/* ---- Blocked flag ---- */}
-              <div className="flex items-center gap-2">
-                <Checkbox
-                    id="blocked"
-                    defaultChecked={item.blocked}
-                />
-                <Label htmlFor="blocked">Blocked</Label>
-              </div>
-            </form>
-
-            <Separator />
+        {/* body */}
+        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+          <form className="flex flex-col gap-4">
+            {/* ---- Task basics ---- */}
             <div className="flex flex-col gap-2">
-              <Label className="text-base font-medium">Time Logged</Label>
+              <Label htmlFor="description">Description</Label>
+              <textarea
+                id="description"
+                className="min-h-[100px] resize-y rounded-md border p-2"
+                defaultValue={item.taskDescription}
+              />
+            </div>
 
-              {/* Simulated log data (replace later with fetched logs) */}
-              <div className="space-y-1 text-sm">
-                {[{ user: "alice", hours: 2, date: "2025-04-19" }, { user: "bob", hours: 3.5, date: "2025-04-20" }].map((log, i) => (
-                    <div key={i} className="flex justify-between text-muted-foreground border rounded-md p-2 bg-muted/40">
-                      <span>{log.user}</span>
-                      <span>{log.hours}h on {log.date}</span>
-                    </div>
-                ))}
+            {/* ---- Type & Status ---- */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="taskType">Type</Label>
+                <Select defaultValue={item.type}>
+                  <SelectTrigger id="taskType">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["BUG", "FEATURE", "IMPROVEMENT"].map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Add new log entry */}
-              <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const input = form.elements.namedItem("logHours") as HTMLInputElement;
-                    const hours = parseFloat(input.value);
-                    if (!isNaN(hours)) {
-                      console.log(`Log ${hours}hours to task ${item.id}`);
-                      input.value = "";
-                    }
-                  }}
-                  className="flex gap-2 mt-2"
-              >
-                <Input
-                    name="logHours"
-                    type="number"
-                    step="0.25"
-                    min="0"
-                    placeholder="Log hours"
-                    className="w-24"
-                    required
-                />
-                <Button type="submit" variant="default">
-                  Add
-                </Button>
-              </form>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="taskStatus">Status</Label>
+                <Select defaultValue={item.status}>
+                  <SelectTrigger id="taskStatus">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["TODO", "IN_PROGRESS", "DONE"].map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s.replace("_", " ")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <Separator />
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p>ID: {item.id}</p>
-              <p>Created: {new Date(item.createdAt).toLocaleString()}</p>
-              <p>Updated: {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "—"}</p>
-              <p>Completed At: {item.completedAt ? new Date(item.completedAt).toLocaleString() : "—"}</p>
-              <p>Created By ID: {item.createdByUsername ?? "—"}</p>
-              <p>Active: {item.isActive ? "Yes" : "No"}</p>
+            {/* ---- Assignment & Priority ---- */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="assignedTo">Assigned To</Label>
+                <Select defaultValue={item.assignedToUsername ?? ""}>
+                  <SelectTrigger id="assignedTo">
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["alice", "bob", "carol"].map((user) => (
+                      <SelectItem key={user} value={user}>
+                        {user}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="priority">Priority</Label>
+                <Select defaultValue={item.priority}>
+                  <SelectTrigger id="priority">
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["LOW", "MEDIUM", "HIGH"].map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {p}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
+            {/* ---- Sprint & Story Points ---- */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="sprint">Sprint</Label>
+                <Select defaultValue={String(item.sprintId)}>
+                  <SelectTrigger id="sprint">
+                    <SelectValue placeholder="Select Sprint" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      { id: 1, name: "Sprint 1" },
+                      { id: 2, name: "Sprint 2" },
+                    ].map((s) => (
+                      <SelectItem key={s.id} value={String(s.id)}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="storyPoints">Story Points</Label>
+                <Input
+                  type="number"
+                  id="storyPoints"
+                  defaultValue={item.storyPoints}
+                  min={0}
+                />
+              </div>
+            </div>
+
+            {/* ---- Due date & Completion ---- */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="dueDate">Due date</Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  defaultValue={item.dueDate?.slice(0, 10)}
+                />
+              </div>
+            </div>
+
+            {/* ---- Blocked flag ---- */}
+            <div className="flex items-center gap-2">
+              <Checkbox id="blocked" defaultChecked={item.blocked} />
+              <Label htmlFor="blocked">Blocked</Label>
+            </div>
+          </form>
+
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <Label className="text-base font-medium">Time Logged</Label>
+
+            {/* Simulated log data (replace later with fetched logs) */}
+            <div className="space-y-1 text-sm">
+              {[
+                { user: "alice", hours: 2, date: "2025-04-19" },
+                { user: "bob", hours: 3.5, date: "2025-04-20" },
+              ].map((log, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between text-muted-foreground border rounded-md p-2 bg-muted/40"
+                >
+                  <span>{log.user}</span>
+                  <span>
+                    {log.hours}h on {log.date}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Add new log entry */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const input = form.elements.namedItem(
+                  "logHours",
+                ) as HTMLInputElement;
+                const hours = parseFloat(input.value);
+                if (!isNaN(hours)) {
+                  console.log(`Log ${hours}hours to task ${item.id}`);
+                  input.value = "";
+                }
+              }}
+              className="flex gap-2 mt-2"
+            >
+              <Input
+                name="logHours"
+                type="number"
+                step="0.25"
+                min="0"
+                placeholder="Log hours"
+                className="w-24"
+                required
+              />
+              <Button type="submit" variant="default">
+                Add
+              </Button>
+            </form>
           </div>
 
-          <DrawerFooter>
-            <Button>Mark As Completed</Button>
-            <Button variant="secondary">Save</Button>
-            <DrawerClose asChild>
-              <Button variant="outline">Close</Button>
-            </DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+          <Separator />
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p>ID: {item.id}</p>
+            <p>Created: {new Date(item.createdAt).toLocaleString()}</p>
+            <p>
+              Updated:{" "}
+              {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "—"}
+            </p>
+            <p>
+              Completed At:{" "}
+              {item.completedAt
+                ? new Date(item.completedAt).toLocaleString()
+                : "—"}
+            </p>
+            <p>Created By ID: {item.createdByUsername ?? "—"}</p>
+            <p>Active: {item.isActive ? "Yes" : "No"}</p>
+          </div>
+        </div>
+
+        <DrawerFooter>
+          <Button>Mark As Completed</Button>
+          <Button variant="secondary">Save</Button>
+          <DrawerClose asChild>
+            <Button variant="outline">Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

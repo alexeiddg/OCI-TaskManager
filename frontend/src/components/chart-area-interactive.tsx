@@ -85,7 +85,10 @@ export function ChartAreaInteractive() {
             const tasks = await fetchTasksByUserId(member.id);
             allTasks.push(...tasks);
           } catch (error) {
-            console.error(`Failed to fetch tasks for user ${member.id}:`, error);
+            console.error(
+              `Failed to fetch tasks for user ${member.id}:`,
+              error,
+            );
           }
         }
 
@@ -102,15 +105,21 @@ export function ChartAreaInteractive() {
     if (tasksData.length === 0) return;
     const tasksByDate: Record<string, Record<string, number>> = {};
 
-    tasksData.forEach(task => {
-      if ((task.status === TaskStatus.DONE || task.completed) && task.assignedToUsername) {
-        const completionDate = task.completedAt || task.updatedAt || task.createdAt;
+    tasksData.forEach((task) => {
+      if (
+        (task.status === TaskStatus.DONE || task.completed) &&
+        task.assignedToUsername
+      ) {
+        const completionDate =
+          task.completedAt || task.updatedAt || task.createdAt;
         if (!completionDate) {
           console.log("Task has no completion date:", task);
           return;
         }
 
-        const completedDate = new Date(completionDate).toISOString().split('T')[0];
+        const completedDate = new Date(completionDate)
+          .toISOString()
+          .split("T")[0];
         if (!tasksByDate[completedDate]) {
           tasksByDate[completedDate] = {};
         }
@@ -125,12 +134,16 @@ export function ChartAreaInteractive() {
 
     const usernameToNameMap: Record<string, string> = {};
 
-    tasksData.forEach(task => {
+    tasksData.forEach((task) => {
       if (task.assignedToUsername) {
-        const member = teamMembers.find(m =>
-          m.name.replace(/\s+/g, '') === task.assignedToUsername?.replace(/\s+/g, '') ||
-          task.assignedToUsername?.includes(m.name) ||
-          m.name.includes(task.assignedToUsername ?? 'No Assigned To Username')
+        const member = teamMembers.find(
+          (m) =>
+            m.name.replace(/\s+/g, "") ===
+              task.assignedToUsername?.replace(/\s+/g, "") ||
+            task.assignedToUsername?.includes(m.name) ||
+            m.name.includes(
+              task.assignedToUsername ?? "No Assigned To Username",
+            ),
         );
 
         if (member) {
@@ -147,23 +160,23 @@ export function ChartAreaInteractive() {
     const currentDate = new Date(threeMonthsAgo);
 
     while (currentDate <= today) {
-      allDates.push(currentDate.toISOString().split('T')[0]);
+      allDates.push(currentDate.toISOString().split("T")[0]);
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    const chartDataArray = allDates.map(date => {
+    const chartDataArray = allDates.map((date) => {
       const dataPoint: ChartDataPoint = { date };
 
-      teamMembers.forEach(member => {
+      teamMembers.forEach((member) => {
         const usernames = Object.entries(usernameToNameMap)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .filter(([_, name]) => name === member.name)
           .map(([username]) => username);
 
         let totalTasks = 0;
 
         if (tasksByDate[date]) {
-          usernames.forEach(username => {
+          usernames.forEach((username) => {
             totalTasks += tasksByDate[date][username] || 0;
           });
 
@@ -184,7 +197,7 @@ export function ChartAreaInteractive() {
   const dynamicChartConfig = React.useMemo(() => {
     const config: ChartConfig = { tasks: { label: "Tasks Completed" } };
 
-    teamMembers.forEach(member => {
+    teamMembers.forEach((member) => {
       config[member.name] = {
         label: member.name,
         color: userColors[member.name] || "var(--primary)",
@@ -285,7 +298,7 @@ export function ChartAreaInteractive() {
                 {teamMembers.map((member) => (
                   <linearGradient
                     key={member.id}
-                    id={`fill-${member.name.replace(/\s+/g, '-')}`}
+                    id={`fill-${member.name.replace(/\s+/g, "-")}`}
                     x1="0"
                     y1="0"
                     x2="0"
@@ -324,7 +337,7 @@ export function ChartAreaInteractive() {
                 cursor={false}
                 content={
                   <ChartTooltipContent
-                      labelFormatter={(value) => {
+                    labelFormatter={(value) => {
                       return new Date(value).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -339,7 +352,7 @@ export function ChartAreaInteractive() {
                   key={member.id}
                   dataKey={member.name}
                   type="monotone"
-                  fill={`url(#fill-${member.name.replace(/\s+/g, '-')})`}
+                  fill={`url(#fill-${member.name.replace(/\s+/g, "-")})`}
                   stroke={userColors[member.name] || "var(--primary)"}
                 />
               ))}

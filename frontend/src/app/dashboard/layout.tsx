@@ -41,7 +41,7 @@ export default function AuthenticatedLayout({
         user={{
           name: session?.user?.name ?? "Unknown",
           email: session?.user?.email ?? "unknown@example.com",
-          avatar: "/avatars/default.png",
+          avatar: "https://github.com/shadcn.png",
         }}
       />
       <SidebarInset>
