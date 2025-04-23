@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
-
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -13,6 +14,10 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { TaskAddModal } from "@/components/create-task-modal";
+import { createTaskRequest } from "@/server/api/task/createTask";
+import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
+import type { CreateTaskFormValues } from "@/lib/types/DTO/setup/TaskCreationSchema";
 
 export function NavMain({
   items,
@@ -24,6 +29,34 @@ export function NavMain({
   }[];
 }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<{ id: string; name: string }[]>([]);
+  const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>([]);
+
+  // Fetch team members for task assignment
+  useEffect(() => {
+    const teamId = session?.user?.teamId;
+    if (!teamId) return;
+
+    fetchTaskDeps(teamId.toString())
+      .then(({ members, sprints }) => {
+        setTeamMembers(members);
+        setSprints(sprints || []);
+      })
+      .catch((err) => console.error("Failed to fetch task dependencies:", err));
+  }, [session]);
+
+  // Handle task creation
+  const handleTaskCreate = async (taskData: CreateTaskFormValues): Promise<void> => {
+    try {
+      await createTaskRequest(taskData);
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      return Promise.reject(error);
+    }
+  };
 
   return (
     <SidebarGroup>
@@ -32,13 +65,13 @@ export function NavMain({
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               tooltip="Quick Create"
-              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+              onClick={() => setIsTaskModalOpen(true)}
             >
-              <Link href="/create/task" className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <IconCirclePlusFilled />
                 <span>Quick Create</span>
-              </Link>
+              </div>
             </SidebarMenuButton>
 
             {/*TODO*/}
@@ -56,7 +89,7 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => {
             const isActive =
-              pathname === item.url || pathname.startsWith(item.url + "/");
+              pathname === item.url || pathname.startsWith(item.url + "/dashboard");
 
             return (
               <SidebarMenuItem key={item.title}>
@@ -77,6 +110,19 @@ export function NavMain({
           })}
         </SidebarMenu>
       </SidebarGroupContent>
+
+      {/* Task Creation Modal */}
+      <TaskAddModal
+        open={isTaskModalOpen}
+        onOpenChange={(open) => {
+          setIsTaskModalOpen(open);
+        }}
+        onSubmit={handleTaskCreate}
+        sprints={sprints}
+        users={teamMembers}
+        currentUser={session?.user ? { id: session.user.id, name: session.user.name || "Current User" } : { id: "0", name: "Current User" }}
+        session={session}
+      />
     </SidebarGroup>
   );
 }
