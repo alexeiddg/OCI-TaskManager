@@ -15,6 +15,5 @@ export async function fetchTasksByUserId(userId: number): Promise<TaskModel[]> {
     }
 
     const data = await res.json();
-    console.log(data)
     return Task.array().parse(data);
 }

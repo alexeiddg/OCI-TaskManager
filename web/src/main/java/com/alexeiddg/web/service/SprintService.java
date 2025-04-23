@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import repository.SprintRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,10 @@ public class SprintService {
                         s.getStartDate(),
                         s.getEndDate()))
                 .toList();
+    }
+
+    public Optional<Sprint> findLatestSprintWithAllRelations(Long teamId) {
+        return sprintRepository.findLatestSprintWithAllRelations(teamId);
     }
 
     public List<Sprint> getActiveSprintsByProjectId(Long projectId) {
