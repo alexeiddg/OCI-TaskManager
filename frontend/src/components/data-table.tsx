@@ -92,6 +92,9 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Task, TaskModel } from "@/lib/types/DTO/model/Task";
+import { addTaskLog } from "@/server/api/task/addTaskLogs";
+import { fetchTaskLogs } from "@/server/api/task/getTaskLogs"
+import type { TaskLogDto } from "@/lib/types/DTO/model/TaskLogDto";
 import { Separator } from "@/components/ui/separator";
 import { fetchTasksByUserId } from "@/server/api/task/getTask";
 import { useSession } from "next-auth/react";
@@ -862,6 +865,8 @@ function TableCellViewer({
   const [dueDateValue, setDueDateValue] = useState(item.dueDate?.slice(0,10) || "");
   const [blockedValue, setBlockedValue] = useState(item.blocked);
 
+  const [taskLogs, setTaskLogs] = useState<TaskLogDto[]>([]);
+
   async function onSave() {
     const payload = {
       id: item.id,
@@ -881,6 +886,23 @@ function TableCellViewer({
     };
     const updated = await updateTask(payload);
     onUpdate(updated);
+  }
+
+  useEffect(() => {
+    fetchTaskLogs(item.id, userId)
+      .then((logs) => setTaskLogs(logs))
+      .catch((err) => console.error("Failed to load task logs:", err));
+  }, [item.id, userId]);
+
+  async function handleAddLog(hours: number) {
+    try {
+      const newLog = await addTaskLog({ taskId: item.id, userId, hoursLogged: hours });
+      setTaskLogs((prev) => [...prev, newLog]);
+      toast.success("Time logged");
+    } catch (err) {
+      console.error("Failed to log time:", err);
+      toast.error("Failed to log time");
+    }
   }
 
   return (
@@ -1044,15 +1066,13 @@ function TableCellViewer({
             <Label className="text-base font-medium">Time Logged</Label>
             {/* Add new log entry */}
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const form = e.currentTarget;
-                const input = form.elements.namedItem(
-                  "logHours",
-                ) as HTMLInputElement;
+                const input = form.elements.namedItem("logHours") as HTMLInputElement;
                 const hours = parseFloat(input.value);
                 if (!isNaN(hours)) {
-                  console.log(`Log ${hours}hours to task ${item.id}`);
+                  await handleAddLog(hours);
                   input.value = "";
                 }
               }}
@@ -1070,6 +1090,16 @@ function TableCellViewer({
                 Add
               </Button>
             </form>
+            <div className="mt-4">
+              <h4 className="font-medium">Previous Logs</h4>
+              <ul className="list-disc list-inside text-sm">
+                {taskLogs.map((log) => (
+                  <li key={log.id}>
+                    {new Date(log.logDate).toLocaleString()}: {log.hoursLogged} hrs
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <Separator />
