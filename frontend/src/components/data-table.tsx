@@ -141,27 +141,23 @@ const columns: ColumnDef<z.infer<typeof Task>>[] = [
   },
   {
     id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
+    header: () => null,
+    cell: ({ row, table }) => {
+      const task = row.original;
+      const { completeTask } = table.options.meta!;
+
+      return (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={task.status === TaskStatus.DONE}
+            onCheckedChange={() => {
+              completeTask(task.id);
+            }}
+            aria-label="Select row"
+          />
+        </div>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -324,7 +320,6 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
 
   return (
     <TableRow
-      data-state={row.getIsSelected() && "selected"}
       data-dragging={isDragging}
       ref={setNodeRef}
       className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
@@ -344,7 +339,6 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
 
 export function DataTable() {
   const [data, setData] = React.useState<TaskModel[]>([]);
-  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([],);
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -382,13 +376,10 @@ export function DataTable() {
     state: {
       sorting,
       columnVisibility,
-      rowSelection,
       columnFilters,
       pagination,
     },
     getRowId: (row) => row.id.toString(),
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -707,8 +698,8 @@ export function DataTable() {
         {/* pagination */}
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredRowModel().rows.filter(row => row.original.status === TaskStatus.DONE).length} of{" "}
+            {table.getFilteredRowModel().rows.length} task(s) completed.
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
