@@ -105,6 +105,9 @@ import {
 import { TaskStatus } from "@/lib/types/enums/TaskStatus";
 import { TaskAddModal } from "@/components/create-task-modal";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
+import {TaskType} from "@/lib/types/enums/TaskType";
+import { updateTask } from "@/server/api/task/updateTask";
+import {TaskPriority} from "@/lib/types/enums/TaskPriority";
 
 /**
  * separate component for the drag handle
@@ -128,190 +131,6 @@ function DragHandle({ id }: { id: number }) {
   );
 }
 
-/**
- * Columns for data table
- **/
-const columns: ColumnDef<z.infer<typeof Task>>[] = [
-  /* ─────────── drag / checkbox ─────────── */
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-    enableHiding: false,
-  },
-  {
-    id: "select",
-    header: () => null,
-    cell: ({ row, table }) => {
-      const task = row.original;
-      const { completeTask } = table.options.meta!;
-
-      return (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={task.status === TaskStatus.DONE}
-            onCheckedChange={() => {
-              completeTask(task.id);
-            }}
-            aria-label="Select row"
-          />
-        </div>
-      );
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
-
-  /* ─────────── task core fields ─────────── */
-  {
-    accessorKey: "taskName",
-    header: "Task",
-    cell: ({ row }) => <TableCellViewer item={row.original} />,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "taskType",
-    header: "Type",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="px-1.5 capitalize">
-        {row.original.type}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className="px-1.5 capitalize flex items-center gap-1"
-      >
-        {row.original.status === "DONE" ? (
-          <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader className="size-4" />
-        )}
-        {row.original.status?.replace("_", " ") ?? "Unknown"}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "taskPriority",
-    header: "Priority",
-    cell: ({ row }) => (
-      <Badge
-        className="px-1.5 capitalize"
-        variant={
-          row.original.priority === "HIGH"
-            ? "destructive"
-            : row.original.priority === "MEDIUM"
-              ? "secondary"
-              : "outline"
-        }
-      >
-        {row.original.priority}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "storyPoints",
-    header: () => <div className="text-center w-full">SP</div>,
-    cell: ({ row }) => (
-      <div className="text-center w-full">{row.original.storyPoints}</div>
-    ),
-  },
-  {
-    accessorKey: "assignedToUsername",
-    header: "Assigned To",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap">
-        {row.original.assignedToUsername ?? "—"}
-      </div>
-    ),
-  },
-  {
-    header: "Sprint",
-    cell: ({ row }) => <div>{row.original.sprintName ?? "—"}</div>,
-  },
-  {
-    accessorKey: "dueDate",
-    header: "Due",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap">
-        {new Date(row.original.dueDate).toLocaleDateString()}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "blocked",
-    header: "Blocked",
-    cell: ({ row }) =>
-      row.original.blocked ? (
-        <Badge variant="destructive">Yes</Badge>
-      ) : (
-        <Badge variant="outline">No</Badge>
-      ),
-  },
-  {
-    id: "favorite",
-    header: () => <span className="sr-only">Favorite</span>,
-    cell: ({ row, table }) => {
-      const task = row.original;
-      const { toggleFavorite } = table.options.meta!;
-
-      return (
-        <FavoriteButton
-          isFavorite={task.favorite ?? false}
-          onToggle={() => toggleFavorite(task.id)}
-        />
-      );
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row, table }) => {
-      const task = row.original;
-      const { toggleFavorite, completeTask, deleteTask, copyTask } =
-        table.options.meta!;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => completeTask(task.id)}>
-              {task.status === "DONE" ? "Re-open" : "Complete"}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => copyTask(task)}>
-              Make a copy
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => toggleFavorite(task.id)}>
-              {task.favorite ? "Unfavorite" : "Favorite"}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => deleteTask(task.id)}
-              className="text-destructive"
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -370,6 +189,197 @@ export function DataTable() {
   const [currentTab, setCurrentTab] =
     React.useState<(typeof statusValues)[number]>("ALL");
 
+  // Columns for data table (moved inside DataTable to access teamMembers and sprints)
+  const columns: ColumnDef<z.infer<typeof Task>>[] = [
+    /* ─────────── drag / checkbox ─────────── */
+    {
+      id: "drag",
+      header: () => null,
+      cell: ({ row }) => <DragHandle id={row.original.id} />,
+      enableHiding: false,
+    },
+    {
+      id: "select",
+      header: () => null,
+      cell: ({ row, table }) => {
+        const task = row.original;
+        const { completeTask } = table.options.meta!;
+
+        return (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              checked={task.status === TaskStatus.DONE}
+              onCheckedChange={() => {
+                completeTask(task.id);
+              }}
+              aria-label="Select row"
+            />
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
+
+    /* ─────────── task core fields ─────────── */
+    {
+      accessorKey: "taskName",
+      header: "Task",
+      cell: ({ row }) => (
+        <TableCellViewer
+          item={row.original}
+          teamMembers={teamMembers}
+          sprints={sprints}
+          onComplete={handleComplete}
+          onUpdate={handleUpdate}
+        />
+      ),
+      enableHiding: false,
+    },
+    {
+      accessorKey: "taskType",
+      header: "Type",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="px-1.5 capitalize">
+          {row.original.type}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge
+          variant="outline"
+          className="px-1.5 capitalize flex items-center gap-1"
+        >
+          {row.original.status === "DONE" ? (
+            <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
+          ) : (
+            <IconLoader className="size-4" />
+          )}
+          {row.original.status?.replace("_", " ") ?? "Unknown"}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "taskPriority",
+      header: "Priority",
+      cell: ({ row }) => (
+        <Badge
+          className="px-1.5 capitalize"
+          variant={
+            row.original.priority === "HIGH"
+              ? "destructive"
+              : row.original.priority === "MEDIUM"
+                ? "secondary"
+                : "outline"
+          }
+        >
+          {row.original.priority}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "storyPoints",
+      header: () => <div className="text-center w-full">SP</div>,
+      cell: ({ row }) => (
+        <div className="text-center w-full">{row.original.storyPoints}</div>
+      ),
+    },
+    {
+      accessorKey: "assignedToUsername",
+      header: "Assigned To",
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          {row.original.assignedToUsername ?? "—"}
+        </div>
+      ),
+    },
+    {
+      header: "Sprint",
+      cell: ({ row }) => <div>{row.original.sprintName ?? "—"}</div>,
+    },
+    {
+      accessorKey: "dueDate",
+      header: "Due",
+      cell: ({ row }) => (
+        <div className="whitespace-nowrap">
+          {new Date(row.original.dueDate).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "blocked",
+      header: "Blocked",
+      cell: ({ row }) =>
+        row.original.blocked ? (
+          <Badge variant="destructive">Yes</Badge>
+        ) : (
+          <Badge variant="outline">No</Badge>
+        ),
+    },
+    {
+      id: "favorite",
+      header: () => <span className="sr-only">Favorite</span>,
+      cell: ({ row, table }) => {
+        const task = row.original;
+        const { toggleFavorite } = table.options.meta!;
+
+        return (
+          <FavoriteButton
+            isFavorite={task.favorite ?? false}
+            onToggle={() => toggleFavorite(task.id)}
+          />
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row, table }) => {
+        const task = row.original;
+        const { toggleFavorite, completeTask, deleteTask, copyTask } =
+          table.options.meta!;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <IconDotsVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={() => completeTask(task.id)}>
+                {task.status === "DONE" ? "Re-open" : "Complete"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => copyTask(task)}>
+                Make a copy
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toggleFavorite(task.id)}>
+                {task.favorite ? "Unfavorite" : "Favorite"}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => deleteTask(task.id)}
+                className="text-destructive"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+
   const table = useReactTable({
     data,
     columns,
@@ -395,6 +405,7 @@ export function DataTable() {
       completeTask: handleComplete,
       deleteTask: handleDelete,
       copyTask: handleCopy,
+      updateTask: handleUpdate,
     },
   });
 
@@ -533,6 +544,14 @@ export function DataTable() {
       console.error(err);
       toast.error("Copy failed");
     }
+  }
+
+  /* ---------- UPDATE ---------- */
+  function handleUpdate(updated: TaskModel) {
+    setData((prev) =>
+        prev.map((t) => (t.id === updated.id ? updated : t))
+    );
+    toast.success("Task saved");
   }
 
   if (loading) {
@@ -812,8 +831,57 @@ export function DataTable() {
   );
 }
 
-function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
+function TableCellViewer({
+  item,
+  teamMembers,
+  sprints,
+  onComplete,
+  onUpdate,
+}: {
+  item: z.infer<typeof Task>;
+  teamMembers: { id: number; name: string }[];
+  sprints: { id: number; sprintName: string }[];
+  onComplete: (taskId: number) => void;
+  onUpdate: (updated: TaskModel) => void;
+}) {
   const isMobile = useIsMobile();
+
+  const { data: session } = useSession();
+  const userId = Number(session?.user?.id);
+
+  const [assignedToUsername, setAssignedToUsername] = useState(
+    item.assignedToUsername || (teamMembers.length > 0 ? teamMembers[0].name : "")
+  );
+
+  const [description, setDescription] = useState(item.taskDescription);
+  const [typeValue, setTypeValue] = useState(item.type);
+  const [statusValue, setStatusValue] = useState(item.status);
+  const [priorityValue, setPriorityValue] = useState(item.priority);
+  const [sprintIdValue, setSprintIdValue] = useState(String(item.sprintId));
+  const [storyPointsValue, setStoryPointsValue] = useState(item.storyPoints);
+  const [dueDateValue, setDueDateValue] = useState(item.dueDate?.slice(0,10) || "");
+  const [blockedValue, setBlockedValue] = useState(item.blocked);
+
+  async function onSave() {
+    const payload = {
+      id: item.id,
+      taskName: item.taskName,
+      taskDescription: description,
+      taskPriority: priorityValue,
+      taskStatus: statusValue,
+      taskType: typeValue,
+      storyPoints: storyPointsValue,
+      dueDate: new Date(dueDateValue).toISOString(),
+      sprintId: Number(sprintIdValue),
+      assignedTo: teamMembers.find(u => u.name === assignedToUsername)?.id ?? userId,
+      blocked: blockedValue,
+      isActive: item.isActive,
+      isFavorite: item.favorite ?? false,
+      changedBy: userId,
+    };
+    const updated = await updateTask(payload);
+    onUpdate(updated);
+  }
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -842,7 +910,8 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
               <textarea
                 id="description"
                 className="min-h-[100px] resize-y rounded-md border p-2"
-                defaultValue={item.taskDescription}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
@@ -850,7 +919,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="taskType">Type</Label>
-                <Select defaultValue={item.type}>
+                <Select value={typeValue} onValueChange={(v) => setTypeValue(v as TaskType)}>
                   <SelectTrigger id="taskType">
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
@@ -866,7 +935,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="taskStatus">Status</Label>
-                <Select defaultValue={item.status}>
+                <Select value={statusValue} onValueChange={(v) => setStatusValue(v as TaskStatus)}>
                   <SelectTrigger id="taskStatus">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -885,14 +954,17 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="assignedTo">Assigned To</Label>
-                <Select defaultValue={item.assignedToUsername ?? ""}>
+                <Select
+                  value={assignedToUsername}
+                  onValueChange={(val) => setAssignedToUsername(val)}
+                >
                   <SelectTrigger id="assignedTo">
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
                   <SelectContent>
-                    {["alice", "bob", "carol"].map((user) => (
-                      <SelectItem key={user} value={user}>
-                        {user}
+                    {teamMembers.map((u) => (
+                      <SelectItem key={u.id} value={u.name}>
+                        {u.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -901,7 +973,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="priority">Priority</Label>
-                <Select defaultValue={item.priority}>
+                <Select value={priorityValue} onValueChange={(v) => setPriorityValue(v as TaskPriority)}>
                   <SelectTrigger id="priority">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
@@ -916,53 +988,53 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
               </div>
             </div>
 
-            {/* ---- Sprint & Story Points ---- */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="sprint">Sprint</Label>
-                <Select defaultValue={String(item.sprintId)}>
-                  <SelectTrigger id="sprint">
-                    <SelectValue placeholder="Select Sprint" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[
-                      { id: 1, name: "Sprint 1" },
-                      { id: 2, name: "Sprint 2" },
-                    ].map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* ---- Sprint ---- */}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="sprint">Sprint</Label>
+              <Select value={sprintIdValue} onValueChange={(v) => setSprintIdValue(v)}>
+                <SelectTrigger id="sprint">
+                  <SelectValue placeholder="Select Sprint" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sprints.map((s) => (
+                    <SelectItem key={s.id} value={String(s.id)}>
+                      {s.sprintName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
+            {/* ---- Story Points & Due date ---- */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="storyPoints">Story Points</Label>
                 <Input
                   type="number"
                   id="storyPoints"
-                  defaultValue={item.storyPoints}
+                  value={storyPointsValue}
+                  onChange={(e) => setStoryPointsValue(Number(e.target.value))}
                   min={0}
                 />
               </div>
-            </div>
-
-            {/* ---- Due date & Completion ---- */}
-            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="dueDate">Due date</Label>
                 <Input
                   id="dueDate"
                   type="date"
-                  defaultValue={item.dueDate?.slice(0, 10)}
+                  value={dueDateValue}
+                  onChange={(e) => setDueDateValue(e.target.value)}
                 />
               </div>
             </div>
 
             {/* ---- Blocked flag ---- */}
             <div className="flex items-center gap-2">
-              <Checkbox id="blocked" defaultChecked={item.blocked} />
+              <Checkbox
+                id="blocked"
+                checked={blockedValue}
+                onCheckedChange={(v) => setBlockedValue(v === true)}
+              />
               <Label htmlFor="blocked">Blocked</Label>
             </div>
           </form>
@@ -970,25 +1042,6 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
           <Separator />
           <div className="flex flex-col gap-2">
             <Label className="text-base font-medium">Time Logged</Label>
-
-            {/* Simulated log data (replace later with fetched logs) */}
-            <div className="space-y-1 text-sm">
-              {[
-                { user: "alice", hours: 2, date: "2025-04-19" },
-                { user: "bob", hours: 3.5, date: "2025-04-20" },
-              ].map((log, i) => (
-                <div
-                  key={i}
-                  className="flex justify-between text-muted-foreground border rounded-md p-2 bg-muted/40"
-                >
-                  <span>{log.user}</span>
-                  <span>
-                    {log.hours}h on {log.date}
-                  </span>
-                </div>
-              ))}
-            </div>
-
             {/* Add new log entry */}
             <form
               onSubmit={(e) => {
@@ -1003,15 +1056,14 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
                   input.value = "";
                 }
               }}
-              className="flex gap-2 mt-2"
+              className="flex flex-col gap-2 mt-2"
             >
               <Input
                 name="logHours"
                 type="number"
                 step="0.25"
                 min="0"
-                placeholder="Log hours"
-                className="w-24"
+                className="w-full"
                 required
               />
               <Button type="submit" variant="default">
@@ -1021,7 +1073,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
           </div>
 
           <Separator />
-          <div className="text-xs text-muted-foreground space-y-1">
+          <div className="text-xs text-muted-foreground space-y-1 mx-2">
             <p>ID: {item.id}</p>
             <p>Created: {new Date(item.createdAt).toLocaleString()}</p>
             <p>
@@ -1040,8 +1092,12 @@ function TableCellViewer({ item }: { item: z.infer<typeof Task> }) {
         </div>
 
         <DrawerFooter>
-          <Button>Mark As Completed</Button>
-          <Button variant="secondary">Save</Button>
+          <Button onClick={() => onComplete(item.id)}>
+            {item.status === TaskStatus.DONE ? "Re-open task" : "Mark As Completed"}
+          </Button>
+          <Button variant="secondary" onClick={onSave}>
+            Save
+          </Button>
           <DrawerClose asChild>
             <Button variant="outline">Close</Button>
           </DrawerClose>

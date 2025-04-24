@@ -4,12 +4,12 @@ import DTO.domian.TaskDto;
 import DTO.domian.mappers.TaskMapper;
 import DTO.helpers.TaskFavoriteRequest;
 import DTO.setup.TaskCreationRequest;
+import DTO.setup.TaskUpdateRequest;
 import com.alexeiddg.web.service.TaskService;
 import enums.TaskPriority;
 import enums.TaskStatus;
 import enums.TaskType;
 import model.Task;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +34,19 @@ public class TaskController {
     }
 
     // Update an existing task
-    @PutMapping("/{taskId}")
-    public ResponseEntity<Task> updateTask(
-            @PathVariable Long taskId,
-            @RequestBody Task task
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskDto> updateTask(
+            @PathVariable("id") Long id,
+            @RequestBody TaskUpdateRequest req
     ) {
-        task.setId(taskId);
-        Task updated = taskService.updateTask(task);
-        return ResponseEntity.ok(updated);
+        // (Optional) enforce path‐id == body.id
+        if (!id.equals(req.id())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Task updated = taskService.updateTaskWithLogging(req);
+        TaskDto dto = TaskMapper.toDto(updated, req.isFavorite());
+        return ResponseEntity.ok(dto);
     }
 
      // Delete Task (hard delete)

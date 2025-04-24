@@ -3,6 +3,7 @@ package com.alexeiddg.web.service;
 import DTO.domian.TaskDto;
 import DTO.domian.mappers.TaskMapper;
 import DTO.setup.TaskCreationRequest;
+import DTO.setup.TaskUpdateRequest;
 import enums.ChangeType;
 import enums.TaskPriority;
 import enums.TaskStatus;
@@ -86,8 +87,47 @@ public class TaskService {
     }
 
     // Update
-    public Task updateTask(Task task) {
-        return taskRepository.save(task);
+    @Transactional
+    public Task updateTaskWithLogging(TaskUpdateRequest req) {
+        Task task = taskRepository.findById(req.id())
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        Sprint sprint = sprintRepository.findById(req.sprintId())
+                .orElseThrow(() -> new RuntimeException("Sprint not found"));
+        AppUser changer = appUserRepository.findById(req.changedBy())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        AppUser assignee = appUserRepository.findById(req.assignedTo())
+                .orElseThrow(() -> new RuntimeException("Assignee not found"));
+
+        task.setSprint(sprint);
+        task.setTaskName(req.taskName());
+        task.setTaskDescription(req.taskDescription());
+        task.setPriority(req.taskPriority());
+        task.setStatus(req.taskStatus());
+        task.setType(req.taskType());
+        task.setStoryPoints(req.storyPoints());
+        task.setDueDate(req.dueDate());
+        task.setAssignedTo(assignee);
+        task.setBlocked(req.blocked());
+        task.setIsActive(req.isActive());
+
+        if (req.taskStatus() == TaskStatus.DONE && task.getCompletedAt() == null) {
+            task.setCompletedAt(LocalDateTime.now());
+        } else if (req.taskStatus() != TaskStatus.DONE) {
+            task.setCompletedAt(null);
+        }
+
+        Task saved = taskRepository.save(task);
+
+        // 3. Audit
+        TaskAudit audit = new TaskAudit();
+        audit.setTask(saved);
+        audit.setChangedBy(changer);
+        audit.setChangeType(ChangeType.UPDATE);
+        audit.setChangedAt(LocalDateTime.now());
+        taskAuditRepository.save(audit);
+
+        return saved;
     }
 
     // Delete
