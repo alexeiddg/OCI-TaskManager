@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useRef} from "react";
 import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { TaskAddModal } from "@/components/create-task-modal";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
+import {InviteTeamMemberModal, InviteTeamMemberModalHandle} from "@/components/email-invite-modal"
+import {Separator} from "@radix-ui/react-menu";
 
 export function NavMain({
   items,
@@ -35,6 +37,7 @@ export function NavMain({
   const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>(
     [],
   );
+  const inviteModalRef = useRef<InviteTeamMemberModalHandle>(null)
 
   useEffect(() => {
     const teamId = session?.user?.teamId;
@@ -73,6 +76,11 @@ export function NavMain({
               <IconMail />
               <span className="sr-only">Inbox</span>
             </Button>
+            {/* Email invite Modal */}
+          </SidebarMenuItem>
+          <Separator />
+          <SidebarMenuItem className="flex items-start">
+            <InviteTeamMemberModal ref={inviteModalRef} />
           </SidebarMenuItem>
         </SidebarMenu>
 
@@ -84,6 +92,7 @@ export function NavMain({
 
             return (
               <SidebarMenuItem key={item.title}>
+                <Separator />
                 <Link href={item.url}>
                   <SidebarMenuButton
                     tooltip={item.title}
@@ -118,7 +127,7 @@ export function NavMain({
               }
             : { id: 0, name: "No User Found" }
         }
-        session={session}
+        session={session!}
       />
     </SidebarGroup>
   );
