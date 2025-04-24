@@ -20,12 +20,18 @@ import { useEffect, useState } from "react";
 import { KpiDto } from "@/lib/types/DTO/model/KpiDto";
 import { fetchKpiDto } from "@/server/api/kpi/getKpis";
 import { useSession } from "next-auth/react";
+import { fetchSprintAnalytics } from "@/server/api/sprint/getSprintAnalytics";
+import { SprintForAnalyticsModel } from "@/lib/types/DTO/helpers/SprintAnalyticsData";
+import { TaskStatus } from "@/lib/types/enums/TaskStatus";
 
 export function SectionCards() {
   const { data: session } = useSession();
   const [kpis, setKpis] = useState<KpiDto | null>(null);
+  const [sprintData, setSprintData] = useState<SprintForAnalyticsModel | null>(null);
   const [loading, setLoading] = useState(true);
   const userId = Number(session?.user?.id);
+  const teamId = Number(session?.user?.teamId);
+  const [avgCompletionTime, setAvgCompletionTime] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -40,9 +46,40 @@ export function SectionCards() {
       });
   }, [userId]);
 
-  if (loading || !kpis) {
+  useEffect(() => {
+    if (!teamId) return;
+
+    setLoading(true);
+    fetchSprintAnalytics(teamId)
+      .then((data) => {
+        setSprintData(data);
+
+        // Calculate average completion time
+        const completedTasks = data.tasks.filter((t) => t.status === TaskStatus.DONE && t.completedAt);
+
+        // Calculate average completion time
+        const completionTimes = completedTasks.map((task) => {
+          const createdDate = new Date(task.createdAt);
+          const completedDate = new Date(task.completedAt!);
+          return (completedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24); // days
+        });
+
+        const avgTime = completionTimes.length > 0
+          ? completionTimes.reduce((sum, time) => sum + time, 0) / completionTimes.length
+          : 0;
+
+        setAvgCompletionTime(avgTime);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch sprint analytics", err);
+        setLoading(false);
+      });
+  }, [teamId]);
+
+  if (loading || !kpis || !sprintData) {
     return (
-      <Card className="@container/card px-4 lg:px-6">
+      <Card className="@container/card mx-4 lg:mx-6 my-6">
         <CardContent className="flex items-center justify-center h-[300px]">
           <IconLoader className="animate-spin size-6 text-muted-foreground" />
         </CardContent>
@@ -124,7 +161,7 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Avg Completion Time</CardDescription>
           <CardTitle className="text-3xl tabular-nums">
-            {kpis.averageCompletionTime.toFixed(1)} hrs
+            {avgCompletionTime !== null ? avgCompletionTime.toFixed(1) : "0.0"} days
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -136,7 +173,7 @@ export function SectionCards() {
           <span className="flex gap-2 font-medium">
             Time from assignment to completion
           </span>
-          <span className="text-muted-foreground">Lower is usually better</span>
+          <span className="text-muted-foreground">Based on {sprintData.tasks.filter(t => t.status === TaskStatus.DONE && t.completedAt).length} completed tasks</span>
         </CardFooter>
       </Card>
     </div>

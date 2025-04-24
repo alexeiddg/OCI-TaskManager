@@ -4,9 +4,11 @@ import DTO.domian.kpi.TeamKpiDto;
 import DTO.domian.kpi.TeamProgressForecast;
 import DTO.domian.kpi.TeamTaskTypeBreakdown;
 import DTO.helpers.UserSummaryDto;
+import com.alexeiddg.web.service.AppUserService;
 import com.alexeiddg.web.service.SprintService;
 import com.alexeiddg.web.service.kpi.TeamKpiCalculationService;
 import lombok.RequiredArgsConstructor;
+import model.AppUser;
 import model.Sprint;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,18 +27,22 @@ public class TeamKpiController {
 
     private final TeamKpiCalculationService teamKpiService;
     private final SprintService sprintService;
+    private final AppUserService userService;
 
-    @GetMapping("/sprint/{sprintId}/team")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<TeamKpiDto> getTeamSprintKpis(
-            @PathVariable Long sprintId
+            @PathVariable("userId") Long userId
     ) {
-        // load sprint or 404
-        Sprint sprint = sprintService.getSprintById(sprintId);
-        if (sprint == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Sprint not found: " + sprintId
-            );
-        }
+
+        AppUser user = userService.getUserById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found with id " + userId
+                ));
+
+        Sprint sprint = sprintService.findLatestSprintWithAllRelations(user.getTeam().getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Sprint not found for team " + user.getTeam().getId()
+                ));
 
         // breakdown & forecast
         TeamTaskTypeBreakdown breakdown = teamKpiService.taskTypeBreakdown(sprint);

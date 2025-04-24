@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import FloatingTelegramButton from "@/components/FloatingTelegramButton";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {ThemeProvider} from "next-themes";
 
 export default function AuthenticatedLayout({
   children,
@@ -35,6 +36,12 @@ export default function AuthenticatedLayout({
   }
 
   return (
+      <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+      >
     <SidebarProvider>
       <AppSidebar
         variant="inset"
@@ -54,5 +61,6 @@ export default function AuthenticatedLayout({
         <FloatingTelegramButton />
       </SidebarInset>
     </SidebarProvider>
+      </ThemeProvider>
   );
 }

@@ -28,17 +28,20 @@ export const sidebarData = {
       url: "/dashboard/projects",
       icon: IconFolder,
     },
+    /*
     {
       title: "Team (TODO)",
       url: "/dashboard/team",
       icon: IconUsers,
     },
+    */
     {
-      title: "Analytics (TODO)",
+      title: "Analytics",
       url: "/dashboard/analytics",
       icon: IconChartBar,
     },
   ],
+  /*
   navSecondary: [
     {
       title: "Settings",
@@ -56,16 +59,20 @@ export const sidebarData = {
       icon: IconSearch,
     },
   ],
+  */
+  navSecondary: [],
   documents: [
     {
-      name: "Reports (Coming Soon)",
+      name: "Reports",
       url: "/dashboard/reports",
       icon: IconReport,
     },
+    /*
     {
       name: "Data Library (Coming Soon)",
       url: "/dashboard/data",
       icon: IconDatabase,
     },
+     */
   ],
 };

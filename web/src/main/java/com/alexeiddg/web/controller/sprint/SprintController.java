@@ -1,6 +1,7 @@
 package com.alexeiddg.web.controller.sprint;
 
 import DTO.domian.SprintDto;
+import DTO.domian.kpi.SprintWithDepsDto;
 import DTO.domian.mappers.SprintMapper;
 import DTO.helpers.SprintCardDto;
 import DTO.helpers.mappers.SprintCardMapper;
@@ -73,5 +74,21 @@ public class SprintController {
                 .map(SprintCardMapper::toDto)
                 .toList();
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/team/{teamId}/latest-sprint")
+    public ResponseEntity<SprintDto> getLatestSprintByTeamId(@PathVariable("teamId") Long teamId) {
+        Sprint sprint = sprintService.findLatestSprintWithAllRelations(teamId).orElse(null);
+        return sprint != null ? ResponseEntity.ok(SprintMapper.toDto(sprint)) : ResponseEntity.notFound().build();
+    }
+
+    /**
+     * Returns the latest active sprint (with full dependencies)
+     * for the provided teamId.
+     */
+    @GetMapping("/latest")
+    public ResponseEntity<SprintWithDepsDto> getLatestByTeam(@RequestParam("teamId") Long teamId) {
+        SprintWithDepsDto dto = sprintService.getLatestSprint(teamId);
+        return ResponseEntity.ok(dto);
     }
 }

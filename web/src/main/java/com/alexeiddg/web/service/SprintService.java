@@ -1,6 +1,9 @@
 package com.alexeiddg.web.service;
 
 import DTO.domian.SprintDto;
+import DTO.domian.kpi.SprintWithDepsDto;
+import DTO.domian.kpi.mappers.SprintWithDepsMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import model.Sprint;
 import org.springframework.stereotype.Service;
@@ -62,5 +65,18 @@ public class SprintService {
 
     public List<Sprint> getActiveSprintsByProjectId(Long projectId) {
         return sprintRepository.findByProjectIdAndIsActiveTrue(projectId);
+    }
+
+    /**
+     * Fetches the most recent active sprint for the given team,
+     * along with its project, tasks, and team members.
+     */
+    public SprintWithDepsDto getLatestSprint(Long teamId) {
+        return sprintRepository
+                .findLatestSprintWithAllRelations(teamId)
+                .map(SprintWithDepsMapper::toDto)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("No active sprint found for team " + teamId)
+                );
     }
 }

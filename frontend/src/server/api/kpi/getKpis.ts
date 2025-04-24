@@ -24,8 +24,8 @@ export async function fetchKpiDto(userId: number): Promise<KpiDto> {
   return parsed.data;
 }
 
-export async function fetchTeamKpiDto(sprintId: number): Promise<TeamKpiDto> {
-  const url = `${BASE_URL}/api/v2/kpis/sprint/${sprintId}/team`;
+export async function fetchTeamKpiDto(userId: number): Promise<TeamKpiDto> {
+  const url = `${BASE_URL}/api/v2/team/kpis/user/${userId}`;
   const res = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
