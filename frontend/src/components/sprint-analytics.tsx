@@ -1300,7 +1300,7 @@ export function SprintAnalyticsDashboard() {
                     <div className="space-y-4">
                       <div className="flex flex-col p-3 border rounded-md">
                         <div className="text-sm font-medium">Time Logged This Sprint (Average)</div>
-                        <div className="text-2xl font-bold mt-1">{kpis.averageLoggedHours} hours</div>
+                        <div className="text-2xl font-bold mt-1">{kpis.averageLoggedHours.toFixed(1)} hours</div>
                         <div className="text-xs text-muted-foreground mt-1">
                           Based on your average logged hours
                         </div>
