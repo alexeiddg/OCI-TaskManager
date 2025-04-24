@@ -1,7 +1,12 @@
 package com.alexeiddg.web.controller.team;
 
 import DTO.domian.AppUserDto;
+
+import com.alexeiddg.web.service.AppUserService;
+import com.alexeiddg.web.service.EmailService;
 import com.alexeiddg.web.service.TeamService;
+
+import model.AppUser;
 import model.Project;
 import model.Team;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +20,14 @@ import java.util.Optional;
 public class TeamController {
 
     private final TeamService teamService;
+    private final AppUserService appUserService;
+    private final EmailService emailService;
 
-    public TeamController(TeamService teamService) {
-        this.teamService = teamService;
-    }
+public TeamController(TeamService teamService, AppUserService appUserService, EmailService emailService) {
+    this.teamService = teamService;
+    this.appUserService = appUserService;
+    this.emailService = emailService;
+}
 
     // Create Team
     @PostMapping
@@ -94,4 +103,50 @@ public class TeamController {
     public ResponseEntity<List<Project>> getTeamProjects(@PathVariable("id") Long id) {
         return ResponseEntity.ok(teamService.getTeamProjects(id));
     }
+
+    @PostMapping("/{teamId}/add-member")
+    public ResponseEntity<String> addMemberToTeam(
+            @PathVariable("teamId") Long teamId,
+            @RequestParam("userId") Long userId) {
+        boolean success = teamService.addUserToTeam(teamId, userId);
+        if (success) {
+            return ResponseEntity.ok("User added to team successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Failed to add user to team.");
+        }
+    }
+
+
+    @PostMapping("/{teamId}/invite")
+    public ResponseEntity<String> inviteToTeam(
+        @PathVariable("teamId") Long teamId,
+        @RequestParam("email") String email) {
+
+        Optional<AppUser> userOptional = appUserService.getUserByEmail(email);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+
+        // Generate link (could use a token or just the teamId for now)
+        String inviteLink = "https://your-frontend.com/accept-invite?userId=" + userOptional.get().getId()
+                        + "&teamId=" + teamId;
+
+        emailService.sendInvitation(email, inviteLink);
+        return ResponseEntity.ok("Invitation sent to " + email);
+    }
+
+    @PostMapping("/accept-invite")
+    public ResponseEntity<String> acceptInvite(
+        @RequestParam("userId") Long userId,
+        @RequestParam("teamId") Long teamId) {
+
+        boolean added = teamService.addUserToTeam(teamId, userId);
+
+        if (added) return ResponseEntity.ok("User added to team.");
+        else return ResponseEntity.badRequest().body("Failed to add user.");
+    }
+
+
+
 }
