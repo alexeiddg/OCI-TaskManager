@@ -32,6 +32,7 @@
 		<frontend-src-dir>${project.basedir}/src/main/frontend</frontend-src-dir> <!-- Change -->
 		<node.version>v16.13.2</node.version> <!-- Change -->
 		<npm.version>8.1.2</npm.version> <!-- Change -->
+		<start-class>com.alexeiddg.telegram.WebApplication</start-class>
 	</properties>
 
 	<dependencies>
