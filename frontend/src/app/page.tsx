@@ -37,24 +37,24 @@ function Header() {
         </div>
         <nav className="hidden md:flex gap-6">
           <Link
-            href="#features"
+            href="#"
             className="text-sm font-medium hover:text-primary"
           >
             Features
           </Link>
           <Link
-            href="#testimonials"
+            href="#"
             className="text-sm font-medium hover:text-primary"
           >
             Testimonials
           </Link>
           <Link
-            href="#pricing"
+            href="#"
             className="text-sm font-medium hover:text-primary"
           >
             Pricing
           </Link>
-          <Link href="#faq" className="text-sm font-medium hover:text-primary">
+          <Link href="#" className="text-sm font-medium hover:text-primary">
             FAQ
           </Link>
         </nav>
@@ -86,25 +86,25 @@ function Header() {
         <div className="container mx-auto border-t py-4 px-4 md:px-6">
           <nav className="flex flex-col gap-4">
             <Link
-              href="#features"
+              href="#"
               className="text-sm font-medium hover:text-primary"
             >
               Features
             </Link>
             <Link
-              href="#testimonials"
+              href="#"
               className="text-sm font-medium hover:text-primary"
             >
               Testimonials
             </Link>
             <Link
-              href="#pricing"
+              href="#"
               className="text-sm font-medium hover:text-primary"
             >
               Pricing
             </Link>
             <Link
-              href="#faq"
+              href="#"
               className="text-sm font-medium hover:text-primary"
             >
               FAQ
@@ -147,7 +147,7 @@ function HeroSection() {
                 <Link href="/signup">Get Started for Free</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="#demo">Watch Demo</Link>
+                <Link href="#">Watch Demo</Link>
               </Button>
             </div>
             <div className="flex items-center gap-2 text-sm">
@@ -567,7 +567,7 @@ function CtaSection() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="/contact">Schedule a Demo</Link>
+              <Link href="/">Schedule a Demo</Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">

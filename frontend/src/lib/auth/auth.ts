@@ -1,11 +1,8 @@
 import NextAuth from "next-auth";
-import Slack from "@auth/core/providers/slack";
-import GitHub from "@auth/core/providers/github";
-import MailGun from "@auth/core/providers/mailgun";
 import Credentials from "@auth/core/providers/credentials";
 import { UserRole } from "@/lib/types/enums/UserRole";
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const { auth, handlers, } = NextAuth({
   session: {
     strategy: "jwt",
     maxAge: 60 * 60, // 1 hour (in seconds)

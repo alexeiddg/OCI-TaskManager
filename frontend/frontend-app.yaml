@@ -45,4 +45,4 @@ spec:
                   name: nextjs-secret
                   key: AUTH_SECRET
             - name: BACKEND_URL
-              value: "http://your-backend-service:8080"
+              value: "http://159.54.144.172"
