@@ -10,11 +10,11 @@ COPY ../pom.xml ./pom.xml
 # Copy the lib module
 COPY ../lib ./lib
 
-# Copy the telegram module (current directory)
-COPY . ./telegram
+# Copy the web module (current directory)
+COPY . ./web
 
 # Build the application
-RUN mvn clean package -pl telegram -am -DskipTests
+RUN mvn clean package -pl web -am -DskipTests
 
 # Runtime stage
 FROM openjdk:17-slim
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y libaio1 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Copy the JAR file from builder stage
-COPY --from=builder /app/telegram/target/*.jar app.jar
+COPY --from=builder /app/web/target/*.jar app.jar
 
 # Copy any additional required files for Oracle wallet connectivity if needed
 # COPY ./wallet/ /mtdrworkshop/creds/
