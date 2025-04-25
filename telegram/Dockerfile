@@ -4,7 +4,7 @@ FROM maven:3.8.3-openjdk-17 AS builder
 # Set build context to /build
 WORKDIR /build
 
-# Copy the parent POM and shared library and service modules
+# Copy the parent POM and project structure
 COPY pom.xml ./
 COPY lib ./lib
 COPY telegram ./telegram
