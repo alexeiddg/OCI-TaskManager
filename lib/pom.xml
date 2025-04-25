@@ -38,7 +38,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version> <!-- Ensure it's a recent version that supports Java 21 -->
                 <configuration>
-                    <release>21</release> <!-- This sets both source and target to 21 -->
+                    <release>17</release> <!-- This sets both source and target to 21 -->
                 </configuration>
             </plugin>
         </plugins>
