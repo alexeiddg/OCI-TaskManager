@@ -16,12 +16,14 @@ docker build \
   -f telegram/Dockerfile \
   -t ${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG} \
   telegram/
+  .
 
 echo "Building Web image..."
 docker build \
   -f web/Dockerfile \
   -t ${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG} \
   web/
+  .
 
 # Push images to OCIR
 echo "Pushing Telegram image to OCIR..."

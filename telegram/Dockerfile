@@ -6,7 +6,7 @@ COPY . .
 # Build only telegram + its dependencies
 RUN mvn clean package -pl telegram -am -DskipTests
 
-FROM openjdk:17-slim AS runtime
+FROM docker.io/library/openjdk:17-slim AS runtime
 WORKDIR /app
 COPY --from=builder /build/telegram/target/*.jar app.jar
 EXPOSE 8080
