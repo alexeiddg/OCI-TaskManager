@@ -1,38 +1,33 @@
 # Build stage
 FROM maven:3.8.3-openjdk-17 AS builder
 
-# Set working directory
-WORKDIR /app
+# Set build context to /build
+WORKDIR /build
 
-# Copy the parent POM first to leverage build caching
-COPY ../pom.xml ./pom.xml
+# Copy the parent POM and shared library and service modules
+COPY pom.xml ./
+COPY lib ./lib
+COPY telegram ./telegram
 
-# Copy the lib module
-COPY ../lib ./lib
-
-# Copy the telegram module (current directory)
-COPY . ./telegram
-
-# Build the application
+# Compile shared lib and the telegram service without running tests
 RUN mvn clean package -pl telegram -am -DskipTests
 
 # Runtime stage
 FROM openjdk:17-slim
 
-# Add Oracle client libraries for wallet authentication
-RUN apt-get update && apt-get install -y libaio1 && rm -rf /var/lib/apt/lists/*
+# Install Oracle client libraries if needed
+RUN apt-get update \
+    && apt-get install -y libaio1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Prepare application directory
 WORKDIR /app
 
-# Copy the JAR file from builder stage
-COPY --from=builder /app/telegram/target/*.jar app.jar
+# Copy the built JAR from the builder stage
+COPY --from=builder /build/telegram/target/*.jar app.jar
 
-# Copy any additional required files for Oracle wallet connectivity if needed
-# COPY ./wallet/ /mtdrworkshop/creds/
-
-# Expose the application port
+# Expose application port
 EXPOSE 8080
 
-# Run the application
+# Launch the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
