@@ -1,4 +1,4 @@
-package com.alexeiddg.web.config;
+package com.alexeiddg.telegram.config;
 
 import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package com.alexeiddg.web.config;
+package com.alexeiddg.telegram.config;
 
 
 import lombok.Getter;

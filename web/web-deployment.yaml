@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      volumes:
+        - name: oracle-wallet
+          secret:
+            secretName: oracle-wallet-secret
+      containers:
+        - name: web
+          # Add volume mount for Oracle wallet
+          volumeMounts:
+            - name: oracle-wallet
+              mountPath: /mtdrworkshop/creds
+              readOnly: true
+          image: iad.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: web-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10

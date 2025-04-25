@@ -1,0 +1,92 @@
+version: 0.1
+component: build
+timeoutInSeconds: 36000
+shell: bash
+
+env:
+  variables:
+    # GraalVM for native-image
+    JAVA_HOME: /usr/lib64/graalvm/graalvm22-ee-java17
+
+    # Docker / OCIR info
+    OCIR_REGION: mx-queretaro-1
+    NAMESPACE: ax83el69bkfn
+    OCI_USER: ax83el69bkfn/a01637405@tec.mx
+    WEB_REPO: mtdr-ocir-web
+    TG_REPO: mtdr-ocir-telegram
+    TAG: latest
+    REGISTRY: ${OCIR_REGION}.ocir.io
+
+    # infra "hard-coded"
+    MTDR_COMPARTMENT: ocid1.compartment.oc1..aaaaaaaa676xiv3yqcswvfjpbxon42pjryrg4sayj24uvgp2eplyilj4mtka
+    WALLET_BUCKET: MTRDB-Storage
+    WALLET_OBJECT: MTRDB-WalletWallet_MTDRDB.zip
+    USER_OCID: ocid1.user.oc1..aaaaaaaaaefwdtlobyok26cptkvvvxolerny7ml3xfkwzwketqkibupoznqq
+
+  vaultVariables:
+    OCI_AUTH_TOKEN: ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja
+
+steps:
+  - type: Command
+    name: Install GraalVM Native Image
+    command: |
+      yum -y install graalvm22-ee-17-native-image
+
+  - type: Command
+    name: Set PATH
+    command: |
+      export PATH=$JAVA_HOME/bin:$PATH
+
+  - type: Command
+    name: Download Oracle Wallet
+    command: |
+      oci os object get \
+        --bucket-name ${WALLET_BUCKET} \
+        --name ${WALLET_OBJECT} \
+        --file ${WALLET_OBJECT} \
+        --region ${OCIR_REGION}
+      unzip -o ${WALLET_OBJECT} -d wallet
+
+  - type: Command
+    name: Build Shared Library
+    command: |
+      mvn -f lib/pom.xml clean install -DskipTests
+
+  - type: Command
+    name: Build Web App
+    command: |
+      mvn -f web/pom.xml clean package -DskipTests
+
+  - type: Command
+    name: Build Telegram App
+    command: |
+      mvn -f telegram/pom.xml clean package -DskipTests
+
+  - type: Command
+    name: Docker Login to OCIR
+    command: |
+      echo "${OCI_AUTH_TOKEN}" \
+        | docker login "${REGISTRY}" \
+                      -u "${NAMESPACE}/${USER_OCID}" \
+                      --password-stdin
+
+  - type: Command
+    name: Build & Push Web Image
+    command: |
+      docker build -f web/Dockerfile -t "${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG}" web/
+      docker push "${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG}"
+
+  - type: Command
+    name: Build & Push Telegram Image
+    command: |
+      docker build -f telegram/Dockerfile -t "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}" telegram/
+      docker push "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}"
+
+outputArtifacts:
+  - name: web-image
+    type: DOCKER_IMAGE
+    location: ${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG}
+
+  - name: telegram-image
+    type: DOCKER_IMAGE
+    location: ${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}
