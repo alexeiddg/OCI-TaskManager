@@ -4,9 +4,9 @@ metadata:
   name: web-secret
 type: Opaque
 stringData:
-  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@MTDRDB_tp?TNS_ADMIN=/mtdrworkshop/creds
-  SPRING_DATASOURCE_USERNAME: APPUSER
-  SPRING_DATASOURCE_PASSWORD: Welcome12345
+  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@(description=(retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1521)(host=adb.mx-queretaro-1.oraclecloud.com))(connect_data=(service_name=g081b0f6287a97d_mtdrdb_tp.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+  SPRING_DATASOURCE_USERNAME: ADMIN
+  SPRING_DATASOURCE_PASSWORD: Welcome12345!
 ---
 apiVersion: v1
 kind: Service
