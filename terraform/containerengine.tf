@@ -11,7 +11,7 @@ resource "oci_containerengine_cluster" "mtdrworkshop_cluster" {
   # changed to match OKE node image
   kubernetes_version  = "v1.32.1"
   # kubernetes_version = local.latest
-  name                = "mtdrworkshopcluster-${var.mtdrKey}"
+  name                = "mtdrworkshopcluster"
   vcn_id              = oci_core_vcn.okevcn.id
   #optional
 
