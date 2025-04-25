@@ -44,7 +44,7 @@ spec:
       volumes:
         - name: oracle-wallet
           secret:
-            secretName: oracle-wallet-secret
+            secretName: oracle-wallet
       containers:
         - name: telegram
           # Add volume mount for Oracle wallet

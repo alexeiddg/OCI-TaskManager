@@ -42,7 +42,7 @@ spec:
       volumes:
         - name: oracle-wallet
           secret:
-            secretName: oracle-wallet-secret
+            secretName: oracle-wallet
       containers:
         - name: web
           # Add volume mount for Oracle wallet
