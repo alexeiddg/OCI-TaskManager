@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -118,35 +119,37 @@ public TeamController(TeamService teamService, AppUserService appUserService, Em
 
 
     @PostMapping("/{teamId}/invite")
-    public ResponseEntity<String> inviteToTeam(
+    public ResponseEntity<Map<String, String>> inviteToTeam(
         @PathVariable("teamId") Long teamId,
         @RequestParam("email") String email) {
 
         Optional<AppUser> userOptional = appUserService.getUserByEmail(email);
 
         if (userOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().body(Map.of("error", "User not found"));
         }
 
         // Generate link (could use a token or just the teamId for now)
-        String inviteLink = "https://your-frontend.com/accept-invite?userId=" + userOptional.get().getId()
+        // TODO: Change hardcoded frontend url
+        String inviteLink = "https://pms.pathscreative/email/accept-invite?userId=" + userOptional.get().getId()
                         + "&teamId=" + teamId;
 
         emailService.sendInvitation(email, inviteLink);
-        return ResponseEntity.ok("Invitation sent to " + email);
+        return ResponseEntity.ok(Map.of("message", "Invitation sent to " + email));
+
     }
 
     @PostMapping("/accept-invite")
-    public ResponseEntity<String> acceptInvite(
+    public ResponseEntity<Map<String,String>> acceptInvite(
         @RequestParam("userId") Long userId,
         @RequestParam("teamId") Long teamId) {
 
         boolean added = teamService.addUserToTeam(teamId, userId);
 
-        if (added) return ResponseEntity.ok("User added to team.");
-        else return ResponseEntity.badRequest().body("Failed to add user.");
+        if (added)
+            return ResponseEntity.ok(Map.of("message", "User added to team."));
+        else
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to add user."));
+
     }
-
-
-
 }
