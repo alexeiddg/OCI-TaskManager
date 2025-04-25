@@ -13,16 +13,16 @@ export TAG=latest
 # Build both images from the combined Dockerfile
 echo "Building Telegram image..."
 docker build \
+  --platform=linux/amd64 \
   -f telegram/Dockerfile \
-  -t ${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG} \
-  telegram/
+  -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest \
   .
 
 echo "Building Web image..."
 docker build \
+  --platform=linux/amd64 \
   -f web/Dockerfile \
-  -t ${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG} \
-  web/
+  -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest \
   .
 
 # Push images to OCIR
