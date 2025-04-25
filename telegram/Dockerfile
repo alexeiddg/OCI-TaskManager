@@ -9,8 +9,8 @@ COPY pom.xml ./
 COPY lib ./lib
 COPY telegram ./telegram
 
-# Compile shared lib and the telegram service without running tests
-RUN mvn clean package -pl telegram -am -DskipTests
+# Compile only the telegram service and its dependencies
+RUN mvn clean package -pl telegram -am -DskipTests -Dmaven.test.skip=true
 
 # Runtime stage
 FROM openjdk:17-slim
