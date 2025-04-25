@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nextjs-secret
+type: Opaque
+stringData:
+  AUTH_SECRET: "fGdgd70ki0i6RvjY2mtMzyCdFmIBShAbf+zn18kSA7Y="
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nextjs-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-app-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nextjs-app
+  template:
+    metadata:
+      labels:
+        app: nextjs-app
+    spec:
+      containers:
+        - name: nextjs-app
+          image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-front:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nextjs-secret
+                  key: AUTH_SECRET
+            - name: BACKEND_URL
+              value: "http://your-backend-service:8080"
