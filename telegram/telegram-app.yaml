@@ -41,17 +41,8 @@ spec:
       labels:
         app: telegram-app
     spec:
-      volumes:
-        - name: oracle-wallet
-          secret:
-            secretName: oracle-wallet
       containers:
         - name: telegram
-          # Add volume mount for Oracle wallet
-          volumeMounts:
-            - name: oracle-wallet
-              mountPath: /mtdrworkshop/creds
-              readOnly: true
           image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest
           imagePullPolicy: Always
           ports:

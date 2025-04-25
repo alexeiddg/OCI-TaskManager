@@ -39,17 +39,8 @@ spec:
       labels:
         app: web-app
     spec:
-      volumes:
-        - name: oracle-wallet
-          secret:
-            secretName: oracle-wallet
       containers:
         - name: web
-          # Add volume mount for Oracle wallet
-          volumeMounts:
-            - name: oracle-wallet
-              mountPath: /mtdrworkshop/creds
-              readOnly: true
           image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest
           imagePullPolicy: Always
           ports:
