@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import {useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,11 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { TaskAddModal } from "@/components/create-task-modal";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
-import {InviteTeamMemberModal, InviteTeamMemberModalHandle} from "@/components/email-invite-modal"
-import {Separator} from "@radix-ui/react-menu";
+import {
+  InviteTeamMemberModal,
+  InviteTeamMemberModalHandle,
+} from "@/components/email-invite-modal";
+import { Separator } from "@radix-ui/react-menu";
 
 export function NavMain({
   items,
@@ -35,9 +38,11 @@ export function NavMain({
     { id: number; name: string }[]
   >([]);
   const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>(
-    [],
+    []
   );
-  const inviteModalRef = useRef<InviteTeamMemberModalHandle>(null)
+  const inviteModalRef = useRef<InviteTeamMemberModalHandle>(null);
+
+  const teamId = session?.user?.teamId;
 
   useEffect(() => {
     const teamId = session?.user?.teamId;
@@ -80,7 +85,9 @@ export function NavMain({
           </SidebarMenuItem>
           <Separator />
           <SidebarMenuItem className="flex items-start">
-            <InviteTeamMemberModal ref={inviteModalRef} />
+            {typeof teamId === "number" && (
+              <InviteTeamMemberModal ref={inviteModalRef} teamId={teamId} />
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
 
@@ -98,7 +105,7 @@ export function NavMain({
                     tooltip={item.title}
                     className={cn(
                       isActive &&
-                        "bg-muted text-foreground hover:bg-muted/90 hover:text-foreground",
+                        "bg-muted text-foreground hover:bg-muted/90 hover:text-foreground"
                     )}
                   >
                     {item.icon && <item.icon />}

@@ -145,4 +145,22 @@ public class TeamService {
                         .toList())
                 .orElse(List.of());
     }
+
+    public boolean addUserToTeam(Long teamId, Long userId) {
+        Optional<AppUser> userOptional = appUserRepository.findById(userId);
+        Optional<Team> teamOptional = teamRepository.findById(teamId);
+    
+        if (userOptional.isPresent() && teamOptional.isPresent()) {
+            AppUser user = userOptional.get();
+            Team team = teamOptional.get();
+    
+            user.setTeam(team); // This is correct
+            appUserRepository.save(user);
+            return true;
+        }
+    
+        return false;
+    }
+    
+    
 }
