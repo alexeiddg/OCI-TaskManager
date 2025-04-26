@@ -4,7 +4,7 @@ metadata:
   name: nextjs-secret
 type: Opaque
 stringData:
-  AUTH_SECRET: "fGdgd70ki0i6RvjY2mtMzyCdFmIBShAbf+zn18kSA7Y="
+  AUTH_SECRET: fGdgd70ki0i6RvjY2mtMzyCdFmIBShAbf+zn18kSA7Y=
 ---
 apiVersion: v1
 kind: Service
