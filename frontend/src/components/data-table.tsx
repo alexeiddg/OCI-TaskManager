@@ -159,8 +159,12 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
   );
 }
 
+import { useTasks } from "@/hooks/useTasks";
+
 export function DataTable() {
-  const [data, setData] = React.useState<TaskModel[]>([]);
+  
+  const data = useTasks();
+
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([],);
   const [sorting, setSorting] = React.useState<SortingState>([]);
