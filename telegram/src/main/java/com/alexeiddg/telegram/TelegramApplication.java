@@ -17,9 +17,4 @@ public class TelegramApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TelegramApplication.class, args);
 	}
-
-	@Bean
-	public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
-		return factory -> factory.setUseApr(false);
-	}
 }

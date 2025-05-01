@@ -135,6 +135,19 @@ public class TaskManagerBot extends AbilityBot {
                 botAbilities.createTaskAbility().createTask(this, chatId, userId);
             }
 
+            if (state == UserState.TASK_CREATE_NAME ||
+                    state == UserState.TASK_CREATE_DESCRIPTION ||
+                    state == UserState.TASK_CREATE_PRIORITY ||
+                    state == UserState.TASK_CREATE_STATUS ||
+                    state == UserState.TASK_CREATE_TYPE ||
+                    state == UserState.TASK_CREATE_STORY_POINTS ||
+                    state == UserState.TASK_CREATE_DUE_DATE ||
+                    state == UserState.TASK_CREATE_SPRINT ||
+                    state == UserState.TASK_CREATE_CONFIRMATION ||
+                    state == UserState.TASK_CREATE_ASSIGNEE) {
+                botAbilities.createTaskAbility().handleCreateTask(this, update);
+            }
+
 
             if (state == UserState.TASK_LOG_HOURS) {
                 botAbilities.taskAbility().handleLoggedHours(this, update);

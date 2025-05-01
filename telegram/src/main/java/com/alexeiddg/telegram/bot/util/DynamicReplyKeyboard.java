@@ -103,15 +103,17 @@ public class DynamicReplyKeyboard {
             }
 
             case TASK_CREATE_ASSIGNEE -> {
-                KeyboardRow MenuRow = new KeyboardRow();
-                MenuRow.add("Assign to self");
-                keyboard.add(MenuRow);
+                // first row: “Assign to self”
+                KeyboardRow selfRow = new KeyboardRow();
+                selfRow.add("Assign to self");
+                keyboard.add(selfRow);
 
-                KeyboardRow usersRow = new KeyboardRow();
+                // then one row per user
                 for (String user : options) {
-                    usersRow.add(user);
+                    KeyboardRow row = new KeyboardRow();
+                    row.add(user);
+                    keyboard.add(row);
                 }
-                keyboard.add(usersRow);
             }
 
             case TASK_CREATE_SPRINT -> {

@@ -20,7 +20,7 @@ variable "mtdrDbName" {
 }
 
 variable "runName" {
-
+  default = "a01637405"
 }
 
 # mtdrKey is a unique generated id
