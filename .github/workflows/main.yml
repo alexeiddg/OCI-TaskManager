@@ -24,7 +24,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Run Jest
         run: npm run test
@@ -60,7 +60,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Telegram backend
-        run: ../mvnw clean install
+        run: mvn clean install
+        working-directory: ${{ github.workspace }}
 
       - name: Build Telegram Docker image
         run: docker build --platform=linux/amd64 -f Dockerfile -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest .
@@ -83,7 +84,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Web backend
-        run: ../mvnw clean install
+        run: mvn clean install
+        working-directory: ${{ github.workspace }}
 
       - name: Build Web Docker image
         run: docker build --platform=linux/amd64 -f Dockerfile -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest .
