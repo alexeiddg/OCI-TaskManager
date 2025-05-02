@@ -2,7 +2,7 @@ name: Full CI Pipeline (no docker push)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ NextJest ]
   pull_request:
     branches: [ main ]
 
