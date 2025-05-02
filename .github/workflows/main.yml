@@ -29,11 +29,11 @@ jobs:
       - name: Run Jest
         run: npm run test
 
-      - name: Run ESLint
-        run: npm run lint
-
       - name: Check Prettier formatting
         run: npm run format:check
+
+      - name: Run ESLint
+        run: npm run lint
 
       - name: Build frontend (Next.js)
         run: npm run build
@@ -60,7 +60,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Telegram backend
-        run: .mvn clean install
+        run: mvn clean install
         working-directory: ${{ github.workspace }}
 
       - name: Build Telegram Docker image
@@ -84,7 +84,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Web backend
-        run: .mvn clean install
+        run: mvn clean install
         working-directory: ${{ github.workspace }}
 
       - name: Build Web Docker image
