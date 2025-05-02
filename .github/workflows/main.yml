@@ -29,6 +29,12 @@ jobs:
       - name: Run Jest
         run: npm run test
 
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        run: npm run format:check
+
       - name: Build frontend (Next.js)
         run: npm run build
 
