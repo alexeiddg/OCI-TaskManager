@@ -28,6 +28,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "next-auth.d.ts"
-  ],
+, "tests/components/mock.test.js", "jest.config.js"  ],
   "exclude": ["node_modules"]
 }
