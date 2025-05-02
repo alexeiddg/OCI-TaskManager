@@ -16,7 +16,7 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "jest-fixed-jsdom",
   testEnvironmentOptions: {
-    customExportConditions: [''],
+    customExportConditions: ['node','default'],
   },
   clearMocks: true,
   collectCoverage: true,
@@ -42,6 +42,9 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/src/$1'
   },
   roots: ['<rootDir>/src'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(next-auth|@next-auth)/)', // transforma next-auth aunque esté en node_modules
+  ],
 }
 
 export default createJestConfig(config)
