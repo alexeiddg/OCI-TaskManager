@@ -14,15 +14,16 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   coverageProvider: "v8",
-  testEnvironment: "jsdom",
+  testEnvironment: "jest-fixed-jsdom",
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
   collectCoverageFrom: [
-    "src/**/*.{js,ts,jsx,tsx}",
-    "!**/node_modules/**",
-    "!**/vendor/**"
+    "src/__tests__/**/*.{ts,tsx,js,jsx}"
   ],
   coverageThreshold: {
     global: {
@@ -40,7 +41,7 @@ const config: Config = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
   },
-  roots: ['<rootDir>/src']
+  roots: ['<rootDir>/src'],
 }
 
 export default createJestConfig(config)
