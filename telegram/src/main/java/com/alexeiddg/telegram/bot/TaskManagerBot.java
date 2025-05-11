@@ -3,6 +3,7 @@ package com.alexeiddg.telegram.bot;
 import com.alexeiddg.telegram.bot.actions.*;
 import com.alexeiddg.telegram.bot.session.UserSessionManager;
 import com.alexeiddg.telegram.bot.session.UserState;
+import com.alexeiddg.telegram.bot.util.DevCommand;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,16 +26,19 @@ public class TaskManagerBot extends AbilityBot {
 
     private final UserSessionManager userSessionManager;
     private final BotAbilities botAbilities;
+    private final DevCommand devCommand;
 
     public TaskManagerBot(
             @Value("${telegram.bot.username}") String botUsername,
             @Value("${telegram.bot.token}") String botToken,
             UserSessionManager userSessionManager,
-            BotAbilities botAbilities
+            BotAbilities botAbilities,
+            DevCommand devCommand
     ) {
         super(botToken, botUsername);
         this.userSessionManager = userSessionManager;
         this.botAbilities = botAbilities;
+        this.devCommand = devCommand;
     }
 
     /**
@@ -57,6 +61,9 @@ public class TaskManagerBot extends AbilityBot {
         return 1L;
     }
 
+    // Command for debuggin, jump to required state
+    
+
     /**
      * Handles incoming updates from Telegram.
      * This override ensures that {@link AbilityBot} still processes updates,
@@ -73,6 +80,12 @@ public class TaskManagerBot extends AbilityBot {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
             Long userId = update.getMessage().getFrom().getId();
+
+            // ✅ CHECK FOR /dev COMMAND BEFORE GETTING STATE
+            if (messageText.startsWith("/dev")) {
+                devCommand.handleDevCommand(this, messageText, chatId, userId);
+                return;
+            }
             UserState state = userSessionManager.getState(userId);
 
             System.out.println("DEBUG: Reached MainBot State with state = " + state);

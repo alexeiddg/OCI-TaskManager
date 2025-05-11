@@ -270,6 +270,7 @@ public class CreateTaskAbility {
                     SendMessage msg = new SendMessage();
                     msg.setChatId(chatId.toString());
                     msg.setText("Please select a sprint to attach the task to from the menu:");
+                    System.out.println("Sending sprint selection message with options: " + sprintOptions);
                     msg.setReplyMarkup(DynamicReplyKeyboard.generateKeyboardForState(
                             UserState.TASK_CREATE_SPRINT, sprintOptions));
 
