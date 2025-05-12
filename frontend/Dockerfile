@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json package-lock.json .npmrc* ./
-RUN npm ci -omit=dev --legacy-peer-deps
+RUN npm ci --omit=dev --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -22,7 +22,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 # Inject ENV variables at build time (needed for NEXT_PUBLIC vars)
-ARG NEXT_PUBLIC_BACKEND_URL="http://159.54.144.172"
+ARG NEXT_PUBLIC_BACKEND_URL="http://localhost:8080"
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 ENV AUTH_TRUST_HOST=true
