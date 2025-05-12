@@ -26,10 +26,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://objectstorage.us-phoenix-1.oraclecloud.com",
                 "https://petstore.swagger.io",
                 "https://objectstorage.mx-queretaro-1.oraclecloud.com",
-                "https://oci-task-manager-plzevhxsp-alexeiddgs-projects.vercel.app/signup",
+                "https://oci-task-manager-plzevhxsp-alexeiddgs-projects.vercel.app",
                 "pms.pathscreative.com",
                 "http://159.54.151.45/"
         ));
