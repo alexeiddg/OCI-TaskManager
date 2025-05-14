@@ -12,9 +12,7 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  console.log(
-      error
-  )
+  console.log(error);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

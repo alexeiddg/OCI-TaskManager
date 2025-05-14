@@ -27,11 +27,15 @@ import { TaskStatus } from "@/lib/types/enums/TaskStatus";
 export function SectionCards() {
   const { data: session } = useSession();
   const [kpis, setKpis] = useState<KpiDto | null>(null);
-  const [sprintData, setSprintData] = useState<SprintForAnalyticsModel | null>(null);
+  const [sprintData, setSprintData] = useState<SprintForAnalyticsModel | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const userId = Number(session?.user?.id);
   const teamId = Number(session?.user?.teamId);
-  const [avgCompletionTime, setAvgCompletionTime] = useState<number | null>(null);
+  const [avgCompletionTime, setAvgCompletionTime] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -55,18 +59,25 @@ export function SectionCards() {
         setSprintData(data);
 
         // Calculate average completion time
-        const completedTasks = data.tasks.filter((t) => t.status === TaskStatus.DONE && t.completedAt);
+        const completedTasks = data.tasks.filter(
+          (t) => t.status === TaskStatus.DONE && t.completedAt,
+        );
 
         // Calculate average completion time
         const completionTimes = completedTasks.map((task) => {
           const createdDate = new Date(task.createdAt);
           const completedDate = new Date(task.completedAt!);
-          return (completedDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24); // days
+          return (
+            (completedDate.getTime() - createdDate.getTime()) /
+            (1000 * 60 * 60 * 24)
+          ); // days
         });
 
-        const avgTime = completionTimes.length > 0
-          ? completionTimes.reduce((sum, time) => sum + time, 0) / completionTimes.length
-          : 0;
+        const avgTime =
+          completionTimes.length > 0
+            ? completionTimes.reduce((sum, time) => sum + time, 0) /
+              completionTimes.length
+            : 0;
 
         setAvgCompletionTime(avgTime);
         setLoading(false);
@@ -161,7 +172,8 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Avg Completion Time</CardDescription>
           <CardTitle className="text-3xl tabular-nums">
-            {avgCompletionTime !== null ? avgCompletionTime.toFixed(1) : "0.0"} days
+            {avgCompletionTime !== null ? avgCompletionTime.toFixed(1) : "0.0"}{" "}
+            days
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -173,7 +185,15 @@ export function SectionCards() {
           <span className="flex gap-2 font-medium">
             Time from assignment to completion
           </span>
-          <span className="text-muted-foreground">Based on {sprintData.tasks.filter(t => t.status === TaskStatus.DONE && t.completedAt).length} completed tasks</span>
+          <span className="text-muted-foreground">
+            Based on{" "}
+            {
+              sprintData.tasks.filter(
+                (t) => t.status === TaskStatus.DONE && t.completedAt,
+              ).length
+            }{" "}
+            completed tasks
+          </span>
         </CardFooter>
       </Card>
     </div>

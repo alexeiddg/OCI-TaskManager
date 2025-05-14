@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import FloatingTelegramButton from "@/components/FloatingTelegramButton";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import {ThemeProvider} from "next-themes";
+import { ThemeProvider } from "next-themes";
 
 export default function AuthenticatedLayout({
   children,
@@ -36,31 +36,31 @@ export default function AuthenticatedLayout({
   }
 
   return (
-      <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-      >
-    <SidebarProvider>
-      <AppSidebar
-        variant="inset"
-        user={{
-          name: session?.user?.name ?? "Unknown",
-          email: session?.user?.email ?? "unknown@example.com",
-          avatar: "https://github.com/shadcn.png",
-        }}
-      />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            {children}
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <SidebarProvider>
+        <AppSidebar
+          variant="inset"
+          user={{
+            name: session?.user?.name ?? "Unknown",
+            email: session?.user?.email ?? "unknown@example.com",
+            avatar: "https://github.com/shadcn.png",
+          }}
+        />
+        <SidebarInset>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              {children}
+            </div>
           </div>
-        </div>
-        <FloatingTelegramButton />
-      </SidebarInset>
-    </SidebarProvider>
-      </ThemeProvider>
+          <FloatingTelegramButton />
+        </SidebarInset>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }

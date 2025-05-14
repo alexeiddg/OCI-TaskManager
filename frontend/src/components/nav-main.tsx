@@ -38,7 +38,7 @@ export function NavMain({
     { id: number; name: string }[]
   >([]);
   const [sprints, setSprints] = useState<{ id: number; sprintName: string }[]>(
-    []
+    [],
   );
   const inviteModalRef = useRef<InviteTeamMemberModalHandle>(null);
 
@@ -105,7 +105,7 @@ export function NavMain({
                     tooltip={item.title}
                     className={cn(
                       isActive &&
-                        "bg-muted text-foreground hover:bg-muted/90 hover:text-foreground"
+                        "bg-muted text-foreground hover:bg-muted/90 hover:text-foreground",
                     )}
                   >
                     {item.icon && <item.icon />}

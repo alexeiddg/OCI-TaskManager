@@ -1,4 +1,4 @@
-import {SprintStatus} from "@/lib/types/enums/SprintStatus";
+import { SprintStatus } from "@/lib/types/enums/SprintStatus";
 
 export interface TeamCreationFormValues {
   teamName: string;

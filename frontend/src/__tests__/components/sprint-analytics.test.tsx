@@ -112,8 +112,8 @@ describe("SprintAnalyticsDashboard", () => {
 
     await waitFor(() =>
       expect(
-        screen.queryByText(/Please wait while we load/i)
-      ).not.toBeInTheDocument()
+        screen.queryByText(/Please wait while we load/i),
+      ).not.toBeInTheDocument(),
     );
 
     // Verifica que el título del sprint aparezca
@@ -145,8 +145,8 @@ describe("SprintAnalyticsDashboard", () => {
 
     await waitFor(() =>
       expect(
-        screen.queryByText(/Please wait while we load/i)
-      ).not.toBeInTheDocument()
+        screen.queryByText(/Please wait while we load/i),
+      ).not.toBeInTheDocument(),
     );
 
     // Verifica que el título del sprint aparezca
@@ -183,15 +183,15 @@ describe("SprintAnalyticsDashboard", () => {
       await waitFor(() => {
         expect(tab).toHaveAttribute("aria-selected", "true");
         expect(
-          screen.getByText(new RegExp(expectedText, "i"))
+          screen.getByText(new RegExp(expectedText, "i")),
         ).toBeInTheDocument();
       });
     };
 
     await waitFor(() =>
       expect(
-        screen.queryByText(/Please wait while we load/i)
-      ).not.toBeInTheDocument()
+        screen.queryByText(/Please wait while we load/i),
+      ).not.toBeInTheDocument(),
     );
 
     expect(screen.getByText(/Sprint 1 Analytics/i)).toBeInTheDocument();

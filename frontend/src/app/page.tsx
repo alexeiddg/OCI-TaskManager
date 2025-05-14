@@ -36,22 +36,13 @@ function Header() {
           </Link>
         </div>
         <nav className="hidden md:flex gap-6">
-          <Link
-            href="#"
-            className="text-sm font-medium hover:text-primary"
-          >
+          <Link href="#" className="text-sm font-medium hover:text-primary">
             Features
           </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium hover:text-primary"
-          >
+          <Link href="#" className="text-sm font-medium hover:text-primary">
             Testimonials
           </Link>
-          <Link
-            href="#"
-            className="text-sm font-medium hover:text-primary"
-          >
+          <Link href="#" className="text-sm font-medium hover:text-primary">
             Pricing
           </Link>
           <Link href="#" className="text-sm font-medium hover:text-primary">
@@ -85,28 +76,16 @@ function Header() {
       {isMenuOpen && (
         <div className="container mx-auto border-t py-4 px-4 md:px-6">
           <nav className="flex flex-col gap-4">
-            <Link
-              href="#"
-              className="text-sm font-medium hover:text-primary"
-            >
+            <Link href="#" className="text-sm font-medium hover:text-primary">
               Features
             </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium hover:text-primary"
-            >
+            <Link href="#" className="text-sm font-medium hover:text-primary">
               Testimonials
             </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium hover:text-primary"
-            >
+            <Link href="#" className="text-sm font-medium hover:text-primary">
               Pricing
             </Link>
-            <Link
-              href="#"
-              className="text-sm font-medium hover:text-primary"
-            >
+            <Link href="#" className="text-sm font-medium hover:text-primary">
               FAQ
             </Link>
             <div className="flex flex-col gap-2 border-t pt-4">

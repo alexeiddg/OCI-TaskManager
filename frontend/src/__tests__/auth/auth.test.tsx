@@ -2,8 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginPage from "../../app/(auth)/login/page";
 import { signIn } from "next-auth/react";
-import '@testing-library/jest-dom';
-
+import "@testing-library/jest-dom";
 
 // Mocks
 jest.mock("next/navigation", () => ({
@@ -23,6 +22,4 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /login/i })).toHaveLength(2);
   });
-
-  
 });

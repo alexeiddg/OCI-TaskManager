@@ -93,7 +93,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Task, TaskModel } from "@/lib/types/DTO/model/Task";
 import { addTaskLog } from "@/server/api/task/addTaskLogs";
-import { fetchTaskLogs } from "@/server/api/task/getTaskLogs"
+import { fetchTaskLogs } from "@/server/api/task/getTaskLogs";
 import type { TaskLogDto } from "@/lib/types/DTO/model/TaskLogDto";
 import { Separator } from "@/components/ui/separator";
 import { fetchTasksByUserId } from "@/server/api/task/getTask";
@@ -108,9 +108,9 @@ import {
 import { TaskStatus } from "@/lib/types/enums/TaskStatus";
 import { TaskAddModal } from "@/components/create-task-modal";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
-import {TaskType} from "@/lib/types/enums/TaskType";
+import { TaskType } from "@/lib/types/enums/TaskType";
 import { updateTask } from "@/server/api/task/updateTask";
-import {TaskPriority} from "@/lib/types/enums/TaskPriority";
+import { TaskPriority } from "@/lib/types/enums/TaskPriority";
 
 /**
  * separate component for the drag handle
@@ -133,7 +133,6 @@ function DragHandle({ id }: { id: number }) {
     </Button>
   );
 }
-
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -161,8 +160,11 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof Task>> }) {
 
 export function DataTable() {
   const [data, setData] = React.useState<TaskModel[]>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([],);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -551,9 +553,7 @@ export function DataTable() {
 
   /* ---------- UPDATE ---------- */
   function handleUpdate(updated: TaskModel) {
-    setData((prev) =>
-        prev.map((t) => (t.id === updated.id ? updated : t))
-    );
+    setData((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
     toast.success("Task saved");
   }
 
@@ -720,8 +720,13 @@ export function DataTable() {
         {/* pagination */}
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredRowModel().rows.filter(row => row.original.status === TaskStatus.DONE).length} of{" "}
-            {table.getFilteredRowModel().rows.length} task(s) completed.
+            {
+              table
+                .getFilteredRowModel()
+                .rows.filter((row) => row.original.status === TaskStatus.DONE)
+                .length
+            }{" "}
+            of {table.getFilteredRowModel().rows.length} task(s) completed.
           </div>
           <div className="flex w-full items-center gap-8 lg:w-fit">
             <div className="hidden items-center gap-2 lg:flex">
@@ -853,7 +858,8 @@ function TableCellViewer({
   const userId = Number(session?.user?.id);
 
   const [assignedToUsername, setAssignedToUsername] = useState(
-    item.assignedToUsername || (teamMembers.length > 0 ? teamMembers[0].name : "")
+    item.assignedToUsername ||
+      (teamMembers.length > 0 ? teamMembers[0].name : ""),
   );
 
   const [description, setDescription] = useState(item.taskDescription);
@@ -862,7 +868,9 @@ function TableCellViewer({
   const [priorityValue, setPriorityValue] = useState(item.priority);
   const [sprintIdValue, setSprintIdValue] = useState(String(item.sprintId));
   const [storyPointsValue, setStoryPointsValue] = useState(item.storyPoints);
-  const [dueDateValue, setDueDateValue] = useState(item.dueDate?.slice(0,10) || "");
+  const [dueDateValue, setDueDateValue] = useState(
+    item.dueDate?.slice(0, 10) || "",
+  );
   const [blockedValue, setBlockedValue] = useState(item.blocked);
 
   const [taskLogs, setTaskLogs] = useState<TaskLogDto[]>([]);
@@ -878,7 +886,8 @@ function TableCellViewer({
       storyPoints: storyPointsValue,
       dueDate: new Date(dueDateValue).toISOString(),
       sprintId: Number(sprintIdValue),
-      assignedTo: teamMembers.find(u => u.name === assignedToUsername)?.id ?? userId,
+      assignedTo:
+        teamMembers.find((u) => u.name === assignedToUsername)?.id ?? userId,
       blocked: blockedValue,
       isActive: item.isActive,
       isFavorite: item.favorite ?? false,
@@ -896,7 +905,11 @@ function TableCellViewer({
 
   async function handleAddLog(hours: number) {
     try {
-      const newLog = await addTaskLog({ taskId: item.id, userId, hoursLogged: hours });
+      const newLog = await addTaskLog({
+        taskId: item.id,
+        userId,
+        hoursLogged: hours,
+      });
       setTaskLogs((prev) => [...prev, newLog]);
       toast.success("Time logged");
     } catch (err) {
@@ -941,7 +954,10 @@ function TableCellViewer({
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="taskType">Type</Label>
-                <Select value={typeValue} onValueChange={(v) => setTypeValue(v as TaskType)}>
+                <Select
+                  value={typeValue}
+                  onValueChange={(v) => setTypeValue(v as TaskType)}
+                >
                   <SelectTrigger id="taskType">
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
@@ -957,7 +973,10 @@ function TableCellViewer({
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="taskStatus">Status</Label>
-                <Select value={statusValue} onValueChange={(v) => setStatusValue(v as TaskStatus)}>
+                <Select
+                  value={statusValue}
+                  onValueChange={(v) => setStatusValue(v as TaskStatus)}
+                >
                   <SelectTrigger id="taskStatus">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -995,7 +1014,10 @@ function TableCellViewer({
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="priority">Priority</Label>
-                <Select value={priorityValue} onValueChange={(v) => setPriorityValue(v as TaskPriority)}>
+                <Select
+                  value={priorityValue}
+                  onValueChange={(v) => setPriorityValue(v as TaskPriority)}
+                >
                   <SelectTrigger id="priority">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
@@ -1013,7 +1035,10 @@ function TableCellViewer({
             {/* ---- Sprint ---- */}
             <div className="flex flex-col gap-2">
               <Label htmlFor="sprint">Sprint</Label>
-              <Select value={sprintIdValue} onValueChange={(v) => setSprintIdValue(v)}>
+              <Select
+                value={sprintIdValue}
+                onValueChange={(v) => setSprintIdValue(v)}
+              >
                 <SelectTrigger id="sprint">
                   <SelectValue placeholder="Select Sprint" />
                 </SelectTrigger>
@@ -1069,7 +1094,9 @@ function TableCellViewer({
               onSubmit={async (e) => {
                 e.preventDefault();
                 const form = e.currentTarget;
-                const input = form.elements.namedItem("logHours") as HTMLInputElement;
+                const input = form.elements.namedItem(
+                  "logHours",
+                ) as HTMLInputElement;
                 const hours = parseFloat(input.value);
                 if (!isNaN(hours)) {
                   await handleAddLog(hours);
@@ -1095,7 +1122,8 @@ function TableCellViewer({
               <ul className="list-disc list-inside text-sm">
                 {taskLogs.map((log) => (
                   <li key={log.id}>
-                    {new Date(log.logDate).toLocaleString()}: {log.hoursLogged} hrs
+                    {new Date(log.logDate).toLocaleString()}: {log.hoursLogged}{" "}
+                    hrs
                   </li>
                 ))}
               </ul>
@@ -1123,7 +1151,9 @@ function TableCellViewer({
 
         <DrawerFooter>
           <Button onClick={() => onComplete(item.id)}>
-            {item.status === TaskStatus.DONE ? "Re-open task" : "Mark As Completed"}
+            {item.status === TaskStatus.DONE
+              ? "Re-open task"
+              : "Mark As Completed"}
           </Button>
           <Button variant="secondary" onClick={onSave}>
             Save

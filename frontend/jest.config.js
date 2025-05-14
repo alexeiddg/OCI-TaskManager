@@ -1,16 +1,16 @@
 // jest.config.js
-const nextJest = require('next/jest');
+const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
-  dir: './',
+  dir: "./",
 });
 
 const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'jest-environment-jsdom',
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1', // Ajusta si usas aliases como "@/components/..."
-    '^.+\\.(css|scss|sass)$': 'identity-obj-proxy',
+    "^@/(.*)$": "<rootDir>/src/$1", // Ajusta si usas aliases como "@/components/..."
+    "^.+\\.(css|scss|sass)$": "identity-obj-proxy",
   },
   clearMocks: true,
 };

@@ -65,18 +65,22 @@ import { createTaskRequest } from "@/server/api/task/createTask";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
 import type { AppUserDto } from "@/lib/types/DTO/model/AppUserDto";
 import type { CreateTaskFormValues } from "@/lib/types/DTO/setup/TaskCreationSchema";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 export function SprintsView() {
   const { data: session } = useSession();
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [selectedProject, setSelectedProject] = useState<number>(0);
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<SprintStatus | "all">("all",);
+  const [statusFilter, setStatusFilter] = React.useState<SprintStatus | "all">(
+    "all",
+  );
   const [localSprints, setLocalSprints] = useState<SprintCards[]>([]);
   const [view, setView] = React.useState<"list" | "board">("list");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSprint, setEditingSprint] = useState<SprintSchemaValues | null>(null,);
+  const [editingSprint, setEditingSprint] = useState<SprintSchemaValues | null>(
+    null,
+  );
 
   // Add state for the status modal
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -222,7 +226,10 @@ export function SprintsView() {
     newStatus: SprintStatus,
   ): Promise<void> => {
     try {
-      const updatedSprint: SprintSchemaValues = await updateSprintStatus(sprintId, newStatus);
+      const updatedSprint: SprintSchemaValues = await updateSprintStatus(
+        sprintId,
+        newStatus,
+      );
       toast.success("Sprint Status Updated!");
       // Update local state with backend response
       setLocalSprints((prev) =>
@@ -257,44 +264,46 @@ export function SprintsView() {
 
   // Handle task creation
   const handleTaskCreate = async (
-      taskData: CreateTaskFormValues,
+    taskData: CreateTaskFormValues,
   ): Promise<void> => {
     try {
       const createdTask = await createTaskRequest(taskData);
-      const assigneeUser = teamMembers.find(member => member.id === taskData.assignedTo);
+      const assigneeUser = teamMembers.find(
+        (member) => member.id === taskData.assignedTo,
+      );
       const assigneeName = assigneeUser ? assigneeUser.name : null;
 
       setLocalSprints((prev) =>
-          prev.map((sprint) => {
-            if (sprint.id === taskData.sprint) {
-              const newTask = {
-                id: createdTask.id,
-                name: taskData.taskName,
-                assignee: assigneeName,
-                assignedTo: Number(session?.user?.id),
-                completed: taskData.taskStatus === "DONE",
-                priority: taskData.taskPriority,
-                estimate: taskData.storyPoints,
-              };
+        prev.map((sprint) => {
+          if (sprint.id === taskData.sprint) {
+            const newTask = {
+              id: createdTask.id,
+              name: taskData.taskName,
+              assignee: assigneeName,
+              assignedTo: Number(session?.user?.id),
+              completed: taskData.taskStatus === "DONE",
+              priority: taskData.taskPriority,
+              estimate: taskData.storyPoints,
+            };
 
-              const updatedTasks = [...sprint.tasks, newTask];
-              const completedTasks = updatedTasks.filter(
-                  (t) => t.completed,
-              ).length;
-              const totalTasks = updatedTasks.length;
-              const newProgress =
-                  totalTasks === 0
-                      ? 0
-                      : Math.floor((completedTasks / totalTasks) * 100);
+            const updatedTasks = [...sprint.tasks, newTask];
+            const completedTasks = updatedTasks.filter(
+              (t) => t.completed,
+            ).length;
+            const totalTasks = updatedTasks.length;
+            const newProgress =
+              totalTasks === 0
+                ? 0
+                : Math.floor((completedTasks / totalTasks) * 100);
 
-              return {
-                ...sprint,
-                tasks: updatedTasks,
-                progress: newProgress,
-              };
-            }
-            return sprint;
-          }),
+            return {
+              ...sprint,
+              tasks: updatedTasks,
+              progress: newProgress,
+            };
+          }
+          return sprint;
+        }),
       );
 
       return Promise.resolve();

@@ -5,7 +5,7 @@ export async function acceptTeamInvite(userId: string, teamId: string) {
     `${BASE_URL}/api/v2/team/accept-invite?userId=${userId}&teamId=${teamId}`,
     {
       method: "POST",
-    }
+    },
   );
 
   if (!response.ok) {

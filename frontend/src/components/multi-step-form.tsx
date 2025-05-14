@@ -53,7 +53,7 @@ export function MultiStepForm() {
       startDate: "",
       endDate: "",
       sprintDescription: "",
-      sprintStatus: SprintStatus.ACTIVE
+      sprintStatus: SprintStatus.ACTIVE,
     },
   });
 
@@ -277,7 +277,10 @@ export function MultiStepForm() {
                         <FormItem>
                           <FormLabel>Sprint Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="Sprint 1: Initial Release" {...field} />
+                            <Input
+                              placeholder="Sprint 1: Initial Release"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -318,28 +321,31 @@ export function MultiStepForm() {
                         <FormItem>
                           <FormLabel>Sprint Description</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="Describe the sprint's focus, backlog, and goals..." {...field} />
+                            <Textarea
+                              placeholder="Describe the sprint's focus, backlog, and goals..."
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
-                        control={form.control}
-                        name="sprintStatus"
-                        render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Sprint Status</FormLabel>
-                              <FormControl>
-                                <Textarea
-                                    {...field}
-                                    readOnly
-                                    className="bg-muted text-muted-foreground cursor-not-allowed"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                        )}
+                      control={form.control}
+                      name="sprintStatus"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sprint Status</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              readOnly
+                              className="bg-muted text-muted-foreground cursor-not-allowed"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </>
                 )}

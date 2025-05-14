@@ -7,7 +7,9 @@ describe("useIsMobile", () => {
 
   beforeEach(() => {
     window.matchMedia = jest.fn().mockImplementation((query) => ({
-      matches: eval(query.replace("(max-width:", "").replace("px)", "")) >= window.innerWidth,
+      matches:
+        eval(query.replace("(max-width:", "").replace("px)", "")) >=
+        window.innerWidth,
       media: query,
       onchange: null,
       addEventListener: jest.fn(),
