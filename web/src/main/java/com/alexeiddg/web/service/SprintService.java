@@ -3,6 +3,7 @@ package com.alexeiddg.web.service;
 import DTO.domian.SprintDto;
 import DTO.domian.kpi.SprintWithDepsDto;
 import DTO.domian.kpi.mappers.SprintWithDepsMapper;
+import enums.SprintStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import model.Sprint;
@@ -78,5 +79,13 @@ public class SprintService {
                 .orElseThrow(() ->
                         new EntityNotFoundException("No active sprint found for team " + teamId)
                 );
+    }
+
+    public Sprint updateSprintStatus(Long sprintId, SprintStatus newStatus) {
+        Sprint sprint = sprintRepository.findById(sprintId)
+                .orElseThrow(() -> new EntityNotFoundException("Sprint not found with id: " + sprintId));
+
+        sprint.setStatus(newStatus);
+        return sprintRepository.save(sprint);
     }
 }

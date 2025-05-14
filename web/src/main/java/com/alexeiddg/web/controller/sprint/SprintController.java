@@ -6,6 +6,7 @@ import DTO.domian.mappers.SprintMapper;
 import DTO.helpers.SprintCardDto;
 import DTO.helpers.mappers.SprintCardMapper;
 import com.alexeiddg.web.service.SprintService;
+import enums.SprintStatus;
 import model.Sprint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,5 +91,14 @@ public class SprintController {
     public ResponseEntity<SprintWithDepsDto> getLatestByTeam(@RequestParam("teamId") Long teamId) {
         SprintWithDepsDto dto = sprintService.getLatestSprint(teamId);
         return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Sprint> updateSprintStatus(
+            @PathVariable("id") Long id,
+            @RequestParam("status") SprintStatus status) {
+
+        Sprint updated = sprintService.updateSprintStatus(id, status);
+        return ResponseEntity.ok(updated);
     }
 }

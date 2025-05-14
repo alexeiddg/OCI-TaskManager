@@ -54,6 +54,7 @@ import {
   ProjectOption,
   SprintCards,
 } from "@/server/api/sprint/getSprints";
+import { updateSprintStatus } from "@/server/api/sprint/updateSprintStatus";
 import { SprintStatus } from "@/lib/types/enums/SprintStatus";
 import { TaskPriority } from "@/lib/types/enums/TaskPriority";
 import { SprintEditModal } from "@/components/edit-sprint-modal";
@@ -64,6 +65,7 @@ import { createTaskRequest } from "@/server/api/task/createTask";
 import { fetchTaskDeps } from "@/server/api/task/createTaskHelpers";
 import type { AppUserDto } from "@/lib/types/DTO/model/AppUserDto";
 import type { CreateTaskFormValues } from "@/lib/types/DTO/setup/TaskCreationSchema";
+import {toast} from "sonner";
 
 export function SprintsView() {
   const { data: session } = useSession();
@@ -204,7 +206,7 @@ export function SprintsView() {
     }, 10);
   };
 
-  // Handle change status - prepare sprint data for status modal
+  // Handle change status
   const handleChangeStatus = (sprintCard: SprintCards) => {
     setStatusEditingSprint({
       id: sprintCard.id,
@@ -214,29 +216,37 @@ export function SprintsView() {
     setIsStatusModalOpen(true);
   };
 
-  // Handle status update - update sprint status in local state
+  // Handle status update
   const handleStatusUpdate = async (
     sprintId: number,
     newStatus: SprintStatus,
   ): Promise<void> => {
-    // This would be replaced with actual API calls in production
-    console.log("Sprint status updated:", sprintId, newStatus);
-
-    // Update local state
-    setLocalSprints((prev) =>
-      prev.map((sprint) => {
-        if (sprint.id === sprintId) {
-          return {
-            ...sprint,
-            status: newStatus,
-          };
-        }
-        return sprint;
-      }),
-    );
+    try {
+      const updatedSprint: SprintSchemaValues = await updateSprintStatus(sprintId, newStatus);
+      toast.success("Sprint Status Updated!");
+      // Update local state with backend response
+      setLocalSprints((prev) =>
+        prev.map((sprint) => {
+          if (sprint.id === sprintId) {
+            // Map SprintSchemaValues to SprintCards
+            return {
+              ...sprint,
+              name: updatedSprint.sprintName,
+              goal: updatedSprint.sprintDescription,
+              progress: updatedSprint.completionRate,
+              status: updatedSprint.status,
+            };
+          }
+          return sprint;
+        }),
+      );
+    } catch (error) {
+      toast.error("Failed to update sprint");
+      console.error(error);
+    }
   };
 
-  // Handle add task - prepare sprint data for task modal
+  // Handle add task
   const handleAddTask = (sprintCard: SprintCards) => {
     setTaskCreationSprint({
       id: sprintCard.id,
@@ -245,50 +255,46 @@ export function SprintsView() {
     setIsTaskModalOpen(true);
   };
 
-  // Handle task creation - create a new task and add it to the sprint
+  // Handle task creation
   const handleTaskCreate = async (
-    taskData: CreateTaskFormValues,
+      taskData: CreateTaskFormValues,
   ): Promise<void> => {
-    // This would be replaced with actual API calls in production
-    console.log("Task created:", taskData);
-
     try {
-      // Call the API to create the task
       const createdTask = await createTaskRequest(taskData);
+      const assigneeUser = teamMembers.find(member => member.id === taskData.assignedTo);
+      const assigneeName = assigneeUser ? assigneeUser.name : null;
 
-      // Update local state with the new task
       setLocalSprints((prev) =>
-        prev.map((sprint) => {
-          if (sprint.id === taskData.sprint) {
-            // Create a new task object in the format expected by SprintCards
-            const newTask = {
-              id: createdTask.id || Math.floor(Math.random() * 10000), // Use API response ID or generate a temporary one
-              name: taskData.taskName,
-              assignee: session?.user?.name || null,
-              completed: taskData.taskStatus === "DONE",
-              priority: taskData.taskPriority,
-              estimate: taskData.storyPoints,
-            };
+          prev.map((sprint) => {
+            if (sprint.id === taskData.sprint) {
+              const newTask = {
+                id: createdTask.id,
+                name: taskData.taskName,
+                assignee: assigneeName,
+                assignedTo: Number(session?.user?.id),
+                completed: taskData.taskStatus === "DONE",
+                priority: taskData.taskPriority,
+                estimate: taskData.storyPoints,
+              };
 
-            // Calculate new progress
-            const updatedTasks = [...sprint.tasks, newTask];
-            const completedTasks = updatedTasks.filter(
-              (t) => t.completed,
-            ).length;
-            const totalTasks = updatedTasks.length;
-            const newProgress =
-              totalTasks === 0
-                ? 0
-                : Math.floor((completedTasks / totalTasks) * 100);
+              const updatedTasks = [...sprint.tasks, newTask];
+              const completedTasks = updatedTasks.filter(
+                  (t) => t.completed,
+              ).length;
+              const totalTasks = updatedTasks.length;
+              const newProgress =
+                  totalTasks === 0
+                      ? 0
+                      : Math.floor((completedTasks / totalTasks) * 100);
 
-            return {
-              ...sprint,
-              tasks: updatedTasks,
-              progress: newProgress,
-            };
-          }
-          return sprint;
-        }),
+              return {
+                ...sprint,
+                tasks: updatedTasks,
+                progress: newProgress,
+              };
+            }
+            return sprint;
+          }),
       );
 
       return Promise.resolve();
@@ -603,7 +609,7 @@ export function SprintsView() {
             setLocalSprints(refreshedSprints);
           } else {
             // Create new sprint
-            // In a real app, this would be an API call that returns the new sprint with an ID
+            //  this would be an API call that returns the new sprint with an ID
             // For now, we'll simulate it by generating a temporary ID
             const newId = Math.max(0, ...localSprints.map((s) => s.id)) + 1;
 
@@ -618,7 +624,7 @@ export function SprintsView() {
               status: updatedSprint.status,
               progress: 0,
               tasks: updatedSprint.tasks.map((task) => ({
-                id: task.id || Math.floor(Math.random() * 10000), // Generate temporary ID for new tasks
+                id: task.id || Math.floor(Math.random() * 10000),
                 name: task.name,
                 assignee: "",
                 completed: task.completed,
