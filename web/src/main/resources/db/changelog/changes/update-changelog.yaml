@@ -1,0 +1,198 @@
+databaseChangeLog:
+- changeSet:
+    id: update-datatypes-1
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: KPI_SNAPSHOTS
+        columnName: VALUE
+        newDataType: float(53)
+
+- changeSet:
+    id: rename-pk-constraints-1
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045153
+        newConstraintName: PK_APP_USER
+        tableName: APP_USER
+
+- changeSet:
+    id: rename-pk-constraints-2
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045159
+        newConstraintName: PK_KPI_SNAPSHOTS
+        tableName: KPI_SNAPSHOTS
+
+- changeSet:
+    id: rename-pk-constraints-3
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045170
+        newConstraintName: PK_PROJECTS
+        tableName: PROJECTS
+
+- changeSet:
+    id: rename-pk-constraints-4
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045163
+        newConstraintName: PK_PROJECT_FAVORITES
+        tableName: PROJECT_FAVORITES
+
+- changeSet:
+    id: rename-pk-constraints-5
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045217
+        newConstraintName: PK_SPRINTS
+        tableName: SPRINTS
+
+- changeSet:
+    id: rename-pk-constraints-6
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045230
+        newConstraintName: PK_TASKS
+        tableName: TASKS
+
+- changeSet:
+    id: rename-pk-constraints-7
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045179
+        newConstraintName: PK_TASK_AUDIT
+        tableName: TASK_AUDIT
+
+- changeSet:
+    id: rename-pk-constraints-8
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045184
+        newConstraintName: PK_TASK_FAVORITES
+        tableName: TASK_FAVORITES
+
+- changeSet:
+    id: rename-pk-constraints-9
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045190
+        newConstraintName: PK_TASK_LOGS
+        tableName: TASK_LOGS
+
+- changeSet:
+    id: rename-pk-constraints-10
+    author: system
+    changes:
+    - renameConstraint:
+        constraintName: SYS_C0045194
+        newConstraintName: PK_TEAMS
+        tableName: TEAMS
+
+- changeSet:
+    id: update-datatypes-2
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASKS
+        columnName: BLOCKED
+        newDataType: number(1,0)
+
+- changeSet:
+    id: update-datatypes-3
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASKS
+        columnName: IS_ACTIVE
+        newDataType: number(1,0)
+
+- changeSet:
+    id: update-datatypes-4
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: SPRINTS
+        columnName: IS_ACTIVE
+        newDataType: number(1,0)
+
+- changeSet:
+    id: update-datatypes-5
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: PROJECTS
+        columnName: IS_ACTIVE
+        newDataType: number(1,0)
+
+- changeSet:
+    id: update-datatypes-6
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TEAMS
+        columnName: IS_ACTIVE
+        newDataType: number(1,0)
+
+- changeSet:
+    id: update-datatypes-7
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: SPRINTS
+        columnName: SPRINT_DESCRIPTION
+        newDataType: CLOB
+
+- changeSet:
+    id: update-datatypes-8
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASKS
+        columnName: TASK_DESCRIPTION
+        newDataType: CLOB
+
+- changeSet:
+    id: update-datatypes-9
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: PROJECTS
+        columnName: PROJECT_DESCRIPTION
+        newDataType: varchar2(500 char)
+
+- changeSet:
+    id: update-datatypes-10
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASK_AUDIT
+        columnName: CHANGE_COMMENT
+        newDataType: varchar2(2000 char)
+
+- changeSet:
+    id: update-datatypes-11
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASKS
+        columnName: STORY_POINTS
+        newDataType: number(10,0)
+
+- changeSet:
+    id: update-datatypes-12
+    author: system
+    changes:
+    - modifyDataType:
+        tableName: TASK_LOGS
+        columnName: HOURS_LOGGED
+        newDataType: float(53)

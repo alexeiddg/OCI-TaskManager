@@ -1,0 +1,864 @@
+databaseChangeLog:
+- changeSet:
+    id: 1747097263211-2
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_APP_USER
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            name: CREATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: EMAIL
+            type: VARCHAR2(100 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: NAME
+            type: VARCHAR2(100 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: PASSWORD
+            type: VARCHAR2(255 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: ROLE
+            type: VARCHAR2(20 CHAR)
+        - column:
+            name: TELEGRAM_ID
+            type: VARCHAR2(255 CHAR)
+        - column:
+            name: UPDATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: USERNAME
+            type: VARCHAR2(50 CHAR)
+        - column:
+            name: MANAGER_ID
+            type: NUMBER(19, 0)
+        - column:
+            name: TEAM_ID
+            type: NUMBER(19, 0)
+        tableName: APP_USER
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-4
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_KPI_SNAPSHOTS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: KPI_TYPE
+            type: VARCHAR2(255 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: RECORDED_AT
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VALUE
+            type: FLOAT(22)
+        - column:
+            name: SPRINT_ID
+            type: NUMBER(19, 0)
+        - column:
+            name: TEAM_ID
+            type: NUMBER(19, 0)
+        - column:
+            name: USER_ID
+            type: NUMBER(19, 0)
+        tableName: KPI_SNAPSHOTS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-5
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_PROJECTS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            name: CREATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: IS_ACTIVE
+            type: NUMBER(1, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: PROJECT_DESCRIPTION
+            type: VARCHAR2(500 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: PROJECT_NAME
+            type: VARCHAR2(150 CHAR)
+        - column:
+            name: UPDATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: MANAGER_ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: TEAM_ID
+            type: NUMBER(19, 0)
+        tableName: PROJECTS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-6
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_PROJECT_FAVORITES
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: PROJECT_ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: USER_ID
+            type: NUMBER(19, 0)
+        tableName: PROJECT_FAVORITES
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-7
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_SPRINTS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER
+        - column:
+            constraints:
+              nullable: false
+            name: SPRINT_NAME
+            type: VARCHAR2(255 BYTE)
+        - column:
+            name: SPRINT_DESCRIPTION
+            type: CLOB
+        - column:
+            constraints:
+              nullable: false
+            name: START_DATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: END_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: STATUS
+            type: VARCHAR2(255 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: PROJECT_ID
+            type: NUMBER
+        - column:
+            defaultValue: 1
+            name: IS_ACTIVE
+            type: NUMBER(1,0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueComputed: CURRENT_TIMESTAMP
+            name: CREATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: UPDATED_AT
+            type: TIMESTAMP(6)
+        tableName: SPRINTS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-8
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_TASKS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER
+        - column:
+            constraints:
+              nullable: false
+            name: SPRINT_ID
+            type: NUMBER
+        - column:
+            constraints:
+              nullable: false
+            name: TASK_NAME
+            type: VARCHAR2(100 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            name: TASK_DESCRIPTION
+            type: CLOB
+        - column:
+            constraints:
+              nullable: false
+            name: PRIORITY
+            type: VARCHAR2(20 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            name: STATUS
+            type: VARCHAR2(20 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            name: TYPE
+            type: VARCHAR2(20 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            name: STORY_POINTS
+            type: NUMBER
+        - column:
+            name: DUE_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: COMPLETED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATED_BY
+            type: NUMBER
+        - column:
+            name: ASSIGNED_TO
+            type: NUMBER
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: '0'
+            name: BLOCKED
+            type: CHAR(1 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: '1'
+            name: IS_ACTIVE
+            type: CHAR(1 BYTE)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueComputed: CURRENT_TIMESTAMP
+            name: CREATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: UPDATED_AT
+            type: TIMESTAMP(6)
+        tableName: TASKS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-9
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_TASK_AUDIT
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: AUDIT_ID
+            type: NUMBER(19, 0)
+        - column:
+            name: CHANGE_COMMENT
+            type: VARCHAR2(2000 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: CHANGE_TYPE
+            type: VARCHAR2(20 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: CHANGED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: NEW_STATUS
+            type: VARCHAR2(20 CHAR)
+        - column:
+            name: OLD_STATUS
+            type: VARCHAR2(20 CHAR)
+        - column:
+            constraints:
+              nullable: false
+            name: CHANGED_BY
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: TASK_ID
+            type: NUMBER(19, 0)
+        tableName: TASK_AUDIT
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-10
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_TASK_FAVORITES
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: FAVORITED_AT
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: TASK_ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: USER_ID
+            type: NUMBER(19, 0)
+        tableName: TASK_FAVORITES
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-11
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_TASK_LOGS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: HOURS_LOGGED
+            type: FLOAT(22)
+        - column:
+            constraints:
+              nullable: false
+            name: LOG_DATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: TASK_ID
+            type: NUMBER(19, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: USER_ID
+            type: NUMBER(19, 0)
+        tableName: TASK_LOGS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-12
+    author: alexeidelgado (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: PK_TEAMS
+            defaultOnNull: false
+            generationType: BY DEFAULT
+            name: ID
+            type: NUMBER(19, 0)
+        - column:
+            name: CREATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: IS_ACTIVE
+            type: NUMBER(1, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: TEAM_NAME
+            type: VARCHAR2(100 CHAR)
+        - column:
+            name: UPDATED_AT
+            type: TIMESTAMP(6)
+        - column:
+            name: MANAGER_ID
+            type: NUMBER(19, 0)
+        tableName: TEAMS
+        tablespace: DATA
+- changeSet:
+    id: 1747097263211-13
+    author: alexeidelgado (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: EMAIL
+        indexName: UK1J9D9A06I600GD43UU3KM82JW
+        tableName: APP_USER
+        unique: true
+- changeSet:
+    id: 1747097263211-14
+    author: alexeidelgado (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: EMAIL
+        constraintName: UK1J9D9A06I600GD43UU3KM82JW
+        tableName: APP_USER
+- changeSet:
+    id: 1747097263211-15
+    author: alexeidelgado (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: USERNAME
+        indexName: UK3K4CPLVH82SRUEUTTFKWNYLQ0
+        tableName: APP_USER
+        unique: true
+- changeSet:
+    id: 1747097263211-16
+    author: alexeidelgado (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: USERNAME
+        constraintName: UK3K4CPLVH82SRUEUTTFKWNYLQ0
+        tableName: APP_USER
+- changeSet:
+    id: 1747097263211-17
+    author: alexeidelgado (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: TELEGRAM_ID
+        indexName: UK9AXX57E4OQEOEEAPMW599K11V
+        tableName: APP_USER
+        unique: true
+- changeSet:
+    id: 1747097263211-18
+    author: alexeidelgado (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: TELEGRAM_ID
+        constraintName: UK9AXX57E4OQEOEEAPMW599K11V
+        tableName: APP_USER
+- changeSet:
+    id: 1747097263211-19
+    author: alexeidelgado (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: TEAM_NAME
+        indexName: UKDSQU2WX93EN6LBL2BNRJY7KOL
+        tableName: TEAMS
+        unique: true
+- changeSet:
+    id: 1747097263211-20
+    author: alexeidelgado (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: TEAM_NAME
+        constraintName: UKDSQU2WX93EN6LBL2BNRJY7KOL
+        tableName: TEAMS
+- changeSet:
+    id: 1747097263211-21
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SPRINT_ID
+        baseTableName: KPI_SNAPSHOTS
+        constraintName: FK_KPI_SNAPSHOTS_SPRINT
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: SPRINTS
+        validate: true
+- changeSet:
+    id: 1747097263211-22
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TEAM_ID
+        baseTableName: KPI_SNAPSHOTS
+        constraintName: FK_KPI_SNAPSHOTS_TEAM
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TEAMS
+        validate: true
+- changeSet:
+    id: 1747097263211-23
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CHANGED_BY
+        baseTableName: TASK_AUDIT
+        constraintName: FK_TASK_AUDIT_CHANGED_BY
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-24
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TEAM_ID
+        baseTableName: APP_USER
+        constraintName: FK_APP_USER_TEAM
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TEAMS
+        validate: true
+- changeSet:
+    id: 1747097263211-25
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: MANAGER_ID
+        baseTableName: APP_USER
+        constraintName: FK_APP_USER_MANAGER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-26
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: MANAGER_ID
+        baseTableName: PROJECTS
+        constraintName: FK_PROJECTS_MANAGER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-27
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USER_ID
+        baseTableName: KPI_SNAPSHOTS
+        constraintName: FK_KPI_SNAPSHOTS_USER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-28
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASK_ID
+        baseTableName: TASK_FAVORITES
+        constraintName: FK_TASK_FAVORITES_TASK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TASKS
+        validate: true
+- changeSet:
+    id: 1747097263211-29
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASK_ID
+        baseTableName: TASK_AUDIT
+        constraintName: FK_TASK_AUDIT_TASK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TASKS
+        validate: true
+- changeSet:
+    id: 1747097263211-30
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TEAM_ID
+        baseTableName: PROJECTS
+        constraintName: FK_PROJECTS_TEAM
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TEAMS
+        validate: true
+- changeSet:
+    id: 1747097263211-31
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USER_ID
+        baseTableName: PROJECT_FAVORITES
+        constraintName: FK_PROJECT_FAVORITES_USER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-32
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROJECT_ID
+        baseTableName: PROJECT_FAVORITES
+        constraintName: FK_PROJECT_FAVORITES_PROJECT
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: PROJECTS
+        validate: true
+- changeSet:
+    id: 1747097263211-33
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USER_ID
+        baseTableName: TASK_LOGS
+        constraintName: FK_TASK_LOGS_USER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-34
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USER_ID
+        baseTableName: TASK_FAVORITES
+        constraintName: FK_TASK_FAVORITES_USER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-35
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: MANAGER_ID
+        baseTableName: TEAMS
+        constraintName: FK_TEAMS_MANAGER
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-36
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TASK_ID
+        baseTableName: TASK_LOGS
+        constraintName: FK_TASK_LOGS_TASK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: TASKS
+        validate: true
+- changeSet:
+    id: 1747097263211-37
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROJECT_ID
+        baseTableName: SPRINTS
+        constraintName: FK_SPRINTS_PROJECT
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: PROJECTS
+        validate: true
+- changeSet:
+    id: 1747097263211-38
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ASSIGNED_TO
+        baseTableName: TASKS
+        constraintName: FK_TASKS_ASSIGNED_TO
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-39
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATED_BY
+        baseTableName: TASKS
+        constraintName: FK_TASKS_CREATED_BY
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: APP_USER
+        validate: true
+- changeSet:
+    id: 1747097263211-40
+    author: alexeidelgado (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: SPRINT_ID
+        baseTableName: TASKS
+        constraintName: FK_TASKS_SPRINT
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: SPRINTS
+        validate: true
+
+- changeSet:
+      id: modify-blocked-to-number
+      author: alexeidelgado
+      changes:
+          - modifyDataType:
+                tableName: TASKS
+                columnName: BLOCKED
+                newDataType: NUMBER(1,0)
+
+- changeSet:
+      id: modify-is-active-to-number
+      author: alexeidelgado
+      changes:
+          - modifyDataType:
+                tableName: TASKS
+                columnName: IS_ACTIVE
+                newDataType: NUMBER(1,0)

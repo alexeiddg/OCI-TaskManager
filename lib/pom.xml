@@ -29,6 +29,13 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.liquibase.ext</groupId>
+            <artifactId>liquibase-hibernate6</artifactId>
+            <version>4.27.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -36,9 +43,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version> <!-- Ensure it's a recent version that supports Java 21 -->
+                <version>3.11.0</version> <!-- Ensure it's a recent version that supports Java 17 -->
                 <configuration>
-                    <release>17</release> <!-- This sets both source and target to 21 -->
+                    <release>17</release> <!-- This sets both source and target to 17 -->
                 </configuration>
             </plugin>
         </plugins>

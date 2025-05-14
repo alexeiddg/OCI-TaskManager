@@ -25,7 +25,7 @@ public class Project {
     @Column(name = "project_name", nullable = false, length = 150)
     private String projectName;
 
-    @Column(name = "project_description", nullable = false, length = 500)
+    @Column(name = "project_description", nullable = false)
     private String projectDescription;
 
     @ManyToOne

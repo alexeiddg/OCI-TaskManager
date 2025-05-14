@@ -40,7 +40,7 @@ public class TaskAudit {
     @Column(name = "change_type", length = 20, nullable = false)
     private ChangeType changeType;
 
-    @Column(name = "change_comment", length = 2000)
+    @Column(name = "change_comment")
     private String changeComment;
 
     @Column(name = "changed_at", nullable = false)

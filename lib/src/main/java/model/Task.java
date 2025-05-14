@@ -32,7 +32,8 @@ public class Task {
     @Column(name = "task_name", nullable = false, length = 100)
     private String taskName;
 
-    @Column(name = "task_description", nullable = false, columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "task_description", nullable = false)
     private String taskDescription;
 
     @Enumerated(EnumType.STRING)
