@@ -128,6 +128,8 @@ public class TeamService {
         sprint.setStartDate(request.getSprint().getStartDate());
         sprint.setEndDate(request.getSprint().getEndDate());
         sprint.setProject(project);
+        sprint.setSprintDescription(request.getSprint().getDescription());
+        sprint.setStatus(request.getSprint().getStatus());
         sprintRepository.save(sprint);
     }
 

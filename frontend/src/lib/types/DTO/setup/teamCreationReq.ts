@@ -1,3 +1,5 @@
+import {SprintStatus} from "@/lib/types/enums/SprintStatus";
+
 export interface TeamCreationRequest {
   teamName: string;
   // invitedEmails: string[];
@@ -9,5 +11,7 @@ export interface TeamCreationRequest {
     name: string;
     startDate: string;
     endDate: string;
+    sprintDescription: string;
+    sprintStatus: SprintStatus;
   };
 }

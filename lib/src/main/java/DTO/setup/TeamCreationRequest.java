@@ -1,9 +1,12 @@
 package DTO.setup;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import enums.SprintStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import model.Sprint;
 
 import java.time.LocalDateTime;
 
@@ -35,5 +38,11 @@ public class TeamCreationRequest {
         private String name;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
+
+        @JsonProperty("sprintDescription")
+        private String description;
+
+        @JsonProperty("sprintStatus")
+        private SprintStatus status;
     }
 }

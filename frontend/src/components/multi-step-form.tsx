@@ -18,6 +18,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { TeamCreationFormValues } from "@/lib/types/DTO/setup/teamCreationForm";
 import { useRouter } from "next/navigation";
+import { SprintStatus } from "@/lib/types/enums/SprintStatus";
+import { Textarea } from "@/components/ui/textarea";
 
 const TOTAL_STEPS = 3;
 
@@ -50,6 +52,8 @@ export function MultiStepForm() {
       sprintName: "",
       startDate: "",
       endDate: "",
+      sprintDescription: "",
+      sprintStatus: SprintStatus.ACTIVE
     },
   });
 
@@ -84,6 +88,8 @@ export function MultiStepForm() {
         name: data.sprintName,
         startDate: `${data.startDate}T00:00:00`,
         endDate: `${data.endDate}T00:00:00`,
+        sprintDescription: data.sprintDescription,
+        sprintStatus: data.sprintStatus,
       },
     };
 
@@ -92,6 +98,7 @@ export function MultiStepForm() {
       toast.success("Setup completed successfully!");
     } catch (error) {
       toast.error("Failed to complete setup. Please try again.");
+      console.error(error);
     } finally {
       toast.message("Re-authentication required. Redirecting...");
       setTimeout(() => router.replace("/sign-out"), 1000);
@@ -270,40 +277,69 @@ export function MultiStepForm() {
                         <FormItem>
                           <FormLabel>Sprint Name</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Sprint 1: Setup + Auth"
-                              {...field}
-                            />
+                            <Input placeholder="Sprint 1: Initial Release" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex gap-4">
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>Start Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="endDate"
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>End Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="sprintDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sprint Description</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Describe the sprint's focus, backlog, and goals..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
-                      control={form.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Start Date</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="endDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>End Date</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                        control={form.control}
+                        name="sprintStatus"
+                        render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sprint Status</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                    {...field}
+                                    readOnly
+                                    className="bg-muted text-muted-foreground cursor-not-allowed"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                        )}
                     />
                   </>
                 )}
