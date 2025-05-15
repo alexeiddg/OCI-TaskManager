@@ -504,16 +504,16 @@ export function SprintAnalyticsDashboard() {
           <TabsList
               className="relative z-10 bg-background p-2 flex flex-wrap gap-2 lg:gap-1 my-4 justify-center sm:justify-start lg:flex-nowrap lg:justify-start"
           >
-            <TabsTrigger className="whitespace-nowrap text-sm" value="burndown">Burndown Chart</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="distribution">Task Distribution</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="velocity">Velocity</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="risks">Risks & Blockers</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="personal">Personal KPIs</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="team">Team KPIs</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="sprintHours">Sprint Hours</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="teamHours">Team Hours</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="sprintTasks">Tasks Completed</TabsTrigger>
-            <TabsTrigger className="whitespace-nowrap text-sm" value="HoursTracking">Hours Tracking</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="burndown">Burndown Chart</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="distribution">Task Distribution</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="velocity">Velocity</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="risks">Risks & Blockers</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="personal">Personal KPIs</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="team">Team KPIs</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="sprintHours">Sprint Hours</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="teamHours">Team Hours</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="sprintTasks">Tasks Completed</TabsTrigger>
+            <TabsTrigger className="whitespace-nowrap text-sm data-[state=active]:outline-2 data-[state=active]:outline-offset-2 data-[state=active]:outline-[#c74634]" value="HoursTracking">Hours Tracking</TabsTrigger>
           </TabsList>
 
           {/* Burndown Chart */}
