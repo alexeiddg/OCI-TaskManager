@@ -11,8 +11,11 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { fetchSprintTotalHours } from "@/server/api/kpi/getHoursPerSprint";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
-// Define the data structure
+
 interface SprintHoursData {
   sprint: string;
   hours: number;
@@ -21,22 +24,74 @@ interface SprintHoursData {
 interface SprintHoursChartProps {
   data?: SprintHoursData[];
   title?: string;
+  teamId?: number;
 }
 
-// Mock data
-const defaultData: SprintHoursData[] = [
-  { sprint: "Sprint 1", hours: 120 },
-  { sprint: "Sprint 2", hours: 145 },
-  { sprint: "Sprint 3", hours: 132 },
-  { sprint: "Sprint 4", hours: 167 },
-  { sprint: "Sprint 5", hours: 153 },
-  { sprint: "Sprint 6", hours: 178 },
-];
-
 export function SprintHoursChart({
-  data = defaultData,
+  data,
   title = "Total Hours per Sprint",
+  teamId,
 }: SprintHoursChartProps) {
+  const { data: session } = useSession();
+  const [chartData, setChartData] = useState<SprintHoursData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      setChartData(data);
+      setLoading(false);
+      return;
+    }
+
+    const effectiveTeamId = teamId || Number(session?.user?.teamId);
+    if (!effectiveTeamId) {
+      setError("Team ID not available");
+      setLoading(false);
+      return;
+    }
+
+    fetchSprintTotalHours(effectiveTeamId)
+      .then((sprintData) => {
+        const formattedData = sprintData.map((item) => ({
+          sprint: item.sprintName,
+          hours: item.totalHours,
+        }));
+        setChartData(formattedData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch sprint hours data:", err);
+        setError("Failed to load sprint hours data");
+        setLoading(false);
+      });
+  }, [data, teamId, session]);
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p>Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p className="text-red-500">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card className="w-full">
       <CardHeader>
@@ -54,7 +109,7 @@ export function SprintHoursChart({
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data}
+                data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />

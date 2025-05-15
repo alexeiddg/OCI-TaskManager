@@ -11,8 +11,10 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { fetchCompletedTasksByMemberPerSprint } from "@/server/api/kpi/getCompletedTasksByMemberPerSprint";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
-// Define the data structure
 interface CompletedTasksData {
   sprint: string;
   [key: string]: string | number; // For dynamic team member names
@@ -22,55 +24,9 @@ interface CompletedTasksChartProps {
   data?: CompletedTasksData[];
   title?: string;
   teamMembers?: string[];
+  teamId?: number;
 }
 
-// Mock data
-const defaultTeamMembers = ["John", "Sarah", "Miguel", "Aisha", "Raj"];
-
-const defaultData: CompletedTasksData[] = [
-  {
-    sprint: "Sprint 1",
-    John: 5,
-    Sarah: 7,
-    Miguel: 4,
-    Aisha: 6,
-    Raj: 3,
-  },
-  {
-    sprint: "Sprint 2",
-    John: 6,
-    Sarah: 8,
-    Miguel: 5,
-    Aisha: 7,
-    Raj: 4,
-  },
-  {
-    sprint: "Sprint 3",
-    John: 8,
-    Sarah: 6,
-    Miguel: 7,
-    Aisha: 5,
-    Raj: 6,
-  },
-  {
-    sprint: "Sprint 4",
-    John: 7,
-    Sarah: 9,
-    Miguel: 6,
-    Aisha: 8,
-    Raj: 5,
-  },
-  {
-    sprint: "Sprint 5",
-    John: 9,
-    Sarah: 7,
-    Miguel: 8,
-    Aisha: 6,
-    Raj: 7,
-  },
-];
-
-// Chart colors from theme
 const chartColors = [
   "var(--color-chart-1)",
   "var(--color-chart-2)",
@@ -80,12 +36,103 @@ const chartColors = [
 ];
 
 export function CompletedTasksChart({
-  data = defaultData,
+  data,
   title = "Completed Tasks by Team Member",
-  teamMembers = defaultTeamMembers,
+  teamMembers,
+  teamId,
 }: CompletedTasksChartProps) {
+  const { data: session } = useSession();
+  const [chartData, setChartData] = useState<CompletedTasksData[]>([]);
+  const [memberNames, setMemberNames] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (data && teamMembers) {
+      setChartData(data);
+      setMemberNames(teamMembers);
+      setLoading(false);
+      return;
+    }
+
+    const effectiveTeamId = teamId || Number(session?.user?.teamId);
+    if (!effectiveTeamId) {
+      setError("Team ID not available");
+      setLoading(false);
+      return;
+    }
+
+    fetchCompletedTasksByMemberPerSprint(effectiveTeamId)
+      .then((sprintData) => {
+        const processedData: CompletedTasksData[] = [];
+        const members = new Set<string>();
+
+        // collect all unique member names
+        sprintData.forEach((sprint) => {
+          sprint.tasksByMember.forEach((member) => {
+            members.add(member.memberName);
+          });
+        });
+
+        const memberList = Array.from(members);
+        setMemberNames(memberList);
+
+        // create the data structure for each sprint
+        sprintData.forEach((sprint) => {
+          const sprintEntry: CompletedTasksData = {
+            sprint: sprint.sprintName,
+          };
+
+          // Initialize all members with 0 tasks
+          memberList.forEach((member) => {
+            sprintEntry[member] = 0;
+          });
+
+          // Update with actual completed tasks
+          sprint.tasksByMember.forEach((member) => {
+            sprintEntry[member.memberName] = member.completedTasks;
+          });
+
+          processedData.push(sprintEntry);
+        });
+
+        setChartData(processedData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch completed tasks by member data:", err);
+        setError("Failed to load completed tasks by member data");
+        setLoading(false);
+      });
+  }, [data, teamMembers, teamId, session]);
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p>Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p className="text-red-500">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
   // Create config for ChartContainer
-  const chartConfig = teamMembers.reduce(
+  const chartConfig = memberNames.reduce(
     (config, member, index) => {
       config[member] = {
         label: member,
@@ -106,7 +153,7 @@ export function CompletedTasksChart({
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data}
+                data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -129,7 +176,7 @@ export function CompletedTasksChart({
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Legend />
-                {teamMembers.map((member, index) => (
+                {memberNames.map((member, index) => (
                   <Bar
                     key={member}
                     dataKey={member}

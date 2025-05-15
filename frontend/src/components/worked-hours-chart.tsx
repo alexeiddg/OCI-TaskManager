@@ -11,8 +11,10 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { fetchHoursByMemberPerSprint } from "@/server/api/kpi/getHoursByMemberPerSprint";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
-// Define the data structure
 interface TeamMemberHoursData {
   sprint: string;
   [key: string]: string | number; // For dynamic team member names
@@ -22,55 +24,10 @@ interface TeamMemberHoursChartProps {
   data?: TeamMemberHoursData[];
   title?: string;
   teamMembers?: string[];
+  teamId?: number;
 }
 
-// Mock data
-const defaultTeamMembers = ["John", "Sarah", "Miguel", "Aisha", "Raj"];
 
-const defaultData: TeamMemberHoursData[] = [
-  {
-    sprint: "Sprint 1",
-    John: 28,
-    Sarah: 32,
-    Miguel: 24,
-    Aisha: 18,
-    Raj: 22,
-  },
-  {
-    sprint: "Sprint 2",
-    John: 32,
-    Sarah: 30,
-    Miguel: 28,
-    Aisha: 24,
-    Raj: 26,
-  },
-  {
-    sprint: "Sprint 3",
-    John: 26,
-    Sarah: 34,
-    Miguel: 22,
-    Aisha: 28,
-    Raj: 24,
-  },
-  {
-    sprint: "Sprint 4",
-    John: 30,
-    Sarah: 28,
-    Miguel: 32,
-    Aisha: 30,
-    Raj: 28,
-  },
-  {
-    sprint: "Sprint 5",
-    John: 34,
-    Sarah: 32,
-    Miguel: 30,
-    Aisha: 26,
-    Raj: 30,
-  },
-];
-
-// Chart colors from theme
 const chartColors = [
   "var(--color-chart-1)",
   "var(--color-chart-2)",
@@ -80,12 +37,103 @@ const chartColors = [
 ];
 
 export function TeamMemberHoursChart({
-  data = defaultData,
+  data,
   title = "Hours Worked by Team Member",
-  teamMembers = defaultTeamMembers,
+  teamMembers,
+  teamId,
 }: TeamMemberHoursChartProps) {
+  const { data: session } = useSession();
+  const [chartData, setChartData] = useState<TeamMemberHoursData[]>([]);
+  const [memberNames, setMemberNames] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (data && teamMembers) {
+      setChartData(data);
+      setMemberNames(teamMembers);
+      setLoading(false);
+      return;
+    }
+
+    const effectiveTeamId = teamId || Number(session?.user?.teamId);
+    if (!effectiveTeamId) {
+      setError("Team ID not available");
+      setLoading(false);
+      return;
+    }
+
+    fetchHoursByMemberPerSprint(effectiveTeamId)
+      .then((sprintData) => {
+        const processedData: TeamMemberHoursData[] = [];
+        const members = new Set<string>();
+
+        // collect all unique member names
+        sprintData.forEach((sprint) => {
+          sprint.hoursByMember.forEach((member) => {
+            members.add(member.memberName);
+          });
+        });
+
+        const memberList = Array.from(members);
+        setMemberNames(memberList);
+
+        // create the data structure for each sprint
+        sprintData.forEach((sprint) => {
+          const sprintEntry: TeamMemberHoursData = {
+            sprint: sprint.sprintName,
+          };
+
+          // Initialize all members with 0 hours
+          memberList.forEach((member) => {
+            sprintEntry[member] = 0;
+          });
+
+          // Update with actual hours
+          sprint.hoursByMember.forEach((member) => {
+            sprintEntry[member.memberName] = member.hours;
+          });
+
+          processedData.push(sprintEntry);
+        });
+
+        setChartData(processedData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch hours by member data:", err);
+        setError("Failed to load hours by member data");
+        setLoading(false);
+      });
+  }, [data, teamMembers, teamId, session]);
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p>Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center h-64">
+          <p className="text-red-500">{error}</p>
+        </CardContent>
+      </Card>
+    );
+  }
   // Create config for ChartContainer
-  const chartConfig = teamMembers.reduce(
+  const chartConfig = memberNames.reduce(
     (config, member, index) => {
       config[member] = {
         label: member,
@@ -106,7 +154,7 @@ export function TeamMemberHoursChart({
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data}
+                data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -129,7 +177,7 @@ export function TeamMemberHoursChart({
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Legend />
-                {teamMembers.map((member, index) => (
+                {memberNames.map((member, index) => (
                   <Bar
                     key={member}
                     dataKey={member}

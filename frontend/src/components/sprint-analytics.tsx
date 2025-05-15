@@ -469,13 +469,13 @@ export function SprintAnalyticsDashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-[-4]">
             <CardTitle className="text-sm font-medium">
               Status Breakdown
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex flex-col space-y-0 text-sm">
               <div className="flex items-center">
                 <span className="h-2 w-2 rounded-full bg-chart-3 mr-1"></span>
                 <span>Todo: {velocityData.statusCounts.todo}</span>
@@ -484,8 +484,6 @@ export function SprintAnalyticsDashboard() {
                 <span className="h-2 w-2 rounded-full bg-chart-1 mr-1"></span>
                 <span>In Progress: {velocityData.statusCounts.inProgress}</span>
               </div>
-            </div>
-            <div className="flex items-center justify-between text-xs mt-2">
               <div className="flex items-center">
                 <span className="h-2 w-2 rounded-full bg-chart-2 mr-1"></span>
                 <span>Done: {velocityData.statusCounts.done}</span>
