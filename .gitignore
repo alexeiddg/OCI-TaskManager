@@ -91,3 +91,4 @@ frontend/.vercel
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
 logs.log
+oci_pms_testenv_bot
