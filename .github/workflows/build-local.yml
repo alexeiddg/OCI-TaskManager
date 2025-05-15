@@ -48,7 +48,7 @@ jobs:
         run: npm install --legacy-peer-deps
         working-directory: ${{ github.workspace }}/frontend
 
-      - name: Docker Build & Push to Docker Hub
+      - name: Docker Build & Push to Docker Hub (Retries 3 Times)
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.service }}

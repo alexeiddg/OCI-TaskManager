@@ -42,7 +42,7 @@ type ChartDataPoint = {
 export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const { data: session } = useSession();
-  const [timeRange, setTimeRange] = useState("90d");
+  const [timeRange, setTimeRange] = useState("7d");
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState<AppUserDto[]>([]);
   const [tasksData, setTasksData] = useState<TaskModel[]>([]);
@@ -105,13 +105,43 @@ export function ChartAreaInteractive() {
     if (tasksData.length === 0) return;
     const tasksByDate: Record<string, Record<string, number>> = {};
 
+    // Create a mapping from username to team member name
+    const usernameToNameMap: Record<string, string> = {};
+
+    // For each team member, find all tasks assigned to them
+    teamMembers.forEach((member) => {
+      tasksData.forEach((task) => {
+        if (task.assignedToUsername) {
+          // Try multiple matching strategies to ensure robust mapping
+          const memberNameNoSpaces = member.name.replace(/\s+/g, "");
+          const usernameNoSpaces = task.assignedToUsername.replace(/\s+/g, "");
+
+          // Strategy 1: Check if username contains member name without spaces
+          if (usernameNoSpaces.includes(memberNameNoSpaces)) {
+            usernameToNameMap[task.assignedToUsername] = member.name;
+          }
+          // Strategy 2: Check if member name contains username without spaces
+          else if (memberNameNoSpaces.includes(usernameNoSpaces)) {
+            usernameToNameMap[task.assignedToUsername] = member.name;
+          }
+          // Strategy 3: Check for partial matches (e.g., "Alexei" in "AlexeiManager")
+          else if (member.name.split(" ").some(namePart =>
+            task.assignedToUsername?.includes(namePart) ||
+            task.assignedToUsername?.includes(namePart.replace(/\s+/g, ""))
+          )) {
+            usernameToNameMap[task.assignedToUsername] = member.name;
+          }
+        }
+      });
+    });
+
     tasksData.forEach((task) => {
       if (
         (task.status === TaskStatus.DONE || task.completed) &&
         task.assignedToUsername
       ) {
-        const completionDate =
-          task.completedAt || task.updatedAt || task.createdAt;
+        // Use completedAt if available, otherwise use createdAt if task is completed
+        const completionDate = task.completedAt || (task.completed ? task.createdAt : null);
         if (!completionDate) {
           console.log("Task has no completion date:", task);
           return;
@@ -132,26 +162,6 @@ export function ChartAreaInteractive() {
       }
     });
 
-    const usernameToNameMap: Record<string, string> = {};
-
-    tasksData.forEach((task) => {
-      if (task.assignedToUsername) {
-        const member = teamMembers.find(
-          (m) =>
-            m.name.replace(/\s+/g, "") ===
-              task.assignedToUsername?.replace(/\s+/g, "") ||
-            task.assignedToUsername?.includes(m.name) ||
-            m.name.includes(
-              task.assignedToUsername ?? "No Assigned To Username",
-            ),
-        );
-
-        if (member) {
-          usernameToNameMap[task.assignedToUsername] = member.name;
-        }
-      }
-    });
-
     const today = new Date();
     const threeMonthsAgo = new Date(today);
     threeMonthsAgo.setDate(today.getDate() - 90);
@@ -168,18 +178,21 @@ export function ChartAreaInteractive() {
       const dataPoint: ChartDataPoint = { date };
 
       teamMembers.forEach((member) => {
+        // Find all usernames that map to this team member
         const usernames = Object.entries(usernameToNameMap)
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           .filter(([_, name]) => name === member.name)
           .map(([username]) => username);
 
         let totalTasks = 0;
 
         if (tasksByDate[date]) {
+          // Sum up tasks for all usernames that map to this team member
           usernames.forEach((username) => {
             totalTasks += tasksByDate[date][username] || 0;
           });
 
+          // If no usernames map to this team member, try using the member name directly
           if (usernames.length === 0) {
             totalTasks = tasksByDate[date][member.name] || 0;
           }
