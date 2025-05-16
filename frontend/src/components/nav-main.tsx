@@ -2,9 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react";
+import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -21,6 +20,7 @@ import {
   InviteTeamMemberModalHandle,
 } from "@/components/email-invite-modal";
 import { Separator } from "@radix-ui/react-menu";
+import * as React from "react";
 
 export function NavMain({
   items,
@@ -71,23 +71,13 @@ export function NavMain({
                 <span>Quick Create</span>
               </div>
             </SidebarMenuButton>
-
-            {/*TODO*/}
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-            >
-              <IconMail />
-              <span className="sr-only">Inbox</span>
-            </Button>
             {/* Email invite Modal */}
-          </SidebarMenuItem>
-          <Separator />
-          <SidebarMenuItem className="flex items-start">
-            {typeof teamId === "number" && (
-              <InviteTeamMemberModal ref={inviteModalRef} teamId={teamId} />
-            )}
+            <div className="size-8 group-data-[collapsible=icon]:opacity-0">
+              <span className="sr-only">Inbox</span>
+              {typeof teamId === "number" && (
+                  <InviteTeamMemberModal ref={inviteModalRef} teamId={teamId} />
+              )}
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
 

@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: nextjs-app
-          image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-front:latest
+          image: alexeiddg5/mtdr-frontend:latest
           ports:
             - containerPort: 3000
           env:

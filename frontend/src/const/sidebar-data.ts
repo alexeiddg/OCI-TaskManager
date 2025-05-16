@@ -28,13 +28,11 @@ export const sidebarData = {
       url: "/dashboard/projects",
       icon: IconFolder,
     },
-    /*
     {
       title: "Team (TODO)",
       url: "/dashboard/team",
       icon: IconUsers,
     },
-    */
     {
       title: "Analytics",
       url: "/dashboard/analytics",
@@ -66,6 +64,11 @@ export const sidebarData = {
       name: "Reports",
       url: "/dashboard/reports",
       icon: IconReport,
+    },
+    {
+      name: "Backlog",
+      url: "/dashboard/backlog",
+      icon: IconDatabase,
     },
     /*
     {

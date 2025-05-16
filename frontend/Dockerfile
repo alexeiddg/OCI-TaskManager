@@ -22,7 +22,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 # Inject ENV variables at build time (needed for NEXT_PUBLIC vars)
-ARG NEXT_PUBLIC_BACKEND_URL="http://localhost:8080"
+ARG NEXT_PUBLIC_BACKEND_URL="http://159.54.144.172"
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 ENV AUTH_TRUST_HOST=true
