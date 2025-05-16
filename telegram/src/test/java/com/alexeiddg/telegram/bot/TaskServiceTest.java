@@ -28,7 +28,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public class UserActionsTest {
+public class TaskServiceTest {
 
     private CreateTaskAbility createTaskAbility;
 
@@ -106,5 +106,7 @@ public class UserActionsTest {
         // Verificamos que se haya enviado el mensaje para descripción
         verify(silentSender).send("Please enter the task description:", chatId); 
     }
+
+    // Aquí puedes agregar más tests para cada paso del switch-case...
 
 }
