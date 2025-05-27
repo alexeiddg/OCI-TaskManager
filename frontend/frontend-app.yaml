@@ -24,7 +24,7 @@ kind: Deployment
 metadata:
   name: nextjs-app-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: nextjs-app
