@@ -1,14 +1,5 @@
 # Project Management Application on OCI
 
-## Showcase
-Dashboard Showcase
-![Workspace Showcase](./.assets/workspace-showcase.jpeg)
-
-Kpi Dashboard Task Distribution Section
-![Workspace Showcase](./.assets/kpi-showcase-1.jpeg)
-
-Kpi Metrics Distribution
-![Workspace Showcase](./.assets/kpi-showcase-2.jpeg)
 <!-- Example: ![Architecture Diagram](path/to/architecture_diagram.png) -->
 
 ## Overview
@@ -66,3 +57,15 @@ This project was initially forked from the `oracle/oci-react-samples` repository
 *   **Expanded Feature Set:** New features for comprehensive project management were introduced.
 
 These changes reflect a deliberate effort to explore different technologies and architectural patterns within the Oracle Cloud ecosystem.
+
+---
+
+## Showcase
+Dashboard Showcase
+![Workspace Showcase](./.assets/workspace-showcase.jpeg)
+
+Kpi Dashboard Task Distribution Section
+![Workspace Showcase](./.assets/kpi-showcase-1.jpeg)
+
+Kpi Metrics Distribution
+![Workspace Showcase](./.assets/kpi-showcase-2.jpeg)
