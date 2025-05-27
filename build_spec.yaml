@@ -1,37 +1,46 @@
 version: 0.1
 component: build
+runAs: root
 shell: bash
 timeoutInSeconds: 28799
 
 env:
   variables:
-    # Docker / OCIR info
-    OCIR_REGION: mx-queretaro-1
-    NAMESPACE:   ax83el69bkfn
-    TG_REPO:     mtdr-ocir-telegram
-    TAG:         latest
-    REGISTRY:    ${OCIR_REGION}.ocir.io
+    # Point to the GraalVM 22 Enterprise JDK 17 home
+    JAVA_HOME: "/usr/lib64/graalvm/graalvm22-ee-java17"
+    # OCIR details
+    OCIR_REGION: "mx-queretaro-1"
+    NAMESPACE: "ax83el69bkfn"
+    TG_REPO: "mtdr-ocir-telegram"
+    TAG: "latest"
+    REGISTRY: "mx-queretaro-1.ocir.io"
 
   vaultVariables:
-    OCI_AUTH_TOKEN: ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja
+    OCI_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja"
 
 steps:
-  - name: Root Maven build
-    type: Command
+  - type: Command
+    name: Install GraalVM & set PATH
     command: |
-      echo "Running root mvn clean install"
+      yum -y install graalvm22-ee-17-native-image
+      export PATH="$JAVA_HOME/bin:$PATH"
+
+  - type: Command
+    name: Root Maven build
+    command: |
+      echo "Using Java version:" && java -version
       mvn clean install -DskipTests -B -e
 
-  - name: Build Telegram Image
-    type: Command
+  - type: Command
+    name: Build Telegram Docker image
     command: |
       docker build \
-        --platform linux/amd64,linux/arm64 \
+        --platform linux/amd64 \
         -f telegram/Dockerfile \
-        -t ${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG} \
+        -t "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}" \
         telegram
 
 outputArtifacts:
   - name: telegram-image
     type: DOCKER_IMAGE
-    location: ${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}
+    location: "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}"

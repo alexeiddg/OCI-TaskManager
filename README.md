@@ -1,3 +1,5 @@
+### Please change the readme to reflect new infra
+
 # oci-react-samples
 A repository for full stack Cloud Native applications with a React JS frontend and various backends (Java, Python, DotNet, and so on) on the Oracle Cloud Infrastructure.
 
@@ -16,4 +18,4 @@ The lab executes scripts that require the following software to run properly: (T
 * kubectl
 * mvn (maven)
 
-## Expect more ...
+## Expect more ... SOOn!
