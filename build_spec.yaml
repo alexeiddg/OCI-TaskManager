@@ -11,7 +11,10 @@ env:
     # OCIR details
     OCIR_REGION: "mx-queretaro-1"
     NAMESPACE: "ax83el69bkfn"
+
     TG_REPO: "mtdr-ocir-telegram"
+    WEB_REPO: "mtdr-ocir-web"
+    FRONTEND_REPO: "mtdr-ocir-front"
     TAG: "latest"
     REGISTRY: "mx-queretaro-1.ocir.io"
 
@@ -29,7 +32,7 @@ steps:
     name: Root Maven build
     command: |
       echo "Using Java version:" && java -version
-      mvn clean install -DskipTests -B -e
+      mvn clean install -DskipTests -B -e -q
 
   - type: Command
     name: Build Telegram Docker image
@@ -40,7 +43,36 @@ steps:
         -t "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}" \
         telegram
 
+  - type: Command
+    name: Build Web Docker image
+    command: |
+      docker build \
+        --platform linux/amd64 \
+        -f web/Dockerfile \
+        -t "${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG}" \
+        web
+
+  - type: Command
+    name: Build Frontend Docker image
+    command: |
+      cd frontend
+      npm install --legacy-peer-deps
+      docker build \
+        --platform linux/amd64 \
+        -f Dockerfile \
+        -t "${REGISTRY}/${NAMESPACE}/${FRONTEND_REPO}:${TAG}" \
+        .
+      cd ..
+
 outputArtifacts:
   - name: telegram-image
     type: DOCKER_IMAGE
     location: "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}"
+
+  - name: web-image
+    type: DOCKER_IMAGE
+    location: "${REGISTRY}/${NAMESPACE}/${WEB_REPO}:${TAG}"
+
+  - name: frontend-image
+    type: DOCKER_IMAGE
+    location: "${REGISTRY}/${NAMESPACE}/${FRONTEND_REPO}:${TAG}"
