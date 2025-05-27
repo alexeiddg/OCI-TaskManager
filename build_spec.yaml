@@ -16,6 +16,14 @@ env:
     OCI_AUTH_TOKEN: ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja
 
 steps:
+  - steps:
+      - name: Install GraalVM / Java 17
+        type: Command
+        command: |
+          yum -y install graalvm22-ee-17-native-image
+          export JAVA_HOME=/usr/lib64/graalvm/graalvm22-ee-java17
+          export PATH=$JAVA_HOME/bin:$PATH
+
   - name: Root Maven build
     type: Command
     command: |
