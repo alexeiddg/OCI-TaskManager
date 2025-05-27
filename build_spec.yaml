@@ -20,7 +20,7 @@ steps:
     type: Command
     command: |
       echo "Running root mvn clean install"
-      mvn clean install -DskipTests
+       mvn clean install -DskipTests -B -e -X
 
   - name: Build Telegram Image
     type: Command
