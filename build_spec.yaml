@@ -1,7 +1,7 @@
 version: 0.1
 component: build
 shell: bash
-timeoutInSeconds: 36000
+timeoutInSeconds: 28799
 
 env:
   variables:
