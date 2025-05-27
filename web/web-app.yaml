@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: alexeiddg5/mtdr-web:latest
+          image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
