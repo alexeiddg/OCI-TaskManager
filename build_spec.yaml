@@ -35,7 +35,7 @@ steps:
     name: Build Telegram Docker image
     command: |
       docker build \
-        --platform linux/amd64,linux/arm64 \
+        --platform linux/arm64 \
         -f telegram/Dockerfile \
         -t "${REGISTRY}/${NAMESPACE}/${TG_REPO}:${TAG}" \
         telegram
