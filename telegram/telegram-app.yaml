@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
         - name: telegram
-          image: alexeiddg5/mtdr-telegram:latest
+          image: mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
