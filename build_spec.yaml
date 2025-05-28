@@ -53,6 +53,14 @@ steps:
         web
 
   - type: Command
+    name: Install Node.js 20
+    command: |
+      curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+      yum install -y nodejs
+      node -v
+      npm -v
+
+  - type: Command
     name: Build Frontend Docker image
     command: |
       cd frontend
