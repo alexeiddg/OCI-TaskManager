@@ -56,9 +56,8 @@ steps:
     name: Build Frontend Docker image
     command: |
       cd frontend
-      npm install --legacy-peer-deps
+      export DOCKER_BUILDKIT=1
       docker build \
-        --platform linux/amd64 \
         -f Dockerfile \
         -t "${REGISTRY}/${NAMESPACE}/${FRONTEND_REPO}:${TAG}" \
         .
