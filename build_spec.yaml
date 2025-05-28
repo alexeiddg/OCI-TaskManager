@@ -29,6 +29,12 @@ steps:
       export PATH="$JAVA_HOME/bin:$PATH"
 
   - type: Command
+    name: Enable Buildx
+    command: |
+      export DOCKER_BUILDKIT=1
+      docker buildx create --use
+
+  - type: Command
     name: Root Maven build
     command: |
       echo "Using Java version:" && java -version
