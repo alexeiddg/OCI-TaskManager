@@ -29,12 +29,6 @@ steps:
       export PATH="$JAVA_HOME/bin:$PATH"
 
   - type: Command
-    name: Enable Buildx
-    command: |
-      export DOCKER_BUILDKIT=1
-      docker buildx create --use
-
-  - type: Command
     name: Root Maven build
     command: |
       echo "Using Java version:" && java -version
@@ -67,12 +61,16 @@ steps:
       npm -v
 
   - type: Command
+    name: Enable BuildKit
+    command: |
+      export DOCKER_BUILDKIT=1
+
+  - type: Command
     name: Build Frontend Docker image
     command: |
       cd frontend
       npm install --legacy-peer-deps
       docker build \
-        --platform linux/amd64 \
         -f Dockerfile \
         -t "${REGISTRY}/${NAMESPACE}/${FRONTEND_REPO}:${TAG}" \
         .
