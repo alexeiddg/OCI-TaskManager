@@ -11,7 +11,7 @@ env:
     # OCIR details
     OCIR_REGION: "mx-queretaro-1"
     NAMESPACE: "ax83el69bkfn"
-    OCI_USERNAME: "a01637405@tec.mx"
+    DOCKER_HUB_USERNAME: "alexeiddg5"
 
     TG_REPO: "mtdr-ocir-telegram"
     WEB_REPO: "mtdr-ocir-web"
@@ -22,14 +22,20 @@ env:
   vaultVariables:
     OCI_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja"
     DOCKER_LOGIN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqa5l5zgxmc4b3tur6upwiqy53mfxkoekv46kiwxfpv2yea"
+    DOCKER_HUB_PASSWORD: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqal4vqb4ukzkdyny2iixd7t7eizxzpj7sg7lqopatsln5a"
 
 steps:
   - type: Command
     name: Docker login to OCIR
     command: |
       echo "$DOCKER_LOGIN" | docker login "$REGISTRY" \
-        -u "${NAMESPACE}/${OCI_USERNAME}" \
+        -u "${NAMESPACE}/a01637405@tec.mx" \
         --password-stdin
+
+  - type: Command
+    name: Docker login for Dockerfiles
+    command: |
+      echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
 
   - type: Command
     name: Install GraalVM & set PATH
