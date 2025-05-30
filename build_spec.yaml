@@ -35,6 +35,13 @@ steps:
       mvn clean install -DskipTests -B -e -q
 
   - type: Command
+    name: Test Backends
+    command: |
+      echo "Running unit tests for backend modules..."
+      mvn -f telegram/pom.xml test -B
+      mvn -f web/pom.xml test -B
+
+  - type: Command
     name: Build Telegram Docker image
     command: |
       docker build \
