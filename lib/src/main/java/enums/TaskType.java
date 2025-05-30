@@ -6,5 +6,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public enum TaskType {
     BUG,
     FEATURE,
-    IMPROVEMENT
+    IMPROVEMENT,
+    TASK
 }
