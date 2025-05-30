@@ -20,8 +20,16 @@ env:
 
   vaultVariables:
     OCI_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja"
+    DOCKER_LOGIN: "ocid1.credential.oc1..aaaaaaaa5mwr27uzu3vni4fhxfyoyjlik24glinwxeqiaa63u2o34l6s7vca"
 
 steps:
+  - type: Command
+    name: Docker login to OCIR
+    command: |
+      echo "$DOCKER_LOGIN" | docker login "$REGISTRY" \
+        -u "${NAMESPACE}/${OCI_USERNAME}" \
+        --password-stdin
+
   - type: Command
     name: Install GraalVM & set PATH
     command: |
