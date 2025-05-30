@@ -1,9 +1,11 @@
-import {DataTable} from "@/components/data-table";
+import {BackLogTable} from "@/components/backlog-table";
 
 export default function backlogPage() {
     return(
         <div>
-            <DataTable/>
+           <div className="mx-6">
+               <BackLogTable/>
+           </div>
         </div>
     )
 }
