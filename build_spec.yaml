@@ -11,6 +11,7 @@ env:
     # OCIR details
     OCIR_REGION: "mx-queretaro-1"
     NAMESPACE: "ax83el69bkfn"
+    OCI_USERNAME: "a01637405@tec.mx"
 
     TG_REPO: "mtdr-ocir-telegram"
     WEB_REPO: "mtdr-ocir-web"
