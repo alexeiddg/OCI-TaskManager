@@ -20,7 +20,7 @@ env:
 
   vaultVariables:
     OCI_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqaj66jt4xtd37nrfwy7jougqc5acjucamyrzk6soq7ndja"
-    DOCKER_LOGIN: "ocid1.credential.oc1..aaaaaaaa5mwr27uzu3vni4fhxfyoyjlik24glinwxeqiaa63u2o34l6s7vca"
+    DOCKER_LOGIN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaarjolbyqa5l5zgxmc4b3tur6upwiqy53mfxkoekv46kiwxfpv2yea"
 
 steps:
   - type: Command
