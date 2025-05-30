@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  telegram-backend:
+    image: mtdr-telegram:latest
+    container_name: telegram-backend
+    ports:
+      - "8081:8080"
+    networks:
+      - mtdr-net
+
+  web-backend:
+    image: mtdr-web:latest
+    container_name: web-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - mtdr-net
+
+  frontend:
+    image: mtdr-front:latest
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_WEB_BACKEND_URL=http://web-backend:8080
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=fGdgd70ki0i6RvjY2mtMzyCdFmIBShAbf+zn18kSA7Y= # Make sure to use a secure secret in production
+      - NEXTAUTH_URL_INTERNAL=http://frontend:3000
+    networks:
+      - mtdr-net
+
+
+networks:
+  mtdr-net:
+    driver: bridge
