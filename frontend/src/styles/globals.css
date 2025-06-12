@@ -35,11 +35,16 @@
   --input: #e5e3e1;
   --ring: #c74634;
 
-  --chart-1: #e95532;
-  --chart-2: #a47460;
-  --chart-3: #b07f52;
-  --chart-4: #f9b44c;
-  --chart-5: #f79d3c;
+  --chart-1: var(--primary);       /* Oracle Red           #c74634 */
+  --chart-2: #a33e2e;               /* darkened red         */
+  --chart-3: #e8745f;               /* lightened red        */
+  --chart-4: #f79d3c;               /* mustard-orange       */
+  --chart-5: #f9b44c;               /* gold                 */
+  --chart-6: #64c4c8;               /* teal accent          */
+  --chart-7: #8a60e3;               /* violet accent        */
+  --chart-8: #b07f52;               /* warm earth brown     */
+  --chart-9: #059669;               /* emerald green        */
+  --chart-10: #5f5855;
 
   --sidebar: #faf9f8;
   --sidebar-foreground: #1c1816;
@@ -82,11 +87,16 @@
   --input: rgba(255, 255, 255, 0.15);
   --ring: #c74634;
 
-  --chart-1: #e95532;
-  --chart-2: #64c4c8;
-  --chart-3: #f79d3c;
-  --chart-4: #8a60e3;
-  --chart-5: #c74634;
+  --chart-1:  #ff6b5c; /* red-400 (vibrant)    */
+  --chart-2:  #c49a88; /* brown-300 (warm)     */
+  --chart-3:  #fde047; /* yellow-300 (bold)    */
+  --chart-4:  #fb923c; /* orange-400           */
+  --chart-5:  #10b981; /* emerald-500          */
+  --chart-6:  #2dd4bf; /* teal-400             */
+  --chart-7:  #a78bfa; /* violet-400           */
+  --chart-8:  #bef264; /* lime-300             */
+  --chart-9:  #f472b6; /* pink-400 (fuchsia)   */
+  --chart-10: #38bdf8; /* sky-400              */
 
   --sidebar: #1c1816;
   --sidebar-foreground: #ffffff;
@@ -129,6 +139,11 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+  --color-chart-9: var(--chart-9);
+  --color-chart-10: var(--chart-10);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

@@ -92,6 +92,18 @@ export function SprintHoursChart({
       </Card>
     );
   }
+  // Sort sprint data by sprint number
+  const sortedChartData = [...chartData].sort((a, b) => {
+    // Extract sprint numbers using regex
+    const aMatch = a.sprint.match(/Sprint\s+(\d+)/i);
+    const bMatch = b.sprint.match(/Sprint\s+(\d+)/i);
+
+    const aNum = aMatch ? parseInt(aMatch[1], 10) : 0;
+    const bNum = bMatch ? parseInt(bMatch[1], 10) : 0;
+
+    return aNum - bNum;
+  });
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -109,7 +121,7 @@ export function SprintHoursChart({
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={chartData}
+                data={sortedChartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
