@@ -33,6 +33,11 @@ const chartColors = [
   "var(--color-chart-3)",
   "var(--color-chart-4)",
   "var(--color-chart-5)",
+  "var(--color-chart-6)",
+  "var(--color-chart-7)",
+  "var(--color-chart-8)",
+  "var(--color-chart-9)",
+  "var(--color-chart-10)",
 ];
 
 export function CompletedTasksChart({
@@ -131,12 +136,24 @@ export function CompletedTasksChart({
       </Card>
     );
   }
+  // Sort sprint data by sprint number
+  const sortedChartData = [...chartData].sort((a, b) => {
+    // Extract sprint numbers using regex
+    const aMatch = a.sprint.match(/Sprint\s+(\d+)/i);
+    const bMatch = b.sprint.match(/Sprint\s+(\d+)/i);
+
+    const aNum = aMatch ? parseInt(aMatch[1], 10) : 0;
+    const bNum = bMatch ? parseInt(bMatch[1], 10) : 0;
+
+    return aNum - bNum;
+  });
+
   // Create config for ChartContainer
   const chartConfig = memberNames.reduce(
     (config, member, index) => {
       config[member] = {
         label: member,
-        color: `hsl(var(--chart-${(index % 5) + 1}))`,
+        color: `hsl(var(--chart-${(index % 10) + 1}))`,
       };
       return config;
     },
@@ -153,7 +170,7 @@ export function CompletedTasksChart({
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={chartData}
+                data={sortedChartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
