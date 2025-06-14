@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Terraform Variables
-export TF_VAR_ociTenancyOcid="ocid1.tenancy.oc1..aaaaaaaan7jtdvh7y4rmm4kw67gkkottukneixg2v4gutcexypdszr62vdiq"
-export TF_VAR_ociUserOcid="ocid1.user.oc1..aaaaaaaaaefwdtlobyok26cptkvvvxolerny7ml3xfkwzwketqkibupoznqq"
-export TF_VAR_ociCompartmentOcid="ocid1.compartment.oc1..aaaaaaaalfq7lr6xf2malitokbw7gwlhhqg2fqpeyi6oz62s3q3tdagjavdq"
+export TF_VAR_ociTenancyOcid="ocid1.tenancy.oc1.."
+export TF_VAR_ociUserOcid="ocid1.user.oc1.."
+export TF_VAR_ociCompartmentOcid="ocid1.compartment.oc1.."
 export TF_VAR_ociRegionIdentifier="mx-queretaro-1"
 export TF_VAR_mtdrDbName="MTDRDB"
 export TF_VAR_runName="name"
