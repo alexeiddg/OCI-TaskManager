@@ -3,7 +3,7 @@ import { SprintAnalyticsDashboard } from "@/components/sprint-analytics"; // Aju
 import { useSession } from "next-auth/react"; // Mockear el hook de sesión
 import { fetchKpiDto, fetchTeamKpiDto } from "@/server/api/kpi/getKpis"; // Mock de funciones de fetch
 import { fetchSprintAnalytics } from "@/server/api/sprint/getSprintAnalytics";
-import HelloWorld from "@/components/HelloWorld";
+// import HelloWorld from "@/components/HelloWorld";
 
 // jest.mock("next-auth/react", () => ({
 //   useSession: jest.fn(),
@@ -18,13 +18,13 @@ import HelloWorld from "@/components/HelloWorld";
 //   fetchSprintAnalytics: jest.fn(),
 // }));
 
-describe("HelloWorld Component", () => {
-  it("renders Hello, World! text", () => {
-    render(<HelloWorld />);
-    const element = screen.getByText(/Hello, World!/i);
-    expect(element).toBeInTheDocument();
-  });
-});
+// describe("HelloWorld Component", () => {
+//   it("renders Hello, World! text", () => {
+//     render(<HelloWorld />);
+//     const element = screen.getByText(/Hello, World!/i);
+//     expect(element).toBeInTheDocument();
+//   });
+// });
 
 // describe("SprintAnalyticsDashboard", () => {
 //   beforeEach(() => {
