@@ -15,11 +15,11 @@ echo "🐳 Building Telegram Docker image..."
 cd telegram
 docker build --platform=linux/amd64 \
   -f Dockerfile \
-  -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest \
+  -t {registry}/{namespace}/{repository}:{tag} \
   .
 
 echo "🚀 Pushing Telegram image to OCIR..."
-docker push mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-telegram:latest
+docker push {registry}/{namespace}/{repository}:{tag}
 cd ..
 
 # Step 2: Build & push Web Docker image
@@ -27,11 +27,11 @@ echo "🐳 Building Web Docker image..."
 cd web
 docker build --platform=linux/amd64 \
   -f Dockerfile \
-  -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest \
+  -t {registry}/{namespace}/{repository}:{tag} \
   .
 
 echo "🚀 Pushing Web image to OCIR..."
-docker push mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-web:latest
+docker push {registry}/{namespace}/{repository}:{tag}
 cd ..
 
 # Step 3: Build & push Frontend Docker image
@@ -39,11 +39,11 @@ echo "🐳 Building Frontend Docker image..."
 cd frontend
 docker build --platform=linux/amd64 \
   -f Dockerfile \
-  -t mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-front:latest \
+  -t {registry}/{namespace}/{repository}:{tag} \
   .
 
 echo "🚀 Pushing Frontend image to OCIR..."
-docker push mx-queretaro-1.ocir.io/ax83el69bkfn/mtdr-ocir-front:latest
+docker push {registry}/{namespace}/{repository}:{tag}
 cd ..
 
 # Step 4: Cleanup Docker system
